@@ -2,19 +2,37 @@ import "@/global.css";
 
 import { PortalHost } from "@rn-primitives/portal";
 import { Stack } from "expo-router";
-import { ThemeProvider } from "expo-router/react-navigation";
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "expo-router/react-navigation";
 import { StatusBar } from "expo-status-bar";
 import { useUniwind } from "uniwind";
-import { useNavigationTheme } from "@/features/theme/useNavigationTheme";
+import { authClient } from "@/features/auth/client/authClient";
+import { SessionLoading } from "@/features/auth/components/sessionLoading";
 
 export default function RootLayout() {
   const { theme } = useUniwind();
-  const navigationTheme = useNavigationTheme();
+  const { data: session, isPending } = authClient.useSession();
+  const signedIn = Boolean(session);
 
   return (
-    <ThemeProvider value={navigationTheme}>
+    <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
       <StatusBar style={theme === "dark" ? "light" : "dark"} />
-      <Stack />
+      {isPending ? (
+        <SessionLoading />
+      ) : (
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Protected guard={signedIn}>
+            <Stack.Screen name="index" />
+          </Stack.Protected>
+          <Stack.Protected guard={!signedIn}>
+            <Stack.Screen name="sign-in" />
+            <Stack.Screen name="sign-up" />
+          </Stack.Protected>
+        </Stack>
+      )}
       <PortalHost />
     </ThemeProvider>
   );

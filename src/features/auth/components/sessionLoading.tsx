@@ -1,5 +1,5 @@
-import { authCopy } from "../copy/authCopy";
 import { ActivityIndicator, View } from "react-native";
+import { authCopy } from "../copy/authCopy";
 
 export function SessionLoading() {
   return (
