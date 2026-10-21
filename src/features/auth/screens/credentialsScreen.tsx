@@ -1,3 +1,4 @@
+import { type AuthResponse, useCredentialsForm } from "@getahoy/lib";
 import { type Href, Link } from "expo-router";
 import type { z } from "zod";
 import { Text } from "@/components/ui/text";
@@ -5,8 +6,6 @@ import { AuthScreenLayout } from "../components/authScreenLayout";
 import { CredentialsForm } from "../components/credentialsForm";
 import { SocialSignInButtons } from "../components/socialSignInButtons";
 import type { CredentialField } from "../forms/credentialFields";
-import type { AuthResponse } from "../hooks/useAuthRequest";
-import { useCredentialsForm } from "../hooks/useCredentialsForm";
 import { useSocialSignIn } from "../hooks/useSocialSignIn";
 
 type CredentialsScreenProps<Input extends Record<string, string>> = {

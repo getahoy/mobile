@@ -1,7 +1,7 @@
+import { authCopy } from "@getahoy/lib";
 import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import { authCopy } from "../copy/authCopy";
 import { useSignOut } from "../hooks/useSignOut";
 import { FormError } from "./formError";
 

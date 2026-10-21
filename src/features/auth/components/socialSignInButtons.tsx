@@ -1,10 +1,7 @@
+import { type SocialProviderId, socialProviderCatalog } from "@getahoy/lib";
 import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import {
-  type SocialProviderId,
-  socialProviderCatalog,
-} from "../providers/socialProviderCatalog";
 
 type SocialSignInButtonsProps = {
   pending: boolean;

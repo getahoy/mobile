@@ -1,7 +1,5 @@
+import { authCopy, type SocialProviderId, useAuthRequest } from "@getahoy/lib";
 import { authClient } from "../client/authClient";
-import { authCopy } from "../copy/authCopy";
-import type { SocialProviderId } from "../providers/socialProviderCatalog";
-import { useAuthRequest } from "./useAuthRequest";
 
 export function useSocialSignIn() {
   const { pending, errorMessage, submit, showError } = useAuthRequest();
