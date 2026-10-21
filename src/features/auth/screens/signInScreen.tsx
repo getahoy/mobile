@@ -1,36 +1,19 @@
-import { Link } from "expo-router";
-import { Text } from "@/components/ui/text";
-import { signInWithEmail } from "../client/authActions";
-import { AuthScreenLayout } from "../components/authScreenLayout";
-import { CredentialsForm } from "../components/credentialsForm";
+import { authClient } from "../client/authClient";
 import { authCopy } from "../copy/authCopy";
 import { signInFields } from "../forms/credentialFields";
-import { useAuthNavigation } from "../hooks/useAuthNavigation";
-import { useCredentialsSignIn } from "../hooks/useCredentialsSignIn";
+import { signInSchema } from "../forms/credentialsSchema";
+import { CredentialsScreen } from "./credentialsScreen";
 
 export function SignInScreen() {
-  const navigation = useAuthNavigation();
-  const credentials = useCredentialsSignIn({
-    signIn: signInWithEmail,
-    onSuccess: navigation.goToAccount,
-  });
-
   return (
-    <AuthScreenLayout title={authCopy["signIn.title"]}>
-      <CredentialsForm
-        fields={signInFields}
-        values={credentials.values}
-        submitLabel={authCopy["signIn.submit"]}
-        pending={credentials.pending}
-        errorMessage={credentials.errorMessage}
-        onChange={credentials.setField}
-        onSubmit={credentials.submit}
-      />
-      <Link href="/sign-up" replace>
-        <Text className="text-primary text-sm">
-          {authCopy["signIn.switch"]}
-        </Text>
-      </Link>
-    </AuthScreenLayout>
+    <CredentialsScreen
+      title={authCopy["signIn.title"]}
+      submitLabel={authCopy["signIn.submit"]}
+      fields={signInFields}
+      schema={signInSchema}
+      request={(input) => authClient.signIn.email(input)}
+      switchHref="/sign-up"
+      switchLabel={authCopy["signIn.switch"]}
+    />
   );
 }

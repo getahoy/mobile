@@ -1,14 +1,10 @@
-import { type AuthResponse, useAuthRequest } from "./useAuthRequest";
+import { authClient } from "../client/authClient";
+import { useAuthRequest } from "./useAuthRequest";
 
-export type UseSignOutOptions = {
-  signOut: () => Promise<AuthResponse>;
-  onSuccess: () => void;
-};
-
-export function useSignOut({ signOut, onSuccess }: UseSignOutOptions) {
+export function useSignOut(onSuccess?: () => void) {
   const { pending, errorMessage, submit } = useAuthRequest();
 
-  const submitSignOut = () => submit(signOut, onSuccess);
+  const signOut = () => submit(() => authClient.signOut(), onSuccess);
 
-  return { pending, errorMessage, submit: submitSignOut };
+  return { pending, errorMessage, signOut };
 }

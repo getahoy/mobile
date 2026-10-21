@@ -1,6 +1,5 @@
 import { authCopy } from "../copy/authCopy";
-import type { SignInFieldName } from "../hooks/useCredentialsSignIn";
-import type { SignUpFieldName } from "../hooks/useCredentialsSignUp";
+import type { SignInInput, SignUpInput } from "./credentialsSchema";
 
 export type CredentialField<Name extends string> = {
   name: Name;
@@ -29,7 +28,7 @@ const emailField: CredentialField<"email"> = {
   secureTextEntry: false,
 };
 
-export const signInFields: readonly CredentialField<SignInFieldName>[] = [
+export const signInFields: readonly CredentialField<keyof SignInInput>[] = [
   emailField,
   {
     name: "password",
@@ -41,7 +40,7 @@ export const signInFields: readonly CredentialField<SignInFieldName>[] = [
   },
 ];
 
-export const signUpFields: readonly CredentialField<SignUpFieldName>[] = [
+export const signUpFields: readonly CredentialField<keyof SignUpInput>[] = [
   nameField,
   emailField,
   {

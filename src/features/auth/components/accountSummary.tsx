@@ -1,6 +1,6 @@
-import { authCopy } from "../copy/authCopy";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
+import { authCopy } from "../copy/authCopy";
 
 type AccountSummaryProps = {
   name: string;
