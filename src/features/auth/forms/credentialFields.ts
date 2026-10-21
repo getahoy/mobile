@@ -1,8 +1,6 @@
-import {
-  authCopy,
-  type SignInFieldName,
-  type SignUpFieldName,
-} from "@getahoy/auth";
+import { authCopy } from "../copy/authCopy";
+import type { SignInFieldName } from "../hooks/useCredentialsSignIn";
+import type { SignUpFieldName } from "../hooks/useCredentialsSignUp";
 
 export type CredentialField<Name extends string> = {
   name: Name;

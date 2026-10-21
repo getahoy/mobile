@@ -1,9 +1,9 @@
-import { authCopy } from "@getahoy/auth";
 import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
+import { authCopy } from "../copy/authCopy";
 import type { CredentialField } from "../forms/credentialFields";
 import { FormError } from "./formError";
 

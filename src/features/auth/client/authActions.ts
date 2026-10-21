@@ -1,4 +1,4 @@
-import type { SignInInput, SignUpInput } from "@getahoy/auth";
+import type { SignInInput, SignUpInput } from "../forms/credentialsSchema";
 import { authClient } from "./authClient";
 
 export const signInWithEmail = (input: SignInInput) =>

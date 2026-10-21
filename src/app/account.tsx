@@ -1,4 +1,4 @@
-import { authCopy } from "@getahoy/auth";
+import { authCopy } from "@/features/auth/copy/authCopy";
 import { Redirect } from "expo-router";
 import { authClient } from "@/features/auth/client/authClient";
 import { AuthScreenLayout } from "@/features/auth/components/authScreenLayout";

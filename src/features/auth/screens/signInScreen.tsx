@@ -1,11 +1,12 @@
-import { authCopy, useCredentialsSignIn } from "@getahoy/auth";
 import { Link } from "expo-router";
 import { Text } from "@/components/ui/text";
 import { signInWithEmail } from "../client/authActions";
 import { AuthScreenLayout } from "../components/authScreenLayout";
 import { CredentialsForm } from "../components/credentialsForm";
+import { authCopy } from "../copy/authCopy";
 import { signInFields } from "../forms/credentialFields";
 import { useAuthNavigation } from "../hooks/useAuthNavigation";
+import { useCredentialsSignIn } from "../hooks/useCredentialsSignIn";
 
 export function SignInScreen() {
   const navigation = useAuthNavigation();

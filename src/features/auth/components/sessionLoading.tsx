@@ -1,4 +1,4 @@
-import { authCopy } from "@getahoy/auth";
+import { authCopy } from "../copy/authCopy";
 import { ActivityIndicator, View } from "react-native";
 
 export function SessionLoading() {

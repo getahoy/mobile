@@ -1,9 +1,10 @@
-import { authCopy, useSignOut } from "@getahoy/auth";
 import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { signOut } from "../client/authActions";
+import { authCopy } from "../copy/authCopy";
 import { useAuthNavigation } from "../hooks/useAuthNavigation";
+import { useSignOut } from "../hooks/useSignOut";
 import { FormError } from "./formError";
 
 export function SignOutButton() {
