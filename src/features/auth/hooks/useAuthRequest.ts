@@ -1,30 +1,22 @@
 import { useState, useTransition } from "react";
-import { type AuthError, toErrorCode } from "../errors/authErrorCode";
-import { authErrorMessage } from "../errors/authErrorMessage";
+import { type AuthError, authErrorMessage } from "../errors/authErrorMessage";
 
 export type AuthResponse = { error: AuthError | null };
 
-export type AuthRequest = () => Promise<AuthResponse>;
-
-const NETWORK_FAILURE: AuthError = { status: 0 };
-
-async function runSafely(request: AuthRequest): Promise<AuthResponse> {
-  try {
-    return await request();
-  } catch {
-    return { error: NETWORK_FAILURE };
-  }
-}
+const NETWORK_FAILURE: AuthResponse = { error: { status: 0 } };
 
 export function useAuthRequest() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const submit = (request: AuthRequest, onSuccess?: () => void) =>
+  const submit = (
+    request: () => Promise<AuthResponse>,
+    onSuccess?: () => void,
+  ) =>
     startTransition(async () => {
       setErrorMessage(null);
-      const { error } = await runSafely(request);
-      if (error) return setErrorMessage(authErrorMessage(toErrorCode(error)));
+      const { error } = await request().catch(() => NETWORK_FAILURE);
+      if (error) return setErrorMessage(authErrorMessage(error));
       onSuccess?.();
     });
 
