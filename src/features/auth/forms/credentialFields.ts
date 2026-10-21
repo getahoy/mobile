@@ -1,5 +1,5 @@
+import type { SignInInput, SignUpInput } from "@getahoy/lib";
 import { authCopy } from "../copy/authCopy";
-import type { SignInInput, SignUpInput } from "./credentialsSchema";
 
 export type CredentialField<Name extends string> = {
   name: Name;
