@@ -13,12 +13,15 @@ export const authCopy = {
   "field.name": "Name",
   "field.email": "Email",
   "field.password": "Password",
+  "social.google": "Continue with Google",
   "validation.name": "Enter your name",
   "validation.email": "Enter a valid email address",
   "validation.password": "Enter your password",
   "validation.passwordMinLength": "Use at least {minimum} characters",
   "validation.passwordMaxLength": "Use at most {maximum} characters",
-  "error.unauthorized": "Email or password is incorrect.",
+  "error.unauthorized":
+    "Email or password is incorrect. New here? Create an account.",
   "error.conflict": "An account with this email already exists.",
   "error.forbidden": "Verify your email before signing in.",
+  "error.social": "Google sign in did not finish. Try again.",
 } as const;

@@ -42,6 +42,7 @@ const config: ExpoConfig = {
       },
     ],
     "expo-secure-store",
+    "expo-web-browser",
   ],
   experiments: {
     typedRoutes: true,
