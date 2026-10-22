@@ -40,6 +40,8 @@ export function CredentialsForm<Name extends string>({
             keyboardType={field.keyboardType}
             secureTextEntry={field.secureTextEntry}
             autoCapitalize="none"
+            autoCorrect={false}
+            spellCheck={false}
             editable={!pending}
           />
         </View>
