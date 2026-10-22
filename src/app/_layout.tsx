@@ -12,6 +12,8 @@ import { useUniwind } from "uniwind";
 import { authClient } from "@/features/auth/client/authClient";
 import { SessionLoading } from "@/features/auth/components/sessionLoading";
 
+export { ErrorFallback as ErrorBoundary } from "@/features/errors/components/errorFallback";
+
 export default function RootLayout() {
   const { theme } = useUniwind();
   const { data: session, isPending } = authClient.useSession();
