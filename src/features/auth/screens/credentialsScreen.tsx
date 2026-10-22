@@ -1,4 +1,8 @@
-import { type AuthResponse, useCredentialsForm } from "@getahoy/lib";
+import {
+  type AuthResponse,
+  useAuthRequest,
+  useCredentialsForm,
+} from "@getahoy/lib";
 import { type Href, Link } from "expo-router";
 import type { z } from "zod";
 import { Text } from "@/components/ui/text";
@@ -21,9 +25,14 @@ type CredentialsScreenProps<Input extends Record<string, string>> = {
 export function CredentialsScreen<Input extends Record<string, string>>(
   props: CredentialsScreenProps<Input>,
 ) {
-  const credentials = useCredentialsForm(props.schema, props.request);
-  const social = useSocialSignIn();
-  const pending = credentials.pending || social.pending;
+  const authRequest = useAuthRequest();
+  const credentials = useCredentialsForm({
+    schema: props.schema,
+    request: props.request,
+    authRequest,
+  });
+  const social = useSocialSignIn(authRequest);
+  const { pending } = authRequest;
 
   return (
     <AuthScreenLayout title={props.title}>
@@ -32,7 +41,7 @@ export function CredentialsScreen<Input extends Record<string, string>>(
         values={credentials.values}
         submitLabel={props.submitLabel}
         pending={pending}
-        errorMessage={credentials.errorMessage ?? social.errorMessage}
+        errorMessage={authRequest.errorMessage}
         onChange={credentials.setField}
         onSubmit={credentials.submit}
       />

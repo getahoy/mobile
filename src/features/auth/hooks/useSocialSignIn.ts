@@ -1,16 +1,20 @@
-import { authCopy, type SocialProviderId, useAuthRequest } from "@getahoy/lib";
+import {
+  type AuthRequestState,
+  authCopy,
+  type SocialProviderId,
+} from "@getahoy/lib";
 import { authClient } from "../client/authClient";
 
-export function useSocialSignIn() {
-  const { pending, errorMessage, submit, showError } = useAuthRequest();
-
+export function useSocialSignIn(authRequest: AuthRequestState) {
   const showErrorIfSignedOut = async () => {
-    const { data } = await authClient.getSession();
-    if (!data) showError(authCopy["error.social"]);
+    const { data } = await authClient
+      .getSession()
+      .catch(() => ({ data: null }));
+    if (!data) authRequest.showError(authCopy["error.social"]);
   };
 
   const signInWith = (provider: SocialProviderId) =>
-    submit(
+    authRequest.submit(
       () =>
         authClient.signIn.social({
           provider,
@@ -20,5 +24,5 @@ export function useSocialSignIn() {
       showErrorIfSignedOut,
     );
 
-  return { pending, errorMessage, signInWith };
+  return { signInWith };
 }
