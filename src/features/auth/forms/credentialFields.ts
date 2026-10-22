@@ -1,4 +1,8 @@
-import { authCopy, type SignInInput, type SignUpInput } from "@getahoy/lib";
+import {
+  credentialFields,
+  type SignInInput,
+  type SignUpInput,
+} from "@getahoy/lib";
 
 export type CredentialField<Name extends string> = {
   name: Name;
@@ -9,45 +13,32 @@ export type CredentialField<Name extends string> = {
   secureTextEntry: boolean;
 };
 
-const nameField: CredentialField<"name"> = {
-  name: "name",
-  label: authCopy["field.name"],
-  autoComplete: "name",
-  textContentType: "name",
+const textInput = { keyboardType: "default", secureTextEntry: false } as const;
+const passwordInput = {
   keyboardType: "default",
-  secureTextEntry: false,
-};
-
-const emailField: CredentialField<"email"> = {
-  name: "email",
-  label: authCopy["field.email"],
-  autoComplete: "email",
+  secureTextEntry: true,
+} as const;
+const emailInput = {
   textContentType: "emailAddress",
   keyboardType: "email-address",
   secureTextEntry: false,
-};
+} as const;
 
 export const signInFields: readonly CredentialField<keyof SignInInput>[] = [
-  emailField,
+  { ...credentialFields.email, ...emailInput },
   {
-    name: "password",
-    label: authCopy["field.password"],
-    autoComplete: "current-password",
+    ...credentialFields.currentPassword,
+    ...passwordInput,
     textContentType: "password",
-    keyboardType: "default",
-    secureTextEntry: true,
   },
 ];
 
 export const signUpFields: readonly CredentialField<keyof SignUpInput>[] = [
-  nameField,
-  emailField,
+  { ...credentialFields.name, ...textInput, textContentType: "name" },
+  { ...credentialFields.email, ...emailInput },
   {
-    name: "password",
-    label: authCopy["field.password"],
-    autoComplete: "new-password",
+    ...credentialFields.newPassword,
+    ...passwordInput,
     textContentType: "newPassword",
-    keyboardType: "default",
-    secureTextEntry: true,
   },
 ];
