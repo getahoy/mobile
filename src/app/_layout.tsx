@@ -1,3 +1,4 @@
+import "@/features/pairing/crypto/randomValues";
 import "@/global.css";
 
 import { PortalHost } from "@rn-primitives/portal";
@@ -28,6 +29,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Protected guard={signedIn}>
             <Stack.Screen name="index" />
+            <Stack.Screen name="pair" />
           </Stack.Protected>
           <Stack.Protected guard={!signedIn}>
             <Stack.Screen name="sign-in" />
