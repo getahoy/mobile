@@ -43,6 +43,15 @@ const config: ExpoConfig = {
     ],
     "expo-secure-store",
     "expo-web-browser",
+    [
+      "expo-camera",
+      {
+        cameraPermission:
+          "Ahoy uses the camera to scan the pairing code on your Mac.",
+        recordAudioAndroid: false,
+        barcodeScannerEnabled: true,
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,
