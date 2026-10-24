@@ -4,6 +4,7 @@
   "main": "expo-router/entry",
   "dependencies": {
     "@better-auth/expo": "1.7.11",
+    "@expo/vector-icons": "^15.1.1",
     "@getahoy/crypto": "file:../shared/packages/crypto",
     "@getahoy/lib": "file:../shared/packages/lib",
     "@getahoy/protocol": "file:../shared/packages/protocol",

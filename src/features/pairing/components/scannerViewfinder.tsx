@@ -1,0 +1,34 @@
+import { View } from "react-native";
+import { Text } from "@/components/ui/text";
+
+type ScannerViewfinderProps = { hint: string };
+
+const corners = [
+  "top-0 left-0 rounded-tl-2xl border-t-4 border-l-4",
+  "top-0 right-0 rounded-tr-2xl border-t-4 border-r-4",
+  "bottom-0 left-0 rounded-bl-2xl border-b-4 border-l-4",
+  "right-0 bottom-0 rounded-br-2xl border-r-4 border-b-4",
+];
+
+export function ScannerViewfinder({ hint }: ScannerViewfinderProps) {
+  return (
+    <View className="absolute inset-0" pointerEvents="none">
+      <View className="flex-1 bg-scrim" />
+      <View className="flex-row">
+        <View className="flex-1 bg-scrim" />
+        <View className="size-viewfinder">
+          {corners.map((placement) => (
+            <View
+              key={placement}
+              className={`absolute size-10 border-on-scrim ${placement}`}
+            />
+          ))}
+        </View>
+        <View className="flex-1 bg-scrim" />
+      </View>
+      <View className="flex-1 items-center bg-scrim px-10 pt-8">
+        <Text className="text-center text-on-scrim">{hint}</Text>
+      </View>
+    </View>
+  );
+}

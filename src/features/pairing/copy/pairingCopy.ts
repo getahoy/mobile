@@ -2,11 +2,13 @@ export const pairingCopy = {
   "home.title": "Your Mac",
   "home.empty": "No Mac paired yet.",
   "home.pair": "Pair a Mac",
+  "home.pairAnother": "Pair another Mac",
   "home.loading": "Loading your Macs…",
-  "pair.title": "Pair your Mac",
-  "pair.instructions":
-    "On your Mac, open Ahoy from the menubar and scan the code it shows.",
-  "pair.cancel": "Cancel",
+  "scanner.title": "Scan to pair",
+  "scanner.hint":
+    "Point your camera at the QR code on your Mac. Open Ahoy from the Mac menubar to show it.",
+  "scanner.close": "Close",
+  "scanner.torch": "Torch",
   "pair.claiming": "Pairing with your Mac…",
   "pair.scanAgain": "Scan again",
   "camera.loading": "Checking camera access…",
@@ -24,12 +26,18 @@ export const pairingCopy = {
   "link.connecting": "Connecting…",
   "link.connected": "Connected, encrypted",
   "link.cellular":
-    "You are on mobile data. Join the same Wi-Fi as your Mac to connect.",
+    "You are on mobile data. Join the same Wi-Fi as your Mac and Ahoy connects on its own.",
   "link.notFound":
-    "Not found on this Wi-Fi. Make sure Ahoy is on, the Mac is awake, and Ahoy has Local Network access in Settings.",
+    "Not found on this Wi-Fi. Ahoy keeps trying. Check that Ahoy is running on the Mac and has Local Network access on this phone.",
   "link.macTooOld": "Update the Ahoy app on your Mac to connect.",
   "link.macTooNew": "Update this app to connect to your Mac.",
-  "link.rejected":
-    "Your Mac did not accept this phone. Pair again from the Mac.",
+  "link.rejected": "This Mac no longer trusts this phone.",
   "link.retry": "Try again",
+  "link.pairAgain": "Pair again",
+  "link.remove": "Remove",
+  "remove.title": "Remove",
+  "remove.body":
+    "This phone forgets the Mac and the link is removed from your account. Scan its code again to reconnect.",
+  "remove.cancel": "Cancel",
+  "remove.confirm": "Remove",
 } as const;

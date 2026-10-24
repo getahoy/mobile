@@ -9,7 +9,8 @@ import {
   ThemeProvider,
 } from "expo-router/react-navigation";
 import { StatusBar } from "expo-status-bar";
-import { useUniwind } from "uniwind";
+import { SafeAreaListener } from "react-native-safe-area-context";
+import { Uniwind, useUniwind } from "uniwind";
 import { authClient } from "@/features/auth/client/authClient";
 import { SessionLoading } from "@/features/auth/components/sessionLoading";
 
@@ -21,23 +22,28 @@ export default function RootLayout() {
   const signedIn = Boolean(session);
 
   return (
-    <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
-      <StatusBar style={theme === "dark" ? "light" : "dark"} />
-      {isPending ? (
-        <SessionLoading />
-      ) : (
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Protected guard={signedIn}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="pair" />
-          </Stack.Protected>
-          <Stack.Protected guard={!signedIn}>
-            <Stack.Screen name="sign-in" />
-            <Stack.Screen name="sign-up" />
-          </Stack.Protected>
-        </Stack>
-      )}
-      <PortalHost />
-    </ThemeProvider>
+    <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
+      <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
+        <StatusBar style={theme === "dark" ? "light" : "dark"} />
+        {isPending ? (
+          <SessionLoading />
+        ) : (
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Protected guard={signedIn}>
+              <Stack.Screen name="index" />
+              <Stack.Screen
+                name="pair"
+                options={{ presentation: "fullScreenModal" }}
+              />
+            </Stack.Protected>
+            <Stack.Protected guard={!signedIn}>
+              <Stack.Screen name="sign-in" />
+              <Stack.Screen name="sign-up" />
+            </Stack.Protected>
+          </Stack>
+        )}
+        <PortalHost />
+      </ThemeProvider>
+    </SafeAreaListener>
   );
 }

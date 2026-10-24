@@ -10,7 +10,7 @@ const UNEXPECTED_FAILURE: ClaimOutcome = {
   message: errorMessages.internal,
 };
 
-type ClaimState =
+export type ClaimState =
   | { kind: "scanning" }
   | { kind: "claiming" }
   | { kind: "failed"; message: string };
