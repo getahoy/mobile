@@ -7,28 +7,39 @@ import { usePairedMacs } from "../hooks/usePairedMacs";
 import { PairedMacItem } from "./pairedMacItem";
 
 export function PairedMacsSection() {
-  const macs = usePairedMacs();
+  const { macs, reload } = usePairedMacs();
+  const openScanner = () => router.push("/pair");
 
+  if (macs === null) {
+    return (
+      <ActivityIndicator
+        accessibilityLabel={pairingCopy["home.loading"]}
+        colorClassName="accent-muted-foreground"
+      />
+    );
+  }
   return (
     <View className="gap-3">
       <Text variant="large">{pairingCopy["home.title"]}</Text>
-      {macs === null ? (
-        <ActivityIndicator
-          accessibilityLabel={pairingCopy["home.loading"]}
-          colorClassName="accent-muted-foreground"
-        />
-      ) : null}
-      {macs?.length === 0 ? (
-        <Text className="text-muted-foreground">
-          {pairingCopy["home.empty"]}
-        </Text>
-      ) : null}
-      {macs?.map((mac) => (
-        <PairedMacItem key={mac.publicKey} mac={mac} />
-      ))}
-      <Button variant="outline" onPress={() => router.push("/pair")}>
-        <Text>{pairingCopy["home.pair"]}</Text>
-      </Button>
+      {macs.length === 0 ? (
+        <>
+          <Text className="text-muted-foreground">
+            {pairingCopy["home.empty"]}
+          </Text>
+          <Button onPress={openScanner}>
+            <Text>{pairingCopy["home.pair"]}</Text>
+          </Button>
+        </>
+      ) : (
+        <>
+          {macs.map((mac) => (
+            <PairedMacItem key={mac.publicKey} mac={mac} onRemoved={reload} />
+          ))}
+          <Button variant="link" onPress={openScanner}>
+            <Text>{pairingCopy["home.pairAnother"]}</Text>
+          </Button>
+        </>
+      )}
     </View>
   );
 }

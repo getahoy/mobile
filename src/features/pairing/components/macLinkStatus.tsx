@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { pairingCopy } from "../copy/pairingCopy";
@@ -8,7 +8,11 @@ type MacLinkStatusProps = {
   macName: string;
   state: MacLinkState;
   onRetry: () => void;
+  onPairAgain: () => void;
+  onRemove: () => void;
 };
+
+type LinkAction = { label: string; onPress: () => void } | null;
 
 function statusLine(state: MacLinkState): string {
   switch (state.kind) {
@@ -31,22 +35,47 @@ function statusLine(state: MacLinkState): string {
   }
 }
 
-export function MacLinkStatus({ macName, state, onRetry }: MacLinkStatusProps) {
-  const settled = state.kind !== "connecting" && state.kind !== "connected";
+function linkAction(props: MacLinkStatusProps): LinkAction {
+  const { kind } = props.state;
+  if (kind === "unreachable") {
+    return { label: pairingCopy["link.retry"], onPress: props.onRetry };
+  }
+  if (kind === "rejected") {
+    return { label: pairingCopy["link.pairAgain"], onPress: props.onPairAgain };
+  }
+  return null;
+}
+
+export function MacLinkStatus(props: MacLinkStatusProps) {
+  const action = linkAction(props);
   return (
-    <View className="gap-2 rounded-lg border border-border p-4">
-      <Text className="font-medium">{macName}</Text>
+    <View className="gap-3 rounded-xl border border-border p-4">
+      <View className="flex-row items-center justify-between gap-3">
+        <Text className="flex-1 font-medium">{props.macName}</Text>
+        {props.state.kind === "connecting" ? (
+          <ActivityIndicator colorClassName="accent-muted-foreground" />
+        ) : null}
+      </View>
       <Text
         accessibilityLiveRegion="polite"
         className="text-muted-foreground text-sm"
       >
-        {statusLine(state)}
+        {statusLine(props.state)}
       </Text>
-      {settled ? (
-        <Button variant="outline" onPress={onRetry}>
-          <Text>{pairingCopy["link.retry"]}</Text>
+      {action ? (
+        <Button variant="outline" onPress={action.onPress}>
+          <Text>{action.label}</Text>
         </Button>
       ) : null}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="self-end"
+        accessibilityLabel={`${pairingCopy["link.remove"]} ${props.macName}`}
+        onPress={props.onRemove}
+      >
+        <Text className="text-destructive">{pairingCopy["link.remove"]}</Text>
+      </Button>
     </View>
   );
 }

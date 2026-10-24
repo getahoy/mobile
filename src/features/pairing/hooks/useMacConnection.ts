@@ -6,6 +6,8 @@ import type { FrameStream } from "../connection/frameStream";
 import { loadDeviceKeys } from "../storage/deviceKeys";
 import type { PairedMac } from "../storage/pairedMacs";
 
+const AUTO_RETRY_MS = 5000;
+
 export type MacLinkState =
   | { kind: "connecting" }
   | { kind: "connected" }
@@ -31,11 +33,10 @@ export function useMacConnection(mac: PairedMac) {
     stream.current = null;
   }, []);
 
-  const connect = useCallback(async () => {
+  const establish = useCallback(async () => {
     disconnect();
     const current = attempt.current;
     const isCurrent = () => current === attempt.current;
-    setState({ kind: "connecting" });
     const link = await loadDeviceKeys()
       .then((keys) => connectToMac(mac, keys))
       .catch((): MacLink => ({ outcome: "unreachable" }));
@@ -55,11 +56,16 @@ export function useMacConnection(mac: PairedMac) {
     else setState({ kind: link.outcome });
   }, [mac, disconnect]);
 
+  const connect = useCallback(() => {
+    setState({ kind: "connecting" });
+    void establish();
+  }, [establish]);
+
   useEffect(() => {
-    void connect();
+    connect();
     const subscription = AppState.addEventListener("change", (appState) => {
       if (appState === "background") disconnect();
-      if (appState === "active" && !stream.current) void connect();
+      if (appState === "active" && !stream.current) connect();
     });
     return () => {
       subscription.remove();
@@ -67,5 +73,20 @@ export function useMacConnection(mac: PairedMac) {
     };
   }, [connect, disconnect]);
 
-  return { state, retry: () => void connect() };
+  useRetryWhileUnreachable(state, establish);
+
+  return { state, retry: connect };
+}
+
+function useRetryWhileUnreachable(
+  state: MacLinkState,
+  establish: () => Promise<void>,
+) {
+  useEffect(() => {
+    if (state.kind !== "unreachable") return;
+    const timer = setTimeout(() => {
+      if (AppState.currentState === "active") void establish();
+    }, AUTO_RETRY_MS);
+    return () => clearTimeout(timer);
+  }, [state, establish]);
 }

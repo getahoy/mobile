@@ -27,10 +27,19 @@ export async function readPairedMacs(): Promise<PairedMac[]> {
   }
 }
 
-export async function savePairedMac(mac: PairedMac): Promise<void> {
-  const others = (await readPairedMacs()).filter(
-    (stored) => stored.publicKey !== mac.publicKey,
-  );
-  const list = [mac, ...others];
+async function macsWithout(publicKey: string): Promise<PairedMac[]> {
+  const stored = await readPairedMacs();
+  return stored.filter((mac) => mac.publicKey !== publicKey);
+}
+
+async function writePairedMacs(list: PairedMac[]): Promise<void> {
   await SecureStore.setItemAsync(PAIRED_MACS_ENTRY, JSON.stringify(list));
+}
+
+export async function savePairedMac(mac: PairedMac): Promise<void> {
+  await writePairedMacs([mac, ...(await macsWithout(mac.publicKey))]);
+}
+
+export async function removePairedMac(publicKey: string): Promise<void> {
+  await writePairedMacs(await macsWithout(publicKey));
 }
