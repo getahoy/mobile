@@ -5,6 +5,8 @@ import {
   claimScannedCode,
 } from "../enrollment/claimScannedCode";
 
+const PAIRED_CONFIRMATION_MS = 1000;
+
 const UNEXPECTED_FAILURE: ClaimOutcome = {
   kind: "failed",
   message: errorMessages.internal,
@@ -13,6 +15,7 @@ const UNEXPECTED_FAILURE: ClaimOutcome = {
 export type ClaimState =
   | { kind: "scanning" }
   | { kind: "claiming" }
+  | { kind: "paired"; macName: string }
   | { kind: "failed"; message: string };
 
 export function useClaimMac(onPaired: () => void) {
@@ -27,7 +30,8 @@ export function useClaimMac(onPaired: () => void) {
       () => UNEXPECTED_FAILURE,
     );
     if (outcome.kind === "paired") {
-      onPaired();
+      setState({ kind: "paired", macName: outcome.macName });
+      setTimeout(onPaired, PAIRED_CONFIRMATION_MS);
       return;
     }
     setState({ kind: "failed", message: outcome.message });

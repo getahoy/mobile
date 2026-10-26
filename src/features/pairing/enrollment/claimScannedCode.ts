@@ -49,6 +49,8 @@ export async function claimScannedCode(scanned: string): Promise<ClaimOutcome> {
     lastKnownAddresses: qr.lan?.hosts ?? [],
     lanPort: qr.lan?.port ?? null,
     pairedAt: Date.now(),
+    paused: false,
+    ended: null,
   });
   return { kind: "paired", macName: qr.name };
 }

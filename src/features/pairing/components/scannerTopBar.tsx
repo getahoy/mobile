@@ -1,7 +1,7 @@
 import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { pairingCopy } from "../copy/pairingCopy";
-import { ScannerIcon } from "./scannerIcon";
+import { Icon } from "./icon";
 
 type ScannerTopBarProps = {
   torchOn: boolean;
@@ -25,11 +25,7 @@ export function ScannerTopBar({
         onPress={onClose}
         className={roundButton}
       >
-        <ScannerIcon
-          name="close"
-          size={ICON_SIZE}
-          colorClassName="accent-on-scrim"
-        />
+        <Icon name="close" size={ICON_SIZE} colorClassName="accent-on-scrim" />
       </Pressable>
       <Text className="font-semibold text-on-scrim">
         {pairingCopy["scanner.title"]}
@@ -41,7 +37,7 @@ export function ScannerTopBar({
         onPress={onToggleTorch}
         className={roundButton}
       >
-        <ScannerIcon
+        <Icon
           name={torchOn ? "flashlight" : "flashlight-outline"}
           size={ICON_SIZE}
           colorClassName="accent-on-scrim"
