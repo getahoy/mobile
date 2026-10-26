@@ -4,6 +4,7 @@ import {
   type ClaimOutcome,
   claimScannedCode,
 } from "../enrollment/claimScannedCode";
+import { usePairedMacsChanges } from "./usePairedMacsChanges";
 
 const PAIRED_CONFIRMATION_MS = 1000;
 
@@ -21,6 +22,7 @@ export type ClaimState =
 export function useClaimMac(onPaired: () => void) {
   const [state, setState] = useState<ClaimState>({ kind: "scanning" });
   const busy = useRef(false);
+  const changes = usePairedMacsChanges();
 
   const claim = async (scanned: string) => {
     if (busy.current) return;
@@ -31,6 +33,7 @@ export function useClaimMac(onPaired: () => void) {
     );
     if (outcome.kind === "paired") {
       setState({ kind: "paired", macName: outcome.macName });
+      changes.announce();
       setTimeout(onPaired, PAIRED_CONFIRMATION_MS);
       return;
     }
