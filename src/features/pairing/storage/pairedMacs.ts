@@ -1,4 +1,4 @@
-import { bytes32Schema } from "@getahoy/protocol";
+import { bytes32Schema, endReasonSchema } from "@getahoy/protocol";
 import * as SecureStore from "expo-secure-store";
 import { z } from "zod";
 
@@ -10,6 +10,11 @@ const pairedMacSchema = z.object({
   lastKnownAddresses: z.array(z.string()),
   lanPort: z.int().nullable(),
   pairedAt: z.int(),
+  paused: z.boolean().default(false),
+  ended: z
+    .object({ reason: endReasonSchema, at: z.int() })
+    .nullable()
+    .default(null),
 });
 
 export type PairedMac = z.infer<typeof pairedMacSchema>;
@@ -27,19 +32,34 @@ export async function readPairedMacs(): Promise<PairedMac[]> {
   }
 }
 
+async function writePairedMacs(list: PairedMac[]): Promise<void> {
+  await SecureStore.setItemAsync(PAIRED_MACS_ENTRY, JSON.stringify(list));
+}
+
 async function macsWithout(publicKey: string): Promise<PairedMac[]> {
   const stored = await readPairedMacs();
   return stored.filter((mac) => mac.publicKey !== publicKey);
-}
-
-async function writePairedMacs(list: PairedMac[]): Promise<void> {
-  await SecureStore.setItemAsync(PAIRED_MACS_ENTRY, JSON.stringify(list));
 }
 
 export async function savePairedMac(mac: PairedMac): Promise<void> {
   await writePairedMacs([mac, ...(await macsWithout(mac.publicKey))]);
 }
 
+export async function updatePairedMac(
+  publicKey: string,
+  change: Partial<Pick<PairedMac, "paused" | "ended">>,
+): Promise<void> {
+  const stored = await readPairedMacs();
+  const updated = stored.map((mac) =>
+    mac.publicKey === publicKey ? { ...mac, ...change } : mac,
+  );
+  await writePairedMacs(updated);
+}
+
 export async function removePairedMac(publicKey: string): Promise<void> {
   await writePairedMacs(await macsWithout(publicKey));
+}
+
+export async function clearPairedMacs(): Promise<void> {
+  await SecureStore.deleteItemAsync(PAIRED_MACS_ENTRY);
 }

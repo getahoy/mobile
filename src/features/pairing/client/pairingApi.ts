@@ -3,31 +3,48 @@ import {
   type PairingClaimRequest,
   type PairingUnlinkRequest,
   pairingClaimSchema,
+  pairingLinksSchema,
   pairingUnlinkSchema,
 } from "@getahoy/protocol";
 import type { z } from "zod";
 import { publicEnv } from "@/env/publicEnv";
 import { authClient } from "@/features/auth/client/authClient";
 
-async function postWithSession<T>(
-  path: string,
-  body: unknown,
-  schema: z.ZodType<T>,
-) {
+type SessionCall<T> = {
+  url: URL;
+  schema: z.ZodType<T>;
+  body?: unknown;
+};
+
+async function withSession<T>({ url, schema, body }: SessionCall<T>) {
   const cookie = await authClient.getCookie();
+  const headers = { cookie };
+  if (body === undefined) {
+    return request({ url: url.toString(), headers, schema });
+  }
   return request({
-    url: new URL(path, publicEnv.EXPO_PUBLIC_API_URL).toString(),
+    url: url.toString(),
     method: "POST",
     body,
-    headers: { cookie },
+    headers,
     schema,
   });
 }
 
+const apiUrl = (path: string) => new URL(path, publicEnv.EXPO_PUBLIC_API_URL);
+
 export function claimPairing(body: PairingClaimRequest) {
-  return postWithSession("/api/pairing/claim", body, pairingClaimSchema);
+  const url = apiUrl("/api/pairing/claim");
+  return withSession({ url, body, schema: pairingClaimSchema });
 }
 
 export function unlinkPairing(body: PairingUnlinkRequest) {
-  return postWithSession("/api/pairing/unlink", body, pairingUnlinkSchema);
+  const url = apiUrl("/api/pairing/unlink");
+  return withSession({ url, body, schema: pairingUnlinkSchema });
+}
+
+export function listPairingLinks(device: string) {
+  const url = apiUrl("/api/pairing/links");
+  url.searchParams.set("device", device);
+  return withSession({ url, schema: pairingLinksSchema });
 }

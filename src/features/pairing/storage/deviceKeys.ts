@@ -25,6 +25,10 @@ function parseStored(text: string | null) {
   }
 }
 
+export async function clearDeviceKeys(): Promise<void> {
+  await SecureStore.deleteItemAsync(DEVICE_KEYS_ENTRY);
+}
+
 export async function loadDeviceKeys(): Promise<KeyPair> {
   const stored = parseStored(await SecureStore.getItemAsync(DEVICE_KEYS_ENTRY));
   if (stored) {
