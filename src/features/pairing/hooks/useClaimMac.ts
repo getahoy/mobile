@@ -1,9 +1,11 @@
 import { errorMessages } from "@getahoy/lib";
 import { useRef, useState } from "react";
+import { pairingCopy } from "../copy/pairingCopy";
 import {
   type ClaimOutcome,
   claimScannedCode,
 } from "../enrollment/claimScannedCode";
+import { finishPairing } from "../enrollment/finishPairing";
 import { usePairedMacsChanges } from "./usePairedMacsChanges";
 
 const PAIRED_CONFIRMATION_MS = 1000;
@@ -16,6 +18,7 @@ const UNEXPECTED_FAILURE: ClaimOutcome = {
 export type ClaimState =
   | { kind: "scanning" }
   | { kind: "claiming" }
+  | { kind: "finishing" }
   | { kind: "paired"; macName: string }
   | { kind: "failed"; message: string };
 
@@ -31,13 +34,19 @@ export function useClaimMac(onPaired: () => void) {
     const outcome = await claimScannedCode(scanned).catch(
       () => UNEXPECTED_FAILURE,
     );
-    if (outcome.kind === "paired") {
-      setState({ kind: "paired", macName: outcome.macName });
-      changes.announce();
-      setTimeout(onPaired, PAIRED_CONFIRMATION_MS);
+    if (outcome.kind === "failed") {
+      setState({ kind: "failed", message: outcome.message });
       return;
     }
-    setState({ kind: "failed", message: outcome.message });
+    setState({ kind: "finishing" });
+    const finished = await finishPairing(outcome.mac).catch(() => false);
+    if (!finished) {
+      setState({ kind: "failed", message: pairingCopy["pair.notFinished"] });
+      return;
+    }
+    setState({ kind: "paired", macName: outcome.mac.displayName });
+    changes.announce();
+    setTimeout(onPaired, PAIRED_CONFIRMATION_MS);
   };
 
   const scanAgain = () => {

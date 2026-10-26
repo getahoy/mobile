@@ -5,12 +5,12 @@ import { claimPairing } from "../client/pairingApi";
 import { pairingCopy } from "../copy/pairingCopy";
 import { phoneDescription } from "../device/phoneDescription";
 import { loadDeviceKeys } from "../storage/deviceKeys";
-import { savePairedMac } from "../storage/pairedMacs";
+import type { PairedMac } from "../storage/pairedMacs";
 
 const MS_PER_SECOND = 1000;
 
 export type ClaimOutcome =
-  | { kind: "paired"; macName: string }
+  | { kind: "claimed"; mac: PairedMac }
   | { kind: "failed"; message: string };
 
 function readQr(scanned: string): PairingQr | null {
@@ -43,7 +43,7 @@ export async function claimScannedCode(scanned: string): Promise<ClaimOutcome> {
   if (claimed.code === "error") {
     return { kind: "failed", message: requestErrorMessage(claimed.error) };
   }
-  await savePairedMac({
+  const mac: PairedMac = {
     publicKey: qr.pk,
     displayName: qr.name,
     lastKnownAddresses: qr.lan?.hosts ?? [],
@@ -51,6 +51,6 @@ export async function claimScannedCode(scanned: string): Promise<ClaimOutcome> {
     pairedAt: Date.now(),
     paused: false,
     ended: null,
-  });
-  return { kind: "paired", macName: qr.name };
+  };
+  return { kind: "claimed", mac };
 }

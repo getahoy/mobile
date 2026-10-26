@@ -5,6 +5,9 @@ export const pairingCopy = {
   "scanner.close": "Close",
   "scanner.torch": "Torch",
   "pair.claiming": "Pairing with your Mac…",
+  "pair.finishing": "Finishing pairing on your Mac…",
+  "pair.notFinished":
+    "Your Mac didn’t finish pairing. Check it’s online and try again.",
   "pair.scanAgain": "Scan again",
   "camera.loading": "Checking camera access…",
   "camera.needed":

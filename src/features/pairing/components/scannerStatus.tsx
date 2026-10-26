@@ -8,6 +8,11 @@ import { Icon } from "./icon";
 
 const CHECK_ICON_SIZE = 24;
 
+const progressCopy = {
+  claiming: "pair.claiming",
+  finishing: "pair.finishing",
+} as const;
+
 type ScannerStatusProps = {
   state: ClaimState;
   onScanAgain: () => void;
@@ -20,11 +25,14 @@ export function ScannerStatus({ state, onScanAgain }: ScannerStatusProps) {
     case "scanning":
       return null;
     case "claiming":
+    case "finishing":
       return (
         <View className="absolute inset-x-0 bottom-0 px-5 pb-safe-offset-5">
           <View className={`${card} flex-row items-center`}>
             <ActivityIndicator colorClassName="accent-muted-foreground" />
-            <Text>{pairingCopy["pair.claiming"]}</Text>
+            <Text accessibilityLiveRegion="polite">
+              {pairingCopy[progressCopy[state.kind]]}
+            </Text>
           </View>
         </View>
       );
