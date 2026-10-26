@@ -1,37 +1,32 @@
-import { encodeBytes } from "@getahoy/crypto";
 import { Alert } from "react-native";
-import { unlinkPairing } from "../client/pairingApi";
-import { pairingCopy } from "../copy/pairingCopy";
-import { loadDeviceKeys } from "../storage/deviceKeys";
+import type { MacConnection } from "../connection/macConnection";
+import { macCopy } from "../copy/macCopy";
 import { type PairedMac, removePairedMac } from "../storage/pairedMacs";
+import { flushPendingUnlinks, queueUnlink } from "../sync/linkSync";
 
-async function unpair(mac: PairedMac): Promise<void> {
-  const keys = await loadDeviceKeys().catch(() => null);
-  if (keys) {
-    await unlinkPairing({
-      devicePublicKey: encodeBytes(keys.publicKey),
-      peerPublicKey: mac.publicKey,
-    });
-  }
+async function unpair(mac: PairedMac, connection: MacConnection) {
+  connection.sayGoodbye("removed");
+  await queueUnlink(mac.publicKey, "removed");
   await removePairedMac(mac.publicKey);
+  await flushPendingUnlinks();
 }
 
-export function useUnpairMac(mac: PairedMac, onRemoved: () => void) {
+export function useUnpairMac(
+  mac: PairedMac,
+  connection: MacConnection,
+  onRemoved: () => void,
+) {
   const remove = () =>
-    void unpair(mac)
+    void unpair(mac, connection)
       .catch(() => undefined)
       .finally(onRemoved);
   return () =>
     Alert.alert(
-      `${pairingCopy["remove.title"]} ${mac.displayName}?`,
-      pairingCopy["remove.body"],
+      macCopy.removeTitle(mac.displayName),
+      macCopy.removeBody(mac.displayName),
       [
-        { text: pairingCopy["remove.cancel"], style: "cancel" },
-        {
-          text: pairingCopy["remove.confirm"],
-          style: "destructive",
-          onPress: remove,
-        },
+        { text: macCopy.cancel, style: "cancel" },
+        { text: macCopy.removeConfirm, style: "destructive", onPress: remove },
       ],
     );
 }

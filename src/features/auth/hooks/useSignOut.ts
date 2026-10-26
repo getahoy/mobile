@@ -1,10 +1,13 @@
 import { useAuthRequest } from "@getahoy/lib";
+import { useConfirmSignOut } from "@/features/pairing/hooks/useConfirmSignOut";
 import { authClient } from "../client/authClient";
 
 export function useSignOut(onSuccess?: () => void) {
   const { pending, errorMessage, submit } = useAuthRequest();
+  const confirmSignOut = useConfirmSignOut();
 
-  const signOut = () => submit(() => authClient.signOut(), onSuccess);
+  const signOut = () =>
+    void confirmSignOut(() => submit(() => authClient.signOut(), onSuccess));
 
   return { pending, errorMessage, signOut };
 }
