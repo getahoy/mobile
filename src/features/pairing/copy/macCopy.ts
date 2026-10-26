@@ -38,5 +38,7 @@ export const macCopy = {
   signOutTitle: "Sign out?",
   signOutBody: (macs: string) =>
     `This phone will also be removed from ${macs}. You will need to scan a code to pair again.`,
+  signOutOfflineBody: (macs: string) =>
+    `You’re offline. ${macs} will keep trusting this phone until you remove it there. Sign out anyway?`,
   signOutConfirm: "Sign out",
 };
