@@ -6,11 +6,15 @@ import { useSignOut } from "../hooks/useSignOut";
 import { FormError } from "./formError";
 
 export function SignOutButton() {
-  const { pending, errorMessage, signOut } = useSignOut();
+  const { pending, checking, errorMessage, signOut } = useSignOut();
 
   return (
     <View className="gap-2">
-      <Button variant="outline" disabled={pending} onPress={signOut}>
+      <Button
+        variant="outline"
+        disabled={pending || checking}
+        onPress={signOut}
+      >
         <Text>
           {pending ? authCopy["signOut.pending"] : authCopy["signOut.submit"]}
         </Text>

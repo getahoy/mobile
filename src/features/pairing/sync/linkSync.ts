@@ -16,6 +16,8 @@ import {
   settlePendingUnlink,
 } from "../storage/pendingUnlinks";
 
+const REACHABILITY_TIMEOUT_MS = 3000;
+
 type UnlinkReason = Extract<GoodbyeReason, "removed" | "signed_out">;
 
 function settled(result: RequestResult<unknown>): boolean {
@@ -52,6 +54,17 @@ export async function markEndedMacs(): Promise<void> {
     const ended = { reason: link.reason ?? "removed", at: Date.now() };
     await updatePairedMac(mac.publicKey, { ended });
   }
+}
+
+export async function serverReachable(): Promise<boolean> {
+  const keys = await loadDeviceKeys();
+  const listed = listPairingLinks(encodeBytes(keys.publicKey)).then(
+    (result) => result.code === "success",
+  );
+  const timedOut = new Promise<boolean>((resolve) =>
+    setTimeout(() => resolve(false), REACHABILITY_TIMEOUT_MS),
+  );
+  return Promise.race([listed, timedOut]);
 }
 
 export async function unpairEverything(live: LiveMacLinks): Promise<void> {
