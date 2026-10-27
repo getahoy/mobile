@@ -1,3 +1,4 @@
+import type { RequestResult } from "@getahoy/lib";
 import { randomUUID } from "expo-crypto";
 import { ImpactFeedbackStyle, impactAsync } from "expo-haptics";
 import type { MacSession } from "@/features/pairing/connection/macSession";
@@ -32,6 +33,10 @@ type Retry =
 
 type Phase = "idle" | "starting" | "listening" | "working";
 
+const NETWORK_FAILURE: RequestResult<never> = {
+  code: "error",
+  error: { kind: "network" },
+};
 const READY: TalkState = { kind: "ready" };
 const TOO_SHORT: TalkState = { kind: "tooShort" };
 const RESULT_SHOWN_MS = 4000;
@@ -126,7 +131,7 @@ export class TalkFlow {
   async #upload(uri: string): Promise<void> {
     this.#retry = { kind: "upload", uri };
     this.#options.onState({ kind: "understanding" });
-    const result = await transcribeRecording(uri);
+    const result = await transcribeRecording(uri).catch(() => NETWORK_FAILURE);
     if (result.code === "success") {
       deleteRecording(uri);
       return this.#dispatch(randomUUID(), result.data.text);
@@ -141,10 +146,10 @@ export class TalkFlow {
     const session = this.#options.session();
     const { onState } = this.#options;
     onState({ kind: "sending", heard: text, slow: false });
+    const onSlow = () => onState({ kind: "sending", heard: text, slow: true });
+    const command = { commandId, text };
     const answer = session
-      ? await sendCommand(session, { commandId, text }, () =>
-          onState({ kind: "sending", heard: text, slow: true }),
-        )
+      ? await sendCommand(session, command, onSlow).catch(() => null)
       : null;
     if (answer?.kind !== "result") {
       const failure =
