@@ -34,6 +34,12 @@ type Phase = "idle" | "starting" | "listening" | "working";
 
 const READY: TalkState = { kind: "ready" };
 const TOO_SHORT: TalkState = { kind: "tooShort" };
+const RESULT_SHOWN_MS = 4000;
+
+function fadesBack(state: TalkState): boolean {
+  if (state.kind === "answered") return true;
+  return state.kind === "failed" && !RETRYABLE_FAILURES.includes(state.failure);
+}
 
 function haptic(): void {
   void impactAsync(ImpactFeedbackStyle.Medium).catch(() => undefined);
@@ -175,5 +181,10 @@ export class TalkFlow {
     this.#phase = "idle";
     this.#attempt += 1;
     this.#options.onState(state);
+    const attempt = this.#attempt;
+    if (!fadesBack(state)) return;
+    setTimeout(() => {
+      if (attempt === this.#attempt) this.#options.onState(READY);
+    }, RESULT_SHOWN_MS);
   }
 }

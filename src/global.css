@@ -13,6 +13,8 @@
   --spacing-hairline: hairlineWidth();
   --spacing-viewfinder: 260px;
   --spacing-talk-button: 112px;
+  --spacing-talk-ring: 128px;
+  --spacing-talk-zone: 176px;
 
   --color-scrim: oklch(0 0 0 / 60%);
   --color-on-scrim: oklch(1 0 0);

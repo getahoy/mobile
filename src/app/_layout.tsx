@@ -12,6 +12,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaListener } from "react-native-safe-area-context";
 import { Uniwind, useUniwind } from "uniwind";
+import { GestureRoot } from "@/components/gestureRoot";
 import { authClient } from "@/features/auth/client/authClient";
 import { SessionLoading } from "@/features/auth/components/sessionLoading";
 import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
@@ -25,36 +26,38 @@ export default function RootLayout() {
 
   return (
     <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
-      <LiveMacLinksProvider>
-        <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
-          <StatusBar style={theme === "dark" ? "light" : "dark"} />
-          {isPending ? (
-            <SessionLoading />
-          ) : (
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Protected guard={signedIn}>
-                <Stack.Screen name="index" />
-                <Stack.Screen
-                  name="pair"
-                  options={{ presentation: "fullScreenModal" }}
-                />
-                <Stack.Screen
-                  name="account"
-                  options={{
-                    headerShown: true,
-                    title: authCopy["account.title"],
-                  }}
-                />
-              </Stack.Protected>
-              <Stack.Protected guard={!signedIn}>
-                <Stack.Screen name="sign-in" />
-                <Stack.Screen name="sign-up" />
-              </Stack.Protected>
-            </Stack>
-          )}
-          <PortalHost />
-        </ThemeProvider>
-      </LiveMacLinksProvider>
+      <GestureRoot className="flex-1">
+        <LiveMacLinksProvider>
+          <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
+            <StatusBar style={theme === "dark" ? "light" : "dark"} />
+            {isPending ? (
+              <SessionLoading />
+            ) : (
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Protected guard={signedIn}>
+                  <Stack.Screen name="index" />
+                  <Stack.Screen
+                    name="pair"
+                    options={{ presentation: "fullScreenModal" }}
+                  />
+                  <Stack.Screen
+                    name="account"
+                    options={{
+                      headerShown: true,
+                      title: authCopy["account.title"],
+                    }}
+                  />
+                </Stack.Protected>
+                <Stack.Protected guard={!signedIn}>
+                  <Stack.Screen name="sign-in" />
+                  <Stack.Screen name="sign-up" />
+                </Stack.Protected>
+              </Stack>
+            )}
+            <PortalHost />
+          </ThemeProvider>
+        </LiveMacLinksProvider>
+      </GestureRoot>
     </SafeAreaListener>
   );
 }

@@ -1,11 +1,19 @@
 const MS_PER_SECOND = 1000;
+const SECONDS_PER_MINUTE = 60;
+const SECOND_DIGITS = 2;
+
+function clock(durationMs: number): string {
+  const seconds = Math.floor(durationMs / MS_PER_SECOND);
+  const minutes = Math.floor(seconds / SECONDS_PER_MINUTE);
+  const rest = seconds % SECONDS_PER_MINUTE;
+  return `${minutes}:${String(rest).padStart(SECOND_DIGITS, "0")}`;
+}
 
 export const talkCopy = {
   holdToTalk: "Hold to talk",
-  listening: (durationMs: number) =>
-    `Listening… ${Math.floor(durationMs / MS_PER_SECOND)}s`,
+  listening: (durationMs: number) => `Listening ${clock(durationMs)}`,
   understanding: "Understanding…",
-  heard: (text: string) => `Heard “${text}”`,
+  heard: (text: string) => `“${text}”`,
   sending: (mac: string) => `Sending to ${mac}…`,
   offline: "Speech needs the internet.",
   transcribeFailed: "Speech didn’t work this time.",

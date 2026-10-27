@@ -1,6 +1,8 @@
 import { Linking, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
+import { Icon } from "@/features/pairing/components/icon";
 import { talkCopy } from "../copy/talkCopy";
 import type { MicAccess } from "../recorder/useFileRecorder";
 import {
@@ -9,6 +11,8 @@ import {
   type TalkFailure,
   type TalkState,
 } from "../talkState";
+
+const DONE_ICON_SIZE = 18;
 
 type TalkStatusProps = {
   state: TalkState;
@@ -25,28 +29,15 @@ function blockLine(block: TalkBlock, mac: string): string {
   return talkCopy.noMac;
 }
 
-function failureLine(failure: TalkFailure, mac: string): string {
-  switch (failure) {
-    case "offline":
-      return talkCopy.offline;
-    case "transcribeFailed":
-      return talkCopy.transcribeFailed;
-    case "nothingHeard":
-      return talkCopy.nothingHeard;
-    case "macUnreachable":
-      return talkCopy.macUnreachable(mac);
-    case "noAnswer":
-      return talkCopy.noAnswer(mac);
-    case "rateLimited":
-      return talkCopy.rateLimited;
-    case "signedOut":
-      return talkCopy.signedOut;
-    default: {
-      const unhandled: never = failure;
-      return unhandled;
-    }
-  }
-}
+const failureLines: Record<TalkFailure, (mac: string) => string> = {
+  offline: () => talkCopy.offline,
+  transcribeFailed: () => talkCopy.transcribeFailed,
+  nothingHeard: () => talkCopy.nothingHeard,
+  macUnreachable: talkCopy.macUnreachable,
+  noAnswer: talkCopy.noAnswer,
+  rateLimited: () => talkCopy.rateLimited,
+  signedOut: () => talkCopy.signedOut,
+};
 
 function stateLine(state: TalkState, mac: string, durationMs: number): string {
   switch (state.kind) {
@@ -62,7 +53,7 @@ function stateLine(state: TalkState, mac: string, durationMs: number): string {
     case "answered":
       return state.message;
     case "failed":
-      return failureLine(state.failure, mac);
+      return failureLines[state.failure](mac);
     default: {
       const unhandled: never = state;
       return unhandled;
@@ -83,28 +74,44 @@ export function TalkStatus(props: TalkStatusProps) {
     );
   }
   const idle = state.kind === "ready" || state.kind === "tooShort";
-  if (block && idle) {
-    return (
-      <Text className="text-center text-muted-foreground">
-        {blockLine(block, macName)}
-      </Text>
-    );
-  }
-  const heard = "heard" in state && state.heard ? state.heard : null;
+  const line = block && idle ? blockLine(block, macName) : null;
+  const heard = "heard" in state ? state.heard : null;
   const done = state.kind === "answered" && state.status === "done";
-  const tone = done ? "text-success" : "text-foreground";
   const canRetry =
     state.kind === "failed" && RETRYABLE_FAILURES.includes(state.failure);
   return (
-    <View className="items-center gap-2" accessibilityLiveRegion="polite">
+    <View
+      className="min-h-24 items-center gap-2"
+      accessibilityLiveRegion="polite"
+    >
       {heard ? (
-        <Text className="text-center text-muted-foreground">
-          {talkCopy.heard(heard)}
-        </Text>
+        <Animated.View
+          entering={FadeIn}
+          exiting={FadeOut}
+          key={heard}
+          className="rounded-2xl bg-muted px-4 py-2"
+        >
+          <Text className="text-center">{talkCopy.heard(heard)}</Text>
+        </Animated.View>
       ) : null}
-      <Text className={`text-center ${tone}`}>
-        {stateLine(state, macName, durationMs)}
-      </Text>
+      <Animated.View
+        entering={FadeIn}
+        key={state.kind}
+        className="flex-row items-center gap-1"
+      >
+        {done ? (
+          <Icon
+            name="checkmark-circle"
+            size={DONE_ICON_SIZE}
+            colorClassName="accent-success"
+          />
+        ) : null}
+        <Text
+          className={`text-center ${done ? "text-success" : "text-muted-foreground"}`}
+        >
+          {line ?? stateLine(state, macName, durationMs)}
+        </Text>
+      </Animated.View>
       {canRetry ? (
         <Button variant="outline" onPress={onTryAgain}>
           <Text>{talkCopy.tryAgain}</Text>

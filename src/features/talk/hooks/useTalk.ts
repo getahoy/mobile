@@ -44,6 +44,6 @@ export function useTalk(mac: PairedMac | null) {
     if (signedOut) void authClient.signOut();
   }, [signedOut]);
 
-  const { access, durationMs } = recorder;
-  return { state, access, durationMs, flow };
+  const { access, durationMs, level } = recorder;
+  return { state, access, durationMs, level, flow };
 }

@@ -20,34 +20,32 @@ export function MacsHomeScreen() {
   const talk = useTalk(target.block ? null : target.mac);
   const macName = target.mac?.displayName ?? "";
   const { kind } = talk.state;
-  const working = kind === "understanding" || kind === "sending";
-  const blocked = target.block !== null || talk.access === "blocked";
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
-      contentContainerClassName="flex-grow gap-4 px-6 pt-safe-offset-4 pb-safe-offset-6"
-    >
-      <HomeHeader />
-      {macs === null ? (
-        <ActivityIndicator
-          accessibilityLabel={homeCopy.loading}
-          colorClassName="accent-muted-foreground"
-        />
-      ) : null}
-      {macs?.length === 0 ? <NoMacsYet /> : null}
-      {macs?.map((mac) => (
-        <PairedMacItem key={mac.publicKey} mac={mac} onChanged={reload} />
-      ))}
-      {target.mac ? (
-        <View className="gap-4 py-4">
-          <TalkButton
-            macName={macName}
-            disabled={blocked || working}
-            listening={kind === "listening"}
-            onPressIn={() => void talk.flow.press()}
-            onPressOut={talk.flow.release}
+    <View className="flex-1 bg-background">
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="gap-4 px-6 pt-safe-offset-4 pb-4"
+      >
+        <HomeHeader />
+        {macs === null ? (
+          <ActivityIndicator
+            accessibilityLabel={homeCopy.loading}
+            colorClassName="accent-muted-foreground"
           />
+        ) : null}
+        {macs?.length === 0 ? <NoMacsYet /> : null}
+        {macs?.map((mac) => (
+          <PairedMacItem key={mac.publicKey} mac={mac} onChanged={reload} />
+        ))}
+        {macs && macs.length > 0 ? (
+          <Button variant="link" onPress={() => router.push("/pair")}>
+            <Text>{homeCopy.addAnother}</Text>
+          </Button>
+        ) : null}
+      </ScrollView>
+      {target.mac ? (
+        <View className="items-center gap-2 px-6 pb-safe-offset-4">
           <TalkStatus
             state={talk.state}
             block={target.block}
@@ -56,13 +54,18 @@ export function MacsHomeScreen() {
             durationMs={talk.durationMs}
             onTryAgain={talk.flow.tryAgain}
           />
+          <TalkButton
+            macName={macName}
+            disabled={target.block !== null || talk.access === "blocked"}
+            listening={kind === "listening"}
+            thinking={kind === "understanding" || kind === "sending"}
+            level={talk.level}
+            onStart={() => void talk.flow.press()}
+            onStop={talk.flow.release}
+            onInterrupted={() => talk.flow.interrupt()}
+          />
         </View>
       ) : null}
-      {macs && macs.length > 0 ? (
-        <Button variant="link" onPress={() => router.push("/pair")}>
-          <Text>{homeCopy.addAnother}</Text>
-        </Button>
-      ) : null}
-    </ScrollView>
+    </View>
   );
 }

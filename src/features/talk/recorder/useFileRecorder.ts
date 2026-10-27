@@ -10,10 +10,12 @@ import {
 } from "expo-audio";
 import { File } from "expo-file-system";
 import { useCallback, useEffect, useState } from "react";
+import { voiceLevel } from "./voiceLevel";
 
-const STATE_INTERVAL_MS = 200;
+const STATE_INTERVAL_MS = 100;
 
 const COMMAND_RECORDING: RecordingOptions = {
+  isMeteringEnabled: true,
   extension: ".m4a",
   sampleRate: 16_000,
   numberOfChannels: 1,
@@ -85,5 +87,6 @@ export function useFileRecorder() {
     discard,
     isRecording: recorderState.isRecording,
     durationMs: recorderState.durationMillis,
+    level: voiceLevel(recorderState.metering),
   };
 }
