@@ -10,6 +10,10 @@ import { authClient } from "@/features/auth/client/authClient";
 
 const TRANSCRIBE_TIMEOUT_MS = 30_000;
 
+// expo/fetch sends the native cookie jar by default; merged with our cookie header it corrupts the session cache cookie.
+const fetchWithOwnCookie: typeof fetch = (input, init) =>
+  fetch(input, { ...init, credentials: "omit" });
+
 export async function transcribeRecording(uri: string) {
   const form = new FormData();
   form.append(AUDIO_UPLOAD_FIELD, new File(uri));
@@ -18,7 +22,7 @@ export async function transcribeRecording(uri: string) {
     url: url.toString(),
     method: "POST",
     form,
-    fetch,
+    fetch: fetchWithOwnCookie,
     headers: { cookie: await authClient.getCookie() },
     schema: transcribeResponseSchema,
     timeoutMs: TRANSCRIBE_TIMEOUT_MS,

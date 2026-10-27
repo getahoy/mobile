@@ -10,6 +10,10 @@ import type { z } from "zod";
 import { publicEnv } from "@/env/publicEnv";
 import { authClient } from "@/features/auth/client/authClient";
 
+// fetch sends the native cookie jar by default; merged with our cookie header it corrupts the session cache cookie.
+const fetchWithOwnCookie: typeof fetch = (input, init) =>
+  fetch(input, { ...init, credentials: "omit" });
+
 type SessionCall<T> = {
   url: URL;
   schema: z.ZodType<T>;
@@ -19,16 +23,14 @@ type SessionCall<T> = {
 async function withSession<T>({ url, schema, body }: SessionCall<T>) {
   const cookie = await authClient.getCookie();
   const headers = { cookie };
-  if (body === undefined) {
-    return request({ url: url.toString(), headers, schema });
-  }
-  return request({
+  const call = {
     url: url.toString(),
-    method: "POST",
-    body,
     headers,
     schema,
-  });
+    fetch: fetchWithOwnCookie,
+  };
+  if (body === undefined) return request(call);
+  return request({ ...call, method: "POST", body });
 }
 
 const apiUrl = (path: string) => new URL(path, publicEnv.EXPO_PUBLIC_API_URL);
