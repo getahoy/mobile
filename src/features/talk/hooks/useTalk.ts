@@ -7,6 +7,12 @@ import { useFileRecorder } from "../recorder/useFileRecorder";
 import { TalkFlow } from "../sending/talkFlow";
 import type { TalkState } from "../talkState";
 
+// One rejected upload is not proof the session is gone, so ask the server first.
+async function signOutIfSessionGone(): Promise<void> {
+  const { data, error } = await authClient.getSession();
+  if (!data && !error) await authClient.signOut();
+}
+
 export function useTalk(mac: PairedMac | null) {
   const live = useLiveMacLinks();
   const recorder = useFileRecorder();
@@ -41,7 +47,7 @@ export function useTalk(mac: PairedMac | null) {
 
   const signedOut = state.kind === "failed" && state.failure === "signedOut";
   useEffect(() => {
-    if (signedOut) void authClient.signOut();
+    if (signedOut) void signOutIfSessionGone().catch(() => undefined);
   }, [signedOut]);
 
   const { access, durationMs, level } = recorder;
