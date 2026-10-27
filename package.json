@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
+    "@types/node": "^26.6.5",
     "@types/react": "~19.3.0",
     "typescript": "~6.0.3"
   },
@@ -54,6 +55,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "lint": "biome ci --error-on-warnings .",
+    "test": "node --test \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit"
   },
   "private": true
