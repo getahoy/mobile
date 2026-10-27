@@ -23,6 +23,7 @@ const config: ExpoConfig = {
     },
   },
   android: {
+    package: "com.getahoy.mobile",
     adaptiveIcon: {
       backgroundColor: "#E6F4FE",
       foregroundImage: "./assets/images/android-icon-foreground.png",
