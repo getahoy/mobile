@@ -74,12 +74,6 @@ export class MacSession {
         this.#send({ type: "pong" });
         return;
       case "ready":
-      case "audio.start":
-      case "audio.chunk":
-      case "audio.end":
-      case "audio.cancel":
-      case "audio.received":
-      case "audio.rejected":
       case "command":
       case "command.received":
       case "command.result":
