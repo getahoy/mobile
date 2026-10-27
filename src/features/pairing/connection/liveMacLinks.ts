@@ -6,6 +6,7 @@ export class LiveMacLinks {
   readonly #sessions = new Map<string, MacSession>();
   readonly #states = new Map<string, MacLinkState>();
   readonly #listeners = new Set<() => void>();
+  #version = 0;
 
   register(publicKey: string, session: MacSession): void {
     this.#sessions.set(publicKey, session);
@@ -23,6 +24,7 @@ export class LiveMacLinks {
 
   reportState(publicKey: string, state: MacLinkState): void {
     this.#states.set(publicKey, state);
+    this.#version += 1;
     for (const listener of this.#listeners) listener();
   }
 
@@ -30,10 +32,12 @@ export class LiveMacLinks {
     return this.#states.get(publicKey) ?? null;
   }
 
-  onChange(listener: () => void): () => void {
+  readonly version = (): number => this.#version;
+
+  readonly onChange = (listener: () => void): (() => void) => {
     this.#listeners.add(listener);
     return () => this.#listeners.delete(listener);
-  }
+  };
 
   goodbyeAll(reason: GoodbyeReason): void {
     for (const session of this.#sessions.values()) session.goodbye(reason);

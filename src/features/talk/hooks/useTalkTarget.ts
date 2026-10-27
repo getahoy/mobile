@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useSyncExternalStore } from "react";
 import type { LiveMacLinks } from "@/features/pairing/connection/liveMacLinks";
 import { useLiveMacLinks } from "@/features/pairing/hooks/useLiveMacLinks";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
@@ -22,8 +22,6 @@ function targetOf(macs: readonly PairedMac[], live: LiveMacLinks): TalkTarget {
 
 export function useTalkTarget(macs: readonly PairedMac[]): TalkTarget {
   const live = useLiveMacLinks();
-  const [, refresh] = useReducer((version: number) => version + 1, 0);
-  // Mac cards report their first state while they render, so refresh after that render.
-  useEffect(() => live.onChange(() => queueMicrotask(refresh)), [live]);
+  useSyncExternalStore(live.onChange, live.version);
   return targetOf(macs, live);
 }

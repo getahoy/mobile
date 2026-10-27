@@ -31,7 +31,6 @@ type MacConnectionOptions = {
 
 export class MacConnection {
   readonly #options: MacConnectionOptions;
-  readonly #listeners = new Set<(state: MacLinkState) => void>();
   #state: MacLinkState;
   #session: MacSession | null = null;
   #attempt = 0;
@@ -44,20 +43,15 @@ export class MacConnection {
     this.#state = options.mac.paused
       ? { kind: "paused" }
       : { kind: "connecting" };
-    options.live.reportState(options.mac.publicKey, this.#state);
   }
 
   state(): MacLinkState {
     return this.#state;
   }
 
-  onState(listener: (state: MacLinkState) => void): () => void {
-    this.#listeners.add(listener);
-    return () => this.#listeners.delete(listener);
-  }
-
   start(): void {
-    if (this.#state.kind !== "paused") this.connect();
+    if (this.#state.kind === "paused") this.#setState(this.#state);
+    else this.connect();
   }
 
   stop(): void {
@@ -105,11 +99,8 @@ export class MacConnection {
     const link = await loadDeviceKeys()
       .then((keys) => connectToMac(this.#options.mac, keys))
       .catch(() => UNREACHABLE_LINK);
-    if (attempt !== this.#attempt) {
-      if (link.outcome === "connected") link.session.close();
-      return;
-    }
-    await this.#apply(link, attempt);
+    if (attempt === this.#attempt) return this.#apply(link, attempt);
+    if (link.outcome === "connected") link.session.close();
   }
 
   async #apply(link: MacLink, attempt: number): Promise<void> {
@@ -121,7 +112,7 @@ export class MacConnection {
         await this.#end(link.reason);
         return;
       case "unreachable":
-        this.#setState(this.#lastReason ?? (await unreachableState()));
+        await this.#settleUnreachable(attempt);
         return;
       case "unrecognised":
       case "macTooOld":
@@ -139,13 +130,12 @@ export class MacConnection {
     this.#session = session;
     this.#lastReason = null;
     this.#options.live.register(this.#options.mac.publicKey, session);
-    session.onEvent((event) => {
-      if (attempt === this.#attempt) void this.#handle(event);
-    });
+    session.onEvent((event) => void this.#handle(event, attempt));
     this.#setState({ kind: "connected", locked: false });
   }
 
-  async #handle(event: MacEvent): Promise<void> {
+  async #handle(event: MacEvent, attempt: number): Promise<void> {
+    if (attempt !== this.#attempt) return;
     if (event.kind === "status") {
       this.#setState({ kind: "connected", locked: event.locked });
       return;
@@ -156,7 +146,12 @@ export class MacConnection {
     }
     this.#dropSession();
     if (this.#state.kind !== "connected") return;
-    this.#setState(this.#lastReason ?? (await unreachableState()));
+    await this.#settleUnreachable(attempt);
+  }
+
+  async #settleUnreachable(attempt: number): Promise<void> {
+    const state = this.#lastReason ?? (await unreachableState());
+    if (attempt === this.#attempt) this.#setState(state);
   }
 
   async #goodbye(reason: GoodbyeReason): Promise<void> {
@@ -191,7 +186,6 @@ export class MacConnection {
   #setState(state: MacLinkState): void {
     this.#state = state;
     this.#options.live.reportState(this.#options.mac.publicKey, state);
-    for (const listener of this.#listeners) listener(state);
     if (this.#retryTimer) clearTimeout(this.#retryTimer);
     if (!this.#foreground || !keepsRetrying(state)) return;
     this.#retryTimer = setTimeout(() => void this.#establish(), AUTO_RETRY_MS);

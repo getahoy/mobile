@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { AppState } from "react-native";
 import { MacConnection } from "../connection/macConnection";
 import type { PairedMac } from "../storage/pairedMacs";
@@ -9,17 +9,18 @@ export function useMacConnection(mac: PairedMac, onEnded: () => void) {
   const [connection] = useState(
     () => new MacConnection({ mac, live, onEnded }),
   );
-  const [state, setState] = useState(connection.state());
+  const reported = useSyncExternalStore(live.onChange, () =>
+    live.state(mac.publicKey),
+  );
+  const state = reported ?? connection.state();
 
   useEffect(() => {
-    const unsubscribe = connection.onState(setState);
     connection.start();
     const subscription = AppState.addEventListener("change", (appState) => {
       if (appState === "active") connection.foreground();
       if (appState === "background") connection.background();
     });
     return () => {
-      unsubscribe();
       subscription.remove();
       connection.stop();
     };
