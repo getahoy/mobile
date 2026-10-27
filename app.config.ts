@@ -52,6 +52,14 @@ const config: ExpoConfig = {
         barcodeScannerEnabled: true,
       },
     ],
+    [
+      "expo-audio",
+      {
+        microphonePermission:
+          "Ahoy records only while you hold the talk button.",
+        recordAudioAndroid: true,
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,

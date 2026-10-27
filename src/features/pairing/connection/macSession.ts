@@ -1,14 +1,25 @@
 import type { SecureChannel } from "@getahoy/crypto";
-import { type Frame, frameSchema, type GoodbyeReason } from "@getahoy/protocol";
+import {
+  type CommandFrame,
+  type Frame,
+  frameSchema,
+  type GoodbyeReason,
+} from "@getahoy/protocol";
 import type { FrameStream } from "./frameStream";
 import { decodeJson, encodeJson } from "./jsonBytes";
 
 const PING_INTERVAL_MS = 10_000;
 const PONG_TIMEOUT_MS = 5000;
 
+export type CommandReply = Extract<
+  CommandFrame,
+  { type: "command.received" | "command.result" }
+>;
+
 export type MacEvent =
   | { kind: "goodbye"; reason: GoodbyeReason }
   | { kind: "status"; locked: boolean }
+  | { kind: "commandReply"; reply: CommandReply }
   | { kind: "closed" };
 
 export class MacSession {
@@ -27,12 +38,22 @@ export class MacSession {
     stream.onClose(() => this.#finish());
   }
 
-  onEvent(listener: (event: MacEvent) => void): void {
+  isOpen(): boolean {
+    return !this.#closed;
+  }
+
+  onEvent(listener: (event: MacEvent) => void): () => void {
     this.#listeners.add(listener);
+    return () => this.#listeners.delete(listener);
+  }
+
+  send(frame: Frame): void {
+    if (this.#closed) return;
+    this.#stream.send(this.#channel.seal(encodeJson(frame)));
   }
 
   goodbye(reason: GoodbyeReason): void {
-    this.#send({ type: "goodbye", reason });
+    this.send({ type: "goodbye", reason });
     this.close();
   }
 
@@ -43,13 +64,8 @@ export class MacSession {
 
   #ping(): void {
     if (this.#pongTimer) return;
-    this.#send({ type: "ping" });
+    this.send({ type: "ping" });
     this.#pongTimer = setTimeout(() => this.close(), PONG_TIMEOUT_MS);
-  }
-
-  #send(frame: Frame): void {
-    if (this.#closed) return;
-    this.#stream.send(this.#channel.seal(encodeJson(frame)));
   }
 
   #receive(sealed: Uint8Array): void {
@@ -71,12 +87,14 @@ export class MacSession {
         this.#pongTimer = null;
         return;
       case "ping":
-        this.#send({ type: "pong" });
+        this.send({ type: "pong" });
+        return;
+      case "command.received":
+      case "command.result":
+        this.#emit({ kind: "commandReply", reply: frame.data });
         return;
       case "ready":
       case "command":
-      case "command.received":
-      case "command.result":
         return;
       default: {
         const unhandled: never = frame.data;

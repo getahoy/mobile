@@ -44,6 +44,7 @@ export class MacConnection {
     this.#state = options.mac.paused
       ? { kind: "paused" }
       : { kind: "connecting" };
+    options.live.reportState(options.mac.publicKey, this.#state);
   }
 
   state(): MacLinkState {
@@ -189,6 +190,7 @@ export class MacConnection {
 
   #setState(state: MacLinkState): void {
     this.#state = state;
+    this.#options.live.reportState(this.#options.mac.publicKey, state);
     for (const listener of this.#listeners) listener(state);
     if (this.#retryTimer) clearTimeout(this.#retryTimer);
     if (!this.#foreground || !keepsRetrying(state)) return;

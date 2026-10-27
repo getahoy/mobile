@@ -12,6 +12,7 @@
 
   --spacing-hairline: hairlineWidth();
   --spacing-viewfinder: 260px;
+  --spacing-talk-button: 112px;
 
   --color-scrim: oklch(0 0 0 / 60%);
   --color-on-scrim: oklch(1 0 0);
@@ -35,6 +36,7 @@
       --color-accent: oklch(0.97 0 0);
       --color-accent-foreground: oklch(0.205 0 0);
       --color-destructive: oklch(0.577 0.245 27.325);
+      --color-success: oklch(0.527 0.154 150.069);
       --color-border: oklch(0.922 0 0);
       --color-input: oklch(0.922 0 0);
       --color-ring: oklch(0.708 0 0);
@@ -69,6 +71,7 @@
       --color-accent: oklch(0.269 0 0);
       --color-accent-foreground: oklch(0.985 0 0);
       --color-destructive: oklch(0.704 0.191 22.216);
+      --color-success: oklch(0.723 0.192 149.579);
       --color-border: oklch(1 0 0 / 10%);
       --color-input: oklch(1 0 0 / 15%);
       --color-ring: oklch(0.556 0 0);
