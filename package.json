@@ -8,6 +8,7 @@
     "@getahoy/crypto": "file:../shared/packages/crypto",
     "@getahoy/lib": "file:../shared/packages/lib",
     "@getahoy/protocol": "file:../shared/packages/protocol",
+    "@gorhom/bottom-sheet": "^5.2.14",
     "@rn-primitives/label": "^1.5.2",
     "@rn-primitives/portal": "^1.5.3",
     "@rn-primitives/slot": "^1.5.2",

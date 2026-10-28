@@ -1,5 +1,3 @@
-import type { RequestResult } from "@getahoy/lib";
-import { randomUUID } from "expo-crypto";
 import { ImpactFeedbackStyle, impactAsync } from "expo-haptics";
 import type { MacSession } from "@/features/pairing/connection/macSession";
 import { transcribeRecording } from "../client/transcribeApi";
@@ -11,9 +9,11 @@ import {
   MAX_RECORDING_MS,
   MIN_HOLD_MS,
   RETRYABLE_FAILURES,
+  shownFor,
   type TalkState,
 } from "../talkState";
-import { sendCommand } from "./sendCommand";
+import { askMac, choiceRequest, commandRequest } from "./askMac";
+import type { MacRequest } from "./sendCommand";
 import { uploadFailure } from "./uploadFailure";
 
 export type TalkRecorder = Pick<
@@ -29,22 +29,12 @@ type TalkFlowOptions = {
 
 type Retry =
   | { kind: "upload"; uri: string }
-  | { kind: "command"; commandId: string; text: string };
+  | { kind: "request"; request: MacRequest; heard: string };
 
 type Phase = "idle" | "starting" | "listening" | "working";
 
-const NETWORK_FAILURE: RequestResult<never> = {
-  code: "error",
-  error: { kind: "network" },
-};
 const READY: TalkState = { kind: "ready" };
 const TOO_SHORT: TalkState = { kind: "tooShort" };
-const RESULT_SHOWN_MS = 4000;
-
-function fadesBack(state: TalkState): boolean {
-  if (state.kind === "answered") return true;
-  return state.kind === "failed" && !RETRYABLE_FAILURES.includes(state.failure);
-}
 
 function haptic(): void {
   void impactAsync(ImpactFeedbackStyle.Medium).catch(() => undefined);
@@ -58,6 +48,7 @@ export class TalkFlow {
   #pressedAt = 0;
   #attempt = 0;
   #retry: Retry | null = null;
+  #choosingFor: string | null = null;
   #maxTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(options: TalkFlowOptions) {
@@ -102,7 +93,21 @@ export class TalkFlow {
     if (!again || this.#phase !== "idle") return;
     this.#phase = "working";
     if (again.kind === "upload") void this.#upload(again.uri);
-    else void this.#dispatch(again.commandId, again.text);
+    else void this.#ask(again.request, again.heard);
+  };
+
+  readonly choose = (number: number): void => {
+    const parentId = this.#choosingFor;
+    if (!parentId || this.#phase !== "idle") return;
+    this.#choosingFor = null;
+    this.#phase = "working";
+    void this.#ask(choiceRequest(parentId, number), String(number));
+  };
+
+  readonly dismissChoices = (): void => {
+    if (!this.#choosingFor || this.#phase !== "idle") return;
+    this.#choosingFor = null;
+    this.#settle(READY);
   };
 
   interrupt(): void {
@@ -131,34 +136,26 @@ export class TalkFlow {
   async #upload(uri: string): Promise<void> {
     this.#retry = { kind: "upload", uri };
     this.#options.onState({ kind: "understanding" });
-    const result = await transcribeRecording(uri).catch(() => NETWORK_FAILURE);
+    const result = await transcribeRecording(uri);
     if (result.code === "success") {
       deleteRecording(uri);
-      return this.#dispatch(randomUUID(), result.data.text);
+      const { text } = result.data;
+      return this.#ask(commandRequest(text), text);
     }
     const failure = await uploadFailure(result.error);
     if (!RETRYABLE_FAILURES.includes(failure)) this.#forgetRetry();
     this.#settle({ kind: "failed", failure, heard: null });
   }
 
-  async #dispatch(commandId: string, text: string): Promise<void> {
-    this.#retry = { kind: "command", commandId, text };
-    const session = this.#options.session();
-    const { onState } = this.#options;
-    onState({ kind: "sending", heard: text, slow: false });
-    const onSlow = () => onState({ kind: "sending", heard: text, slow: true });
-    const command = { commandId, text };
-    const answer = session
-      ? await sendCommand(session, command, onSlow).catch(() => null)
-      : null;
-    if (answer?.kind !== "result") {
-      const failure =
-        answer?.kind === "noAnswer" ? "noAnswer" : "macUnreachable";
-      return this.#settle({ kind: "failed", failure, heard: text });
-    }
-    this.#retry = null;
-    const { status, message } = answer;
-    this.#settle({ kind: "answered", heard: text, status, message });
+  async #ask(request: MacRequest, heard: string): Promise<void> {
+    this.#retry = { kind: "request", request, heard };
+    const { session, onState } = this.#options;
+    const state = await askMac(session(), request, heard, onState);
+    const answered = state.kind === "answered";
+    if (answered) this.#retry = null;
+    const choosing = answered && state.choices.length > 0;
+    this.#choosingFor = choosing ? request.commandId : null;
+    this.#settle(state);
   }
 
   async #discard(next: TalkState): Promise<void> {
@@ -187,9 +184,12 @@ export class TalkFlow {
     this.#attempt += 1;
     this.#options.onState(state);
     const attempt = this.#attempt;
-    if (!fadesBack(state)) return;
+    const shownMs = shownFor(state);
+    if (shownMs === null) return;
     setTimeout(() => {
-      if (attempt === this.#attempt) this.#options.onState(READY);
-    }, RESULT_SHOWN_MS);
+      if (attempt !== this.#attempt) return;
+      this.#choosingFor = null;
+      this.#options.onState(READY);
+    }, shownMs);
   }
 }

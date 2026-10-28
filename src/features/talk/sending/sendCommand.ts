@@ -1,4 +1,4 @@
-import type { CommandStatus } from "@getahoy/protocol";
+import type { CommandChoice, CommandStatus, Frame } from "@getahoy/protocol";
 import type { MacSession } from "@/features/pairing/connection/macSession";
 
 const RECEIVED_TIMEOUT_MS = 5000;
@@ -7,17 +7,24 @@ const RESULT_TIMEOUT_MS = 15_000;
 const SLOW_COMMAND_MS = 3000;
 
 export type CommandAnswer =
-  | { kind: "result"; status: CommandStatus; message: string }
+  | {
+      kind: "result";
+      status: CommandStatus;
+      message: string;
+      choices: readonly CommandChoice[];
+      confirm: boolean;
+    }
   | { kind: "unreachable" }
   | { kind: "noAnswer" };
 
-type PendingCommand = { commandId: string; text: string };
+export type MacRequest = Extract<Frame, { type: "command" | "command.choose" }>;
 
 export function sendCommand(
   session: MacSession,
-  { commandId, text }: PendingCommand,
+  request: MacRequest,
   onSlow: () => void,
 ): Promise<CommandAnswer> {
+  const { commandId } = request;
   if (!session.isOpen()) return Promise.resolve({ kind: "unreachable" });
   return new Promise((resolve) => {
     let timer = setTimeout(
@@ -35,8 +42,8 @@ export function sendCommand(
       const { reply } = event;
       if (reply.commandId !== commandId) return;
       if (reply.type === "command.result") {
-        const { status, message } = reply;
-        settle({ kind: "result", status, message });
+        const { status, message, choices, confirm } = reply;
+        settle({ kind: "result", status, message, choices, confirm });
         return;
       }
       if (received) return;
@@ -51,6 +58,6 @@ export function sendCommand(
       unsubscribe();
       resolve(answer);
     }
-    session.send({ type: "command", commandId, text });
+    session.send(request);
   });
 }

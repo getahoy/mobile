@@ -95,6 +95,7 @@ export class MacSession {
         return;
       case "ready":
       case "command":
+      case "command.choose":
         return;
       default: {
         const unhandled: never = frame.data;
