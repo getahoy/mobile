@@ -6,6 +6,7 @@ import { TalkButton } from "@/features/talk/components/talkButton";
 import { TalkStatus } from "@/features/talk/components/talkStatus";
 import { useTalk } from "@/features/talk/hooks/useTalk";
 import { useTalkTarget } from "@/features/talk/hooks/useTalkTarget";
+import { DevBuildStamp } from "../components/devBuildStamp";
 import { HomeHeader } from "../components/homeHeader";
 import { NoMacsYet } from "../components/noMacsYet";
 import { PairedMacItem } from "../components/pairedMacItem";
@@ -28,6 +29,7 @@ export function MacsHomeScreen() {
         contentContainerClassName="gap-4 px-6 pt-safe-offset-4 pb-4"
       >
         <HomeHeader />
+        <DevBuildStamp />
         {macs === null ? (
           <ActivityIndicator
             accessibilityLabel={homeCopy.loading}

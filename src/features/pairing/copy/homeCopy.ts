@@ -7,4 +7,6 @@ export const homeCopy = {
     "On your Mac, click the Ahoy icon in the menubar and choose Open Ahoy. Then scan the code it shows.",
   scan: "Scan code",
   addAnother: "Add another Mac",
+  devStamp: (commit: string, loadedAt: string) =>
+    `Dev build ${commit}, loaded ${loadedAt}`,
 };

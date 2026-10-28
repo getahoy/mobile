@@ -1,7 +1,18 @@
+import { execFileSync } from "node:child_process";
 import { APP_SCHEME } from "@getahoy/lib";
 import type { ExpoConfig } from "expo/config";
 
+function gitCommit(): string {
+  try {
+    const args = ["rev-parse", "--short", "HEAD"];
+    return execFileSync("git", args, { encoding: "utf8" }).trim();
+  } catch {
+    return "unknown";
+  }
+}
+
 const config: ExpoConfig = {
+  extra: { gitCommit: gitCommit() },
   name: "Ahoy",
   slug: "ahoy",
   version: "1.0.0",
