@@ -11,7 +11,7 @@ export const SPEAK_POLICIES = ["problems", "everything", "off"] as const;
 const SETTINGS_KEY = "voice.settings";
 const INDIA_REGION = "IN";
 
-const storage = createMMKV({ id: "ahoy.voice" });
+export const voiceStorage = createMMKV({ id: "ahoy.voice" });
 
 const voiceSettingsSchema = z.object({
   playsOn: z.enum(SPEAK_TARGETS),
@@ -39,7 +39,7 @@ function defaults(): VoiceSettings {
 }
 
 function storedJson(): unknown {
-  const text = storage.getString(SETTINGS_KEY);
+  const text = voiceStorage.getString(SETTINGS_KEY);
   if (text === undefined) return null;
   try {
     return JSON.parse(text);
@@ -58,6 +58,6 @@ export function readVoiceSettings(): VoiceSettings {
 
 export function writeVoiceSettings(change: Partial<VoiceSettings>) {
   const next = { ...readVoiceSettings(), ...change };
-  storage.set(SETTINGS_KEY, JSON.stringify(next));
+  voiceStorage.set(SETTINGS_KEY, JSON.stringify(next));
   return next;
 }

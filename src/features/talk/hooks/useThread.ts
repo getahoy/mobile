@@ -2,11 +2,6 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import type { TalkState } from "../talkState";
 import { noThreads, threadReducer } from "../threads/threadStore";
 
-function choiceLapsed(before: TalkState, now: TalkState): boolean {
-  const asked = before.kind === "answered" && before.choices.length > 0;
-  return asked && now.kind === "ready";
-}
-
 export function useThread(state: TalkState) {
   const [threads, dispatch] = useReducer(threadReducer, noThreads);
   const [expanded, setExpanded] = useState(false);
@@ -16,7 +11,8 @@ export function useThread(state: TalkState) {
     const before = previous.current;
     previous.current = state;
     if (state.kind !== "answered") {
-      if (before.kind === "answered" && choiceLapsed(before, state)) {
+      const asked = before.kind === "answered" && before.choices.length > 0;
+      if (asked && state.kind === "ready") {
         dispatch({ kind: "expired", threadId: before.threadId });
       }
       return;

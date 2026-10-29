@@ -1,11 +1,8 @@
 import { logger } from "@/features/logging/logger";
+import { playSource } from "./audioPlayback";
 import { deviceVoice } from "./deviceVoice";
-import {
-  type PreparedSpeech,
-  playSpeech,
-  prepareSpeech,
-} from "./elevenLabsVoice";
-import type { SpeakOptions, SpokenEnd, VoiceEngine } from "./voiceEngine";
+import { type PreparedSpeech, prepareSpeech } from "./elevenLabsVoice";
+import type { SpeakOptions, VoiceEngine } from "./voiceEngine";
 
 // Past this the device voice speaks instead, so a slow network never leaves silence.
 const FIRST_AUDIO_MS = 1500;
@@ -23,7 +20,7 @@ function timeout(signal: AbortSignal): Promise<Late> {
 async function speakWithFallback(
   text: string,
   { voice, signal }: SpeakOptions,
-): Promise<SpokenEnd> {
+): Promise<void> {
   const fetching = new AbortController();
   const stopFetching = () => fetching.abort();
   signal.addEventListener("abort", stopFetching);
@@ -31,13 +28,10 @@ async function speakWithFallback(
     prepareSpeech(text, voice, fetching.signal),
     timeout(fetching.signal),
   ]);
-  if (signal.aborted) return { kind: "stopped" };
-  if (first.kind === "ready") {
-    signal.removeEventListener("abort", stopFetching);
-    const played = await playSpeech(first.uri, signal);
-    return played === "finished" ? { kind: "spoken" } : { kind: "stopped" };
-  }
+  signal.removeEventListener("abort", stopFetching);
   fetching.abort();
+  if (signal.aborted) return;
+  if (first.kind === "ready") return playSource({ uri: first.uri }, signal);
   const reason = first.kind === "late" ? "timeout" : first.reason;
   logger.warn("voice", `Device voice instead of ElevenLabs: ${reason}`);
   return deviceVoice.speak(text, { voice, signal });
@@ -50,7 +44,9 @@ export function createFallbackVoice(): VoiceEngine {
       current?.abort();
       const own = new AbortController();
       current = own;
-      options.signal.addEventListener("abort", () => own.abort());
+      options.signal.addEventListener("abort", () => own.abort(), {
+        once: true,
+      });
       return speakWithFallback(text, { ...options, signal: own.signal });
     },
     stop() {

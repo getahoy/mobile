@@ -1,6 +1,5 @@
 import type { SpeakVoice } from "@getahoy/protocol";
 import { fetchSpeech } from "../client/speakApi";
-import { playSource } from "./audioPlayback";
 import { cachedSpeech, speechKey, storeSpeech } from "./speechCache";
 
 export type PreparedSpeech =
@@ -19,8 +18,4 @@ export async function prepareSpeech(
   if (audio.kind === "failed") return audio;
   if (signal.aborted) return { kind: "failed", reason: "stopped" };
   return { kind: "ready", uri: await storeSpeech(key, audio.bytes) };
-}
-
-export function playSpeech(uri: string, signal: AbortSignal) {
-  return playSource({ uri }, signal);
 }

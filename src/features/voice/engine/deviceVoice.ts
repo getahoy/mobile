@@ -1,6 +1,6 @@
 import type { SpeakVoice } from "@getahoy/protocol";
 import * as Speech from "expo-speech";
-import type { SpeakOptions, SpokenEnd, VoiceEngine } from "./voiceEngine";
+import type { SpeakOptions, VoiceEngine } from "./voiceEngine";
 
 const INDIAN_ENGLISH = "en-IN";
 const ENGLISH = "en";
@@ -20,21 +20,21 @@ async function bestVoice(voice: SpeakVoice): Promise<string | undefined> {
 export const deviceVoice: VoiceEngine = {
   async speak(text: string, { voice, signal }: SpeakOptions) {
     const identifier = await bestVoice(voice);
-    if (signal.aborted) return { kind: "stopped" };
+    if (signal.aborted) return;
     const language = voice === "india" ? INDIAN_ENGLISH : undefined;
-    return new Promise<SpokenEnd>((resolve) => {
+    return new Promise<void>((resolve) => {
       const stop = () => void Speech.stop();
       signal.addEventListener("abort", stop);
-      const settle = (end: SpokenEnd) => {
+      const settle = () => {
         signal.removeEventListener("abort", stop);
-        resolve(end);
+        resolve();
       };
       Speech.speak(text, {
         ...(identifier ? { voice: identifier } : {}),
         ...(language ? { language } : {}),
-        onDone: () => settle({ kind: "spoken" }),
-        onStopped: () => settle({ kind: "stopped" }),
-        onError: () => settle({ kind: "failed", reason: "device" }),
+        onDone: settle,
+        onStopped: settle,
+        onError: settle,
       });
     });
   },

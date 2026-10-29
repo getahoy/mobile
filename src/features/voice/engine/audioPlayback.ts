@@ -8,8 +8,6 @@ import {
 const FADE_MS = 80;
 const FADE_STEPS = 4;
 
-export type Played = "finished" | "stopped";
-
 // iOS reads playsInSilentMode; Android has no silent switch and ignores it.
 export async function preparePlayback(playsInSilentMode: boolean) {
   await setAudioModeAsync({
@@ -31,21 +29,25 @@ async function fadeOut(player: AudioPlayer): Promise<void> {
 export function playSource(
   source: AudioSource,
   signal: AbortSignal,
-): Promise<Played> {
+): Promise<void> {
   const player = createAudioPlayer(source);
   return new Promise((resolve) => {
-    const finish = (played: Played) => {
+    let finished = false;
+    // The clip can end during the stop fade, and a removed player must not be removed twice.
+    const finish = () => {
+      if (finished) return;
+      finished = true;
       subscription.remove();
       signal.removeEventListener("abort", stop);
       player.remove();
-      resolve(played);
+      resolve();
     };
-    const stop = () => void fadeOut(player).then(() => finish("stopped"));
+    const stop = () => void fadeOut(player).then(finish);
     const onStatus = (status: { didJustFinish: boolean }) => {
-      if (status.didJustFinish) finish("finished");
+      if (status.didJustFinish) finish();
     };
     const subscription = player.addListener("playbackStatusUpdate", onStatus);
-    if (signal.aborted) return finish("stopped");
+    if (signal.aborted) return finish();
     signal.addEventListener("abort", stop);
     player.play();
   });

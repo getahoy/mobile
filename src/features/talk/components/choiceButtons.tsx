@@ -22,7 +22,7 @@ export function ChoiceButtons(props: ChoiceButtonsProps) {
           className="h-14"
           onPress={() => onChoose(only.number)}
         >
-          <Text className="text-lg">{talkCopy.confirm(only.label)}</Text>
+          <Text className="text-lg">{only.label}</Text>
         </Button>
         <Button variant="outline" size="lg" className="h-14" onPress={onCancel}>
           <Text className="text-lg">{talkCopy.cancel}</Text>

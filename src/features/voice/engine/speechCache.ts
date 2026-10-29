@@ -1,14 +1,13 @@
 import type { SpeakVoice } from "@getahoy/protocol";
 import { CryptoDigestAlgorithm, digestStringAsync } from "expo-crypto";
 import { Directory, File, Paths } from "expo-file-system";
-import { createMMKV } from "react-native-mmkv";
 import { z } from "zod";
+import { voiceStorage } from "../storage/voiceSettings";
 import { touchCache } from "./cacheOrder";
 
 const ORDER_KEY = "voice.cacheOrder";
 const AUDIO_EXTENSION = ".mp3";
 
-const storage = createMMKV({ id: "ahoy.voice" });
 const orderSchema = z.array(z.string());
 
 function speechDirectory(): Directory {
@@ -20,7 +19,7 @@ function speechDirectory(): Directory {
 function readOrder(): string[] {
   try {
     const parsed = orderSchema.safeParse(
-      JSON.parse(storage.getString(ORDER_KEY) ?? "[]"),
+      JSON.parse(voiceStorage.getString(ORDER_KEY) ?? "[]"),
     );
     return parsed.success ? parsed.data : [];
   } catch {
@@ -38,7 +37,7 @@ function remember(key: string): void {
     const file = fileFor(old);
     if (file.exists) file.delete();
   }
-  storage.set(ORDER_KEY, JSON.stringify(order));
+  voiceStorage.set(ORDER_KEY, JSON.stringify(order));
 }
 
 export function speechKey(text: string, voice: SpeakVoice): Promise<string> {

@@ -5,12 +5,7 @@ export type SpeakOptions = {
   signal: AbortSignal;
 };
 
-export type SpokenEnd =
-  | { kind: "spoken" }
-  | { kind: "stopped" }
-  | { kind: "failed"; reason: "timeout" | "http" | "offline" | "device" };
-
 export type VoiceEngine = {
-  speak: (text: string, options: SpeakOptions) => Promise<SpokenEnd>;
+  speak: (text: string, options: SpeakOptions) => Promise<void>;
   stop: () => void;
 };

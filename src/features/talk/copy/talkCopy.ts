@@ -43,7 +43,6 @@ export const talkCopy = {
   openSettings: "Open Settings",
   buttonLabel: (mac: string) => `Hold to talk to ${mac}`,
   buttonHint: "Hold, say a command, then let go to send it.",
-  confirm: (label: string) => label,
   cancel: "Cancel",
   choiceLabel: (number: number, label: string) => `Pick ${number}, ${label}`,
   threadSummary: (status: ThreadStatus, steps: number) =>

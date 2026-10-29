@@ -20,10 +20,6 @@ export type CommandAnswer =
   | { kind: "noAnswer" };
 
 export type MacRequest = Extract<Frame, { type: "command" | "command.choose" }>;
-export type MacSignal = Extract<
-  Frame,
-  { type: "speech.stop" | "choice.extend" }
->;
 
 export function sendCommand(
   session: MacSession,
