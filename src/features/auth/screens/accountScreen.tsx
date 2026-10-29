@@ -1,3 +1,4 @@
+import { VoiceSettingsSection } from "@/features/voice/components/voiceSettingsSection";
 import { AccountSummary } from "../components/accountSummary";
 import { SignOutButton } from "../components/signOutButton";
 
@@ -10,6 +11,7 @@ export function AccountScreen({ name, email }: AccountScreenProps) {
   return (
     <>
       <AccountSummary name={name} email={email} />
+      <VoiceSettingsSection />
       <SignOutButton />
     </>
   );

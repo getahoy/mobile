@@ -21,11 +21,15 @@ export type TalkState =
   | { kind: "sending"; heard: string; slow: boolean }
   | {
       kind: "answered";
+      commandId: string;
+      threadId: string;
       heard: string;
       status: CommandStatus;
       message: string;
+      speech: string | null;
       choices: readonly CommandChoice[];
       confirm: boolean;
+      receivedAt: number;
     }
   | { kind: "failed"; failure: TalkFailure; heard: string | null };
 

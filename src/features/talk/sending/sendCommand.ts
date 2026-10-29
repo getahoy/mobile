@@ -9,8 +9,10 @@ const SLOW_COMMAND_MS = 3000;
 export type CommandAnswer =
   | {
       kind: "result";
+      threadId: string;
       status: CommandStatus;
       message: string;
+      speech: string | null;
       choices: readonly CommandChoice[];
       confirm: boolean;
     }
@@ -18,6 +20,10 @@ export type CommandAnswer =
   | { kind: "noAnswer" };
 
 export type MacRequest = Extract<Frame, { type: "command" | "command.choose" }>;
+export type MacSignal = Extract<
+  Frame,
+  { type: "speech.stop" | "choice.extend" }
+>;
 
 export function sendCommand(
   session: MacSession,
@@ -42,8 +48,10 @@ export function sendCommand(
       const { reply } = event;
       if (reply.commandId !== commandId) return;
       if (reply.type === "command.result") {
-        const { status, message, choices, confirm } = reply;
-        settle({ kind: "result", status, message, choices, confirm });
+        const { threadId, status, message, choices, confirm } = reply;
+        const speech = reply.speech ?? null;
+        const result = { threadId, status, message, speech, choices, confirm };
+        settle({ kind: "result", ...result });
         return;
       }
       if (received) return;

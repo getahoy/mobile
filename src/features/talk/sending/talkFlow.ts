@@ -1,3 +1,4 @@
+import type { SpeakTarget } from "@getahoy/protocol";
 import { ImpactFeedbackStyle, impactAsync } from "expo-haptics";
 import type { MacSession } from "@/features/pairing/connection/macSession";
 import { transcribeRecording } from "../client/transcribeApi";
@@ -24,6 +25,8 @@ export type TalkRecorder = Pick<
 type TalkFlowOptions = {
   recorder: () => TalkRecorder;
   session: () => MacSession | null;
+  speakOn: () => SpeakTarget;
+  onPress: (choosingFor: string | null) => void;
   onState: (state: TalkState) => void;
 };
 
@@ -62,6 +65,8 @@ export class TalkFlow {
     this.#sawRecording = false;
     this.#pressedAt = Date.now();
     this.#forgetRetry();
+    this.#attempt += 1;
+    this.#options.onPress(this.#choosingFor);
     const attempt = this.#attempt;
     const recorder = this.#options.recorder();
     const allowed =
@@ -140,7 +145,7 @@ export class TalkFlow {
     if (result.code === "success") {
       deleteRecording(uri);
       const { text } = result.data;
-      return this.#ask(commandRequest(text), text);
+      return this.#ask(commandRequest(text, this.#options.speakOn()), text);
     }
     const failure = await uploadFailure(result.error);
     if (!RETRYABLE_FAILURES.includes(failure)) this.#forgetRetry();
