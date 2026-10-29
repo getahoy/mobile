@@ -1,3 +1,15 @@
+import type { ThreadStatus } from "../threads/threadStore";
+
+const threadStatusLabels: Record<ThreadStatus, string> = {
+  open: "WAITING",
+  done: "DONE",
+  needsChoice: "WAITING",
+  refused: "STOPPED",
+  failed: "FAILED",
+  expired: "EXPIRED",
+  replaced: "REPLACED",
+};
+
 const MS_PER_SECOND = 1000;
 const SECONDS_PER_MINUTE = 60;
 const SECOND_DIGITS = 2;
@@ -34,4 +46,8 @@ export const talkCopy = {
   confirm: (label: string) => label,
   cancel: "Cancel",
   choiceLabel: (number: number, label: string) => `Pick ${number}, ${label}`,
+  threadSummary: (status: ThreadStatus, steps: number) =>
+    `${threadStatusLabels[status]} · ${steps} steps`,
+  threadLine: (speaker: "you" | "ahoy", text: string) =>
+    speaker === "you" ? `You: “${text}”` : text,
 };
