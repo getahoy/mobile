@@ -29,7 +29,7 @@ export type TalkState =
       speech: string | null;
       choices: readonly CommandChoice[];
       confirm: boolean;
-      receivedAt: number;
+      sentAt: number;
     }
   | { kind: "failed"; failure: TalkFailure; heard: string | null };
 

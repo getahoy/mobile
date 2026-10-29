@@ -7,7 +7,6 @@ const facts: ReplyFacts = {
   asks: false,
   playsOn: "phone",
   policy: "problems",
-  current: true,
   ageMs: 0,
   recording: false,
   screenReader: false,
@@ -25,10 +24,9 @@ test("everything speaks successes too, off keeps quiet", () => {
   assert.equal(replyAction({ ...facts, policy: "off", asks: true }), "quiet");
 });
 
-test("old, earlier, mid-recording or Mac-only replies stay quiet", () => {
+test("old, mid-recording or Mac-only replies stay quiet", () => {
   const old = { ...facts, asks: true, ageMs: STALE_REPLY_MS + 1 };
   assert.equal(replyAction(old), "quiet");
-  assert.equal(replyAction({ ...facts, asks: true, current: false }), "quiet");
   assert.equal(replyAction({ ...facts, asks: true, recording: true }), "quiet");
   assert.equal(replyAction({ ...facts, asks: true, playsOn: "mac" }), "quiet");
   assert.equal(replyAction({ ...facts, asks: true, playsOn: "both" }), "speak");

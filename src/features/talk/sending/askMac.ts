@@ -14,15 +14,13 @@ export function choiceRequest(parentId: string, number: number): MacRequest {
 }
 
 // Pressing talk silences the Mac and keeps an open choice alive while the answer is spoken.
+// Stop goes out whatever the setting says now: the Mac may still be speaking under the old one.
 export function signalPress(
   session: MacSession | null,
-  speakOn: SpeakTarget,
   choosingFor: string | null,
 ): void {
   if (!session) return;
-  if (speakOn === "mac" || speakOn === "both") {
-    session.send({ type: "speech.stop" });
-  }
+  session.send({ type: "speech.stop" });
   if (choosingFor) {
     session.send({ type: "choice.extend", choiceId: choosingFor });
   }
@@ -36,14 +34,14 @@ export async function askMac(
 ): Promise<TalkState> {
   onState({ kind: "sending", heard, slow: false });
   const onSlow = () => onState({ kind: "sending", heard, slow: true });
+  const sentAt = Date.now();
   const answer = session
     ? await sendCommand(session, request, onSlow).catch(() => null)
     : null;
   if (answer?.kind === "result") {
     const { kind: _, ...result } = answer;
     const { commandId } = request;
-    const receivedAt = Date.now();
-    return { kind: "answered", commandId, heard, receivedAt, ...result };
+    return { kind: "answered", commandId, heard, sentAt, ...result };
   }
   const failure = answer?.kind === "noAnswer" ? "noAnswer" : "macUnreachable";
   return { kind: "failed", failure, heard };

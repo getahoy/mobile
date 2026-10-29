@@ -1,3 +1,4 @@
+import type { SpeakTarget } from "@getahoy/protocol";
 import { useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { authClient } from "@/features/auth/client/authClient";
@@ -28,14 +29,17 @@ export function useTalk(mac: PairedMac | null) {
       const { macKey: key } = latest.current;
       return key ? live.session(key) : null;
     };
-    const speakOn = () => readVoiceSettings().playsOn;
+    const speakOn = (): SpeakTarget => {
+      const { playsOn, policy } = readVoiceSettings();
+      return policy === "off" ? "off" : playsOn;
+    };
     return new TalkFlow({
       recorder: () => latest.current.recorder,
       session,
       speakOn,
       onPress: (choosingFor) => {
         latest.current.stopVoice();
-        signalPress(session(), speakOn(), choosingFor);
+        signalPress(session(), choosingFor);
       },
       onState: setState,
     });

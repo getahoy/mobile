@@ -4,6 +4,7 @@ import { AccessibilityInfo, AppState } from "react-native";
 import type { TalkState } from "@/features/talk/talkState";
 import { playSource, preparePlayback } from "../engine/audioPlayback";
 import { createFallbackVoice } from "../engine/fallbackVoice";
+import type { VoiceEngine } from "../engine/voiceEngine";
 import { replyAction } from "../replyAction";
 import { readVoiceSettings } from "../storage/voiceSettings";
 
@@ -56,7 +57,7 @@ type Context = { recording: boolean; screenReader: boolean };
 async function reply(
   answered: Answered,
   { recording, screenReader }: Context,
-  speak: ReturnType<typeof createFallbackVoice>["speak"],
+  speak: VoiceEngine["speak"],
 ): Promise<void> {
   const settings = readVoiceSettings();
   const line = answered.speech ?? answered.message;
@@ -65,8 +66,7 @@ async function reply(
     asks: answered.choices.length > 0,
     playsOn: settings.playsOn,
     policy: settings.policy,
-    current: true,
-    ageMs: Date.now() - answered.receivedAt,
+    ageMs: Date.now() - answered.sentAt,
     recording,
     screenReader,
   });

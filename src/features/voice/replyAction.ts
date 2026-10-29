@@ -10,16 +10,16 @@ export type ReplyFacts = {
   asks: boolean;
   playsOn: SpeakTarget;
   policy: SpeakPolicy;
-  current: boolean;
   ageMs: number;
   recording: boolean;
   screenReader: boolean;
 };
 
 // Speech is a bonus: anything doubtful stays quiet, the text is on screen either way.
+// The talk flow sends one command at a time, so a reply reaching here is always the latest.
 export function replyAction(facts: ReplyFacts): ReplyAction {
   const { status, asks, playsOn, policy } = facts;
-  if (!facts.current || facts.ageMs > STALE_REPLY_MS || facts.recording) {
+  if (facts.ageMs > STALE_REPLY_MS || facts.recording) {
     return "quiet";
   }
   if (policy === "off" || (playsOn !== "phone" && playsOn !== "both")) {
