@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 import { z } from "zod";
 import { Text } from "@/components/ui/text";
-import { homeCopy } from "../copy/homeCopy";
+import { galleryCopy } from "../copy/galleryCopy";
 
 const buildExtraSchema = z.object({ gitCommit: z.string() });
 
@@ -10,11 +10,8 @@ const commit =
   "unknown";
 const loadedAt = new Date().toLocaleTimeString();
 
-export function DevBuildStamp() {
-  if (!__DEV__) return null;
+export function BuildStamp() {
   return (
-    <Text className="text-xs text-muted-foreground">
-      {homeCopy.devStamp(commit, loadedAt)}
-    </Text>
+    <Text variant="caption">{galleryCopy.buildStamp(commit, loadedAt)}</Text>
   );
 }

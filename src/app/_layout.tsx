@@ -15,6 +15,7 @@ import { Uniwind, useUniwind } from "uniwind";
 import { GestureRoot } from "@/components/gestureRoot";
 import { authClient } from "@/features/auth/client/authClient";
 import { SessionLoading } from "@/features/auth/components/sessionLoading";
+import { useGalleryMenuItem } from "@/features/devGallery/hooks/useGalleryMenuItem";
 import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
 
 export { ErrorFallback as ErrorBoundary } from "@/features/errors/components/errorFallback";
@@ -23,6 +24,7 @@ export default function RootLayout() {
   const { theme } = useUniwind();
   const { data: session, isPending } = authClient.useSession();
   const signedIn = Boolean(session);
+  useGalleryMenuItem();
 
   return (
     <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
@@ -51,6 +53,9 @@ export default function RootLayout() {
                 <Stack.Protected guard={!signedIn}>
                   <Stack.Screen name="sign-in" />
                   <Stack.Screen name="sign-up" />
+                </Stack.Protected>
+                <Stack.Protected guard={__DEV__}>
+                  <Stack.Screen name="dev/components" />
                 </Stack.Protected>
               </Stack>
             )}
