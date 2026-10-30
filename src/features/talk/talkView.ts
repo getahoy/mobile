@@ -50,7 +50,10 @@ function threadReply(thread: Thread): Reply | null {
     lines.length >= FOLLOW_UP_LINES && asked && answer
       ? talkCopy.followUp(asked.text, answer.text)
       : null;
-  const label = talkCopy.statusLabel(status);
+  const label =
+    status === "done"
+      ? talkCopy.doneIn(thread.durationMs)
+      : talkCopy.statusLabel(status);
   return {
     label,
     tone: toneOf[status],

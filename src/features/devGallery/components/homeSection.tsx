@@ -55,8 +55,10 @@ function sampleActions(state: MacLinkState): MacCardAction[] {
   return [];
 }
 
+const SAMPLE_DURATION_MS = 800;
+
 const done = {
-  label: talkCopy.statusLabel("done"),
+  label: talkCopy.doneIn(SAMPLE_DURATION_MS),
   tone: "done",
   message: galleryCopy.body,
   followUp: talkCopy.followUp(galleryCopy.sheetTitle, "2"),

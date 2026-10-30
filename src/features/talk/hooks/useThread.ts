@@ -21,7 +21,16 @@ export function useThread(state: TalkState) {
     }
     const { commandId, threadId, heard, message, status } = state;
     const asks = state.choices.length > 0;
-    const result = { commandId, threadId, heard, message, status, asks };
+    const durationMs = state.receivedAt - state.sentAt;
+    const result = {
+      commandId,
+      threadId,
+      heard,
+      message,
+      status,
+      asks,
+      durationMs,
+    };
     dispatch({ kind: "result", ...result });
   }, [state]);
 

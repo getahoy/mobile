@@ -30,6 +30,7 @@ export type TalkState =
       choices: readonly CommandChoice[];
       confirm: boolean;
       sentAt: number;
+      receivedAt: number;
     }
   | { kind: "failed"; failure: TalkFailure; heard: string | null };
 

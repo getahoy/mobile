@@ -9,6 +9,7 @@ const answeredChoice: Thread = {
   threadId: "t",
   status: "done",
   rounds: 2,
+  durationMs: 840,
   lines: [
     { id: "1", speaker: "you", text: "save this" },
     { id: "2", speaker: "ahoy", text: "Which one?" },
@@ -23,6 +24,7 @@ test("a finished thread folds into its last reply and one follow-up line", () =>
   assert.equal(reply?.message, "Clicked Save As in Pages.");
   assert.equal(reply?.followUp, "Which one? · 2");
   assert.equal(reply?.tone, "done");
+  assert.equal(reply?.label, "Done · 0.8s");
 });
 
 test("a retryable failure offers try again and keeps what was heard", () => {

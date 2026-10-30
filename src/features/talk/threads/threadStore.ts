@@ -9,6 +9,7 @@ export type Thread = {
   lines: readonly ThreadLine[];
   status: ThreadStatus;
   rounds: number;
+  durationMs: number;
 };
 
 export type ThreadEvent =
@@ -20,6 +21,7 @@ export type ThreadEvent =
       message: string;
       status: CommandStatus;
       asks: boolean;
+      durationMs: number;
     }
   | { kind: "expired"; threadId: string };
 
@@ -46,6 +48,7 @@ function started(result: Result): Thread {
     lines: lines(result),
     status: statusOf(result),
     rounds: 0,
+    durationMs: result.durationMs,
   };
 }
 
@@ -70,6 +73,7 @@ export function threadReducer(
       lines: [...current.lines, ...lines(event)],
       status: statusOf(event),
       rounds: current.rounds + 1,
+      durationMs: event.durationMs,
     };
     return { ...state, current: next };
   }

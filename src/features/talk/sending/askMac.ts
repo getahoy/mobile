@@ -41,7 +41,15 @@ export async function askMac(
   if (answer?.kind === "result") {
     const { kind: _, ...result } = answer;
     const { commandId } = request;
-    return { kind: "answered", commandId, heard, sentAt, ...result };
+    const receivedAt = Date.now();
+    return {
+      kind: "answered",
+      commandId,
+      heard,
+      sentAt,
+      receivedAt,
+      ...result,
+    };
   }
   const failure = answer?.kind === "noAnswer" ? "noAnswer" : "macUnreachable";
   return { kind: "failed", failure, heard };

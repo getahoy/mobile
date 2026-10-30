@@ -51,5 +51,7 @@ export const talkCopy = {
   close: "Close",
   choiceLabel: (number: number, label: string) => `Pick ${number}, ${label}`,
   statusLabel: (status: ThreadStatus) => threadStatusLabels[status],
+  doneIn: (durationMs: number) =>
+    `${threadStatusLabels.done} · ${(durationMs / MS_PER_SECOND).toFixed(1)}s`,
   followUp: (asked: string, answer: string) => `${asked} · ${answer}`,
 };

@@ -12,6 +12,7 @@ const result = (overrides: Partial<ThreadEvent> = {}): ThreadEvent => ({
   message: "More than one Save on the screen. Pick a number.",
   status: "needsChoice",
   asks: true,
+  durationMs: 800,
   ...overrides,
 });
 
