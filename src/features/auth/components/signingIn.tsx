@@ -4,7 +4,7 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Button } from "@/components/ui/button";
 import { Orb } from "@/components/ui/orb";
 import { Text } from "@/components/ui/text";
-import { welcomeCopy } from "@/features/welcome/copy/welcomeCopy";
+import { Wordmark } from "@/features/welcome/components/wordmark";
 import { duration } from "@/lib/motion";
 
 type SigningInProps = { slow: boolean; onCancel?: () => void };
@@ -20,9 +20,7 @@ export function SigningIn({ slow, onCancel }: SigningInProps) {
         aria-hidden
         className="absolute inset-x-0 top-21/50 -mt-8 h-16 items-center justify-center"
       >
-        <Text className="font-fraunces text-wordmark">
-          {welcomeCopy.wordmark}
-        </Text>
+        <Wordmark />
       </View>
       <View className="absolute inset-x-0 top-21/50 mt-13 items-center">
         <Orb motion="breathe" className="size-signing-orb opacity-90" />

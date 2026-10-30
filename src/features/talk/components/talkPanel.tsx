@@ -1,5 +1,7 @@
 import { View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
+import { easing } from "@/lib/motion";
 import { talkCopy } from "../copy/talkCopy";
 import { useTalk } from "../hooks/useTalk";
 import type { TalkTarget } from "../hooks/useTalkTarget";
@@ -13,6 +15,9 @@ import { ReplyCard } from "./replyCard";
 import { TalkBar } from "./talkBar";
 import { TalkReason } from "./talkReason";
 import { TryHints } from "./tryHints";
+
+const LAUNCH_RISE_MS = 900;
+const rise = FadeInDown.duration(LAUNCH_RISE_MS).easing(easing.out);
 
 type TalkPanelProps = { target: TalkTarget & { mac: PairedMac } };
 
@@ -50,7 +55,7 @@ export function TalkPanel({ target }: TalkPanelProps) {
           <ReplyCard reply={reply} onRetry={talk.flow.tryAgain} />
         ) : null}
       </View>
-      <View className="gap-3.5 px-5 pb-safe-offset-2">
+      <Animated.View entering={rise} className="gap-3.5 px-5 pb-safe-offset-2">
         {bar.reason ? (
           <TalkReason
             reason={bar.reason}
@@ -58,7 +63,7 @@ export function TalkPanel({ target }: TalkPanelProps) {
           />
         ) : null}
         <TalkBar macName={mac} {...bar} activity={activity} {...hold} />
-      </View>
+      </Animated.View>
       <ChoiceSheet
         state={talk.state}
         answer={answer}

@@ -16,6 +16,8 @@ import { SigningIn } from "@/features/auth/components/signingIn";
 import { useSessionGate } from "@/features/auth/hooks/useSessionGate";
 import type * as GalleryMenu from "@/features/devGallery/hooks/useGalleryMenuItem";
 import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
+import { LaunchIntro } from "@/features/welcome/components/launchIntro";
+import { useLaunchIntro } from "@/features/welcome/hooks/useLaunchIntro";
 
 export { ErrorFallback as ErrorBoundary } from "@/features/errors/components/errorFallback";
 
@@ -28,6 +30,7 @@ const useGalleryMenuItem = devMenu?.useGalleryMenuItem ?? (() => undefined);
 export default function RootLayout() {
   const { theme } = useUniwind();
   const { gate, signedIn } = useSessionGate();
+  const intro = useLaunchIntro(gate === "ready", signedIn);
   useGalleryMenuItem();
 
   return (
@@ -60,6 +63,7 @@ export default function RootLayout() {
                 </Stack.Protected>
               </Stack>
             ) : null}
+            {intro.playing ? <LaunchIntro onDone={intro.finish} /> : null}
             <PortalHost />
           </ThemeProvider>
         </LiveMacLinksProvider>
