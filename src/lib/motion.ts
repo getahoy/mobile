@@ -27,7 +27,6 @@ export function timelinePhase(
   return easeOutCurve(linear);
 }
 
-export const WORD_STAGGER_MS = 60;
 export const REDUCED_FADE_MS = duration.fast;
 
 export const spinnerTiming = {

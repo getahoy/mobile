@@ -3,7 +3,7 @@ import { talkCopy } from "./copy/talkCopy";
 import type { MicAccess } from "./recorder/useFileRecorder";
 import type { TalkBlock, TalkState } from "./talkState";
 
-export type TalkBarView = {
+type TalkBarView = {
   label: string;
   labelStyle: "text" | "timer";
   reason: string | null;

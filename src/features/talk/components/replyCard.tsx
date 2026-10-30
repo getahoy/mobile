@@ -38,9 +38,9 @@ export function ReplyCard({ reply, onRetry }: ReplyCardProps) {
       </View>
       {reply.retry ? (
         <Button
-          variant="secondary"
+          variant="outline"
           size="sm"
-          className="h-9 bg-transparent px-3.5"
+          className="h-9 px-3.5"
           onPress={onRetry}
         >
           <Text className="text-body-sm">{talkCopy.tryAgain}</Text>

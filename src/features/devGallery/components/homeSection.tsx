@@ -42,15 +42,15 @@ function sampleActions(state: MacLinkState): MacCardAction[] {
   if (state.kind === "ended") {
     return [
       action(macCopy.pairAgain, "primary"),
-      action(macCopy.dismiss, "secondary"),
+      action(macCopy.dismiss, "outline"),
     ];
   }
   if (state.kind === "paused") return [action(macCopy.connect, "primary")];
   if (state.kind === "unrecognised") {
-    return [action(macCopy.pairAgain, "secondary")];
+    return [action(macCopy.pairAgain, "outline")];
   }
   if (state.kind === "unreachable" && !state.onCellular) {
-    return [action(macCopy.retry, "secondary")];
+    return [action(macCopy.retry, "outline")];
   }
   return [];
 }

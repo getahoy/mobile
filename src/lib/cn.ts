@@ -30,7 +30,7 @@ const merge = extendTailwindMerge({
         "fraunces-light",
         "fraunces-light-italic",
       ],
-      radius: ["tag", "thumb", "card", "sheet", "panel"],
+      radius: ["tag", "thumb", "card", "sheet"],
       shadow: ["float", "tag"],
     },
   },

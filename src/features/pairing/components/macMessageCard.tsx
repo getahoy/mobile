@@ -33,7 +33,6 @@ export function MacMessageCard({ message, actions }: MacMessageCardProps) {
               key={action.label}
               size="sm"
               variant={action.tone}
-              className={action.tone === "secondary" ? "bg-transparent" : ""}
               onPress={action.onPress}
             >
               <Text>{action.label}</Text>

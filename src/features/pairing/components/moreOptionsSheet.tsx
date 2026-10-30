@@ -42,7 +42,10 @@ export function MoreOptionsSheet(props: MoreOptionsSheetProps) {
               key={choice.publicKey}
               mac={choice}
               selected={choice.publicKey === mac.publicKey}
-              onSelect={(publicKey) => run(() => props.onSelect(publicKey))()}
+              onSelect={(publicKey) => {
+                onClose();
+                props.onSelect(publicKey);
+              }}
             />
           ))}
         </View>
@@ -52,11 +55,7 @@ export function MoreOptionsSheet(props: MoreOptionsSheetProps) {
           <Text>{link.label}</Text>
         </Button>
       ) : null}
-      <Button
-        variant="secondary"
-        className="bg-transparent"
-        onPress={run(props.onRemove)}
-      >
+      <Button variant="outline" onPress={run(props.onRemove)}>
         <Text className="text-flare">{macCopy.removeMac}</Text>
       </Button>
       <Button variant="ghost" onPress={onClose}>

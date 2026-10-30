@@ -7,7 +7,7 @@ import { useUnpairMac } from "./useUnpairMac";
 
 export type MacCardAction = {
   label: string;
-  tone: "primary" | "secondary";
+  tone: "primary" | "outline";
   onPress: () => void;
 };
 
@@ -52,13 +52,11 @@ function cardActions(
   if (state.kind === "ended") {
     return [
       { label: macCopy.pairAgain, tone: "primary", onPress: pairAgain },
-      { label: macCopy.dismiss, tone: "secondary", onPress: dismiss },
+      { label: macCopy.dismiss, tone: "outline", onPress: dismiss },
     ];
   }
   if (state.kind === "unrecognised") {
-    return [
-      { label: macCopy.pairAgain, tone: "secondary", onPress: pairAgain },
-    ];
+    return [{ label: macCopy.pairAgain, tone: "outline", onPress: pairAgain }];
   }
   if (!connection) return [];
   if (state.kind === "paused") {
@@ -67,7 +65,7 @@ function cardActions(
   }
   if (state.kind === "unreachable" && !state.onCellular) {
     const onPress = () => connection.connect();
-    return [{ label: macCopy.retry, tone: "secondary", onPress }];
+    return [{ label: macCopy.retry, tone: "outline", onPress }];
   }
   return [];
 }

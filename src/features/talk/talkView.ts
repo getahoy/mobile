@@ -16,7 +16,7 @@ export type Reply = {
   retry: boolean;
 };
 
-export type TalkView = { heard: string | null; reply: Reply | null };
+type TalkView = { heard: string | null; reply: Reply | null };
 
 const toneOf: Record<ThreadStatus, ReplyTone> = {
   done: "done",

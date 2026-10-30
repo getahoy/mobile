@@ -12,6 +12,7 @@ const buttonVariants = cva(
       variant: {
         primary: "bg-ink active:opacity-80",
         secondary: "border border-rope bg-paper active:bg-linen",
+        outline: "border border-rope active:bg-linen",
         ghost: "active:bg-linen",
         destructive: "bg-flare active:opacity-80",
       },
@@ -29,6 +30,7 @@ const labelVariants = cva("font-sans-medium", {
     variant: {
       primary: "text-on-ink",
       secondary: "text-ink",
+      outline: "text-ink",
       ghost: "text-ink",
       destructive: "text-on-flare",
     },
@@ -43,6 +45,7 @@ const labelVariants = cva("font-sans-medium", {
 const spinnerTint = {
   primary: "accent-on-ink",
   secondary: "accent-ink",
+  outline: "accent-ink",
   ghost: "accent-ink",
   destructive: "accent-on-flare",
 } as const;

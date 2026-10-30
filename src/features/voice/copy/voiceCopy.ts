@@ -41,5 +41,4 @@ export const voiceCopy = {
   footer:
     "Ahoy talks back when it needs you. Successes get a soft sound instead.",
   silentMode: "Speak in silent mode",
-  silentModeOptions: { on: "On", off: "Off" },
 } as const;

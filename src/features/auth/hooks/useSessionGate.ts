@@ -5,7 +5,7 @@ import { useSplashHold } from "./useSplashHold";
 
 const SESSION_WAIT_LIMIT_MS = 6000;
 
-export type SessionGate = "waiting" | "signingIn" | "ready";
+type SessionGate = "waiting" | "signingIn" | "ready";
 
 export function useSessionGate() {
   const { data: session, isPending } = authClient.useSession();

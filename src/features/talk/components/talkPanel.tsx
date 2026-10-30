@@ -43,9 +43,8 @@ export function TalkPanel({ target }: TalkPanelProps) {
             </Text>
             {talk.access === "blocked" ? (
               <Button
-                variant="secondary"
+                variant="outline"
                 size="sm"
-                className="bg-transparent"
                 onPress={() => void Linking.openSettings()}
               >
                 <Text>{talkCopy.openSettings}</Text>

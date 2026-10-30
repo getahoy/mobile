@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { haptics } from "@/lib/haptics";
 import type { TalkState } from "../talkState";
 
-export type ShownChoices = {
+type ShownChoices = {
   choices: readonly CommandChoice[];
   message: string;
   confirm: boolean;

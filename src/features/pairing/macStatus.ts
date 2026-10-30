@@ -16,7 +16,7 @@ const endedMessages: Record<EndReason, (mac: string) => string> = {
   signed_out: macCopy.endedSignedOut,
 };
 
-export function endedMessage(reason: EndReason, mac: string): string {
+function endedMessage(reason: EndReason, mac: string): string {
   return endedMessages[reason](mac);
 }
 

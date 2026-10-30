@@ -5,7 +5,7 @@ import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
 
 const SLOW_AFTER_MS = 6000;
 
-export type AuthSource = "credentials" | "google";
+type AuthSource = "credentials" | "google";
 
 export function useSigningInOverlay(authRequest: AuthRequestState) {
   const [source, setSource] = useState<AuthSource>("credentials");

@@ -47,9 +47,9 @@ export function SigningIn({ slow, onCancel }: SigningInProps) {
           className="absolute inset-x-0 bottom-14 items-center"
         >
           <Button
-            variant="secondary"
+            variant="outline"
             size="sm"
-            className="h-11 bg-transparent px-6"
+            className="h-11 px-6"
             onPress={onCancel}
           >
             <Text>{authCopy["session.cancel"]}</Text>

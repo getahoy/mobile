@@ -20,7 +20,7 @@ export function MacsHomeScreen() {
     <View className="flex-1 bg-sailcloth pt-safe">
       {macs?.length === 0 ? (
         <>
-          <HomeHeader chip={<View />} />
+          <HomeHeader />
           <NoMacsYet />
         </>
       ) : null}

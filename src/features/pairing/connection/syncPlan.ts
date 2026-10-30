@@ -1,6 +1,6 @@
 import type { PairedMac } from "../storage/pairedMacs";
 
-export type SyncPlan = { start: PairedMac[]; stop: string[] };
+type SyncPlan = { start: PairedMac[]; stop: string[] };
 
 export function syncPlan(
   running: Iterable<string>,

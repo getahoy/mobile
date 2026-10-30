@@ -52,7 +52,6 @@
   --radius-thumb: 10px;
   --radius-card: 24px;
   --radius-sheet: 28px;
-  --radius-panel: 32px;
 
   --shadow-float: 0 1px 0 rgba(23, 22, 20, 0.04), 0 16px 40px -16px rgba(23, 22, 20, 0.22);
   --shadow-tag: 0 0 0 2px #f4f2ed, 0 4px 12px rgba(0, 0, 0, 0.35);
@@ -64,7 +63,6 @@
   --spacing-signing-orb: 120px;
 
   --color-night: #121110;
-  --color-night-raised: #1c1b19;
   --color-white: #ffffff;
   --color-scrim: rgba(0, 0, 0, 0.6);
   --color-on-scrim: #f4f2ed;

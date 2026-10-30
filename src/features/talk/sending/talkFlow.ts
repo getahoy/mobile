@@ -1,6 +1,6 @@
 import type { SpeakTarget } from "@getahoy/protocol";
-import { ImpactFeedbackStyle, impactAsync } from "expo-haptics";
 import type { MacSession } from "@/features/pairing/connection/macSession";
+import { haptics } from "@/lib/haptics";
 import { transcribeRecording } from "../client/transcribeApi";
 import {
   deleteRecording,
@@ -38,10 +38,6 @@ type Phase = "idle" | "starting" | "listening" | "working";
 
 const READY: TalkState = { kind: "ready" };
 const TOO_SHORT: TalkState = { kind: "tooShort" };
-
-function haptic(): void {
-  void impactAsync(ImpactFeedbackStyle.Medium).catch(() => undefined);
-}
 
 export class TalkFlow {
   readonly #options: TalkFlowOptions;
@@ -81,7 +77,7 @@ export class TalkFlow {
     if (!started) return this.#settle(READY);
     if (this.#releasedEarly) return this.#discard(TOO_SHORT);
     this.#phase = "listening";
-    haptic();
+    haptics.talkStart();
     this.#options.onState({ kind: "listening" });
     this.#maxTimer = setTimeout(() => void this.#finish(), MAX_RECORDING_MS);
   };
@@ -133,7 +129,7 @@ export class TalkFlow {
     this.#clearMaxTimer();
     const recorder = this.#options.recorder();
     const uri = await recorder.stop().catch(() => null);
-    haptic();
+    haptics.talkEnd();
     if (!uri) return this.#settle(READY);
     await this.#upload(uri);
   }
