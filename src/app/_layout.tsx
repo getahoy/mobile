@@ -14,10 +14,16 @@ import { Uniwind, useUniwind } from "uniwind";
 import { GestureRoot } from "@/components/gestureRoot";
 import { SigningIn } from "@/features/auth/components/signingIn";
 import { useSessionGate } from "@/features/auth/hooks/useSessionGate";
-import { useGalleryMenuItem } from "@/features/devGallery/hooks/useGalleryMenuItem";
+import type * as GalleryMenu from "@/features/devGallery/hooks/useGalleryMenuItem";
 import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
 
 export { ErrorFallback as ErrorBoundary } from "@/features/errors/components/errorFallback";
+
+// Metro drops the false branch from release bundles, so no gallery code ships.
+const devMenu: typeof GalleryMenu | null = __DEV__
+  ? require("@/features/devGallery/hooks/useGalleryMenuItem")
+  : null;
+const useGalleryMenuItem = devMenu?.useGalleryMenuItem ?? (() => undefined);
 
 export default function RootLayout() {
   const { theme } = useUniwind();
