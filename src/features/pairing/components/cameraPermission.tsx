@@ -17,21 +17,23 @@ export function CameraPermission({
   onClose,
 }: CameraPermissionProps) {
   return (
-    <View className="flex-1 justify-center gap-6 bg-background p-6">
-      <View className="gap-2">
-        <Text variant="title">{pairingCopy["scanner.title"]}</Text>
-        <Text className="text-muted-foreground">
+    <View className="flex-1 bg-sailcloth px-5 pt-safe-offset-14 pb-safe-offset-2">
+      <View className="flex-1 gap-3 px-1">
+        <Text variant="heading">{pairingCopy["scanner.title"]}</Text>
+        <Text className="text-driftwood">
           {pairingCopy[blocked ? "camera.blocked" : "camera.needed"]}
         </Text>
       </View>
-      <Button onPress={blocked ? onOpenSettings : onAllow}>
-        <Text>
-          {pairingCopy[blocked ? "camera.openSettings" : "camera.allow"]}
-        </Text>
-      </Button>
-      <Button variant="ghost" onPress={onClose}>
-        <Text>{pairingCopy["scanner.close"]}</Text>
-      </Button>
+      <View className="gap-1.5">
+        <Button onPress={blocked ? onOpenSettings : onAllow}>
+          <Text>
+            {pairingCopy[blocked ? "camera.openSettings" : "camera.allow"]}
+          </Text>
+        </Button>
+        <Button variant="ghost" onPress={onClose}>
+          <Text>{pairingCopy["scanner.close"]}</Text>
+        </Button>
+      </View>
     </View>
   );
 }

@@ -11,12 +11,9 @@ const progressCopy = {
   finishing: "pair.finishing",
 } as const;
 
-type ScannerStatusProps = {
-  state: ClaimState;
-  onScanAgain: () => void;
-};
+type ScannerStatusProps = { state: ClaimState; onScanAgain: () => void };
 
-const card = "gap-3 rounded-2xl bg-background p-5";
+const dock = "absolute inset-x-0 bottom-0 px-5 pb-safe-offset-5";
 
 export function ScannerStatus({ state, onScanAgain }: ScannerStatusProps) {
   switch (state.kind) {
@@ -25,10 +22,10 @@ export function ScannerStatus({ state, onScanAgain }: ScannerStatusProps) {
     case "claiming":
     case "finishing":
       return (
-        <View className="absolute inset-x-0 bottom-0 px-5 pb-safe-offset-5">
-          <View className={`${card} flex-row items-center`}>
-            <ActivityIndicator colorClassName="accent-muted-foreground" />
-            <Text accessibilityLiveRegion="polite">
+        <View className={dock}>
+          <View className="flex-row items-center gap-3 self-center rounded-full bg-night px-5 py-3">
+            <ActivityIndicator colorClassName="accent-on-scrim" />
+            <Text accessibilityLiveRegion="polite" className="text-on-scrim">
               {pairingCopy[progressCopy[state.kind]]}
             </Text>
           </View>
@@ -36,14 +33,14 @@ export function ScannerStatus({ state, onScanAgain }: ScannerStatusProps) {
       );
     case "paired":
       return (
-        <View className="absolute inset-x-0 bottom-0 px-5 pb-safe-offset-5">
-          <View className={`${card} flex-row items-center`}>
+        <View className={dock}>
+          <View className="items-center gap-3 rounded-card bg-paper p-6">
             <Icon
               name="checkCircle"
-              size="lg"
+              size="xl"
               tintColorClassName="accent-kelp"
             />
-            <Text accessibilityLiveRegion="polite">
+            <Text variant="title" accessibilityLiveRegion="polite">
               {macCopy.pairedWith(state.macName)}
             </Text>
           </View>
@@ -51,9 +48,9 @@ export function ScannerStatus({ state, onScanAgain }: ScannerStatusProps) {
       );
     case "failed":
       return (
-        <View className="absolute inset-x-0 bottom-0 px-5 pb-safe-offset-5">
-          <View className={card}>
-            <Text accessibilityRole="alert">{state.message}</Text>
+        <View className={dock}>
+          <View className="gap-4 rounded-card bg-paper p-5">
+            <Text role="alert">{state.message}</Text>
             <Button onPress={onScanAgain}>
               <Text>{pairingCopy["pair.scanAgain"]}</Text>
             </Button>

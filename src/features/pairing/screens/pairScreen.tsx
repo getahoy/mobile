@@ -2,7 +2,7 @@ import { useCameraPermissions } from "expo-camera";
 import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { ActivityIndicator, Linking, View } from "react-native";
+import { Linking, View } from "react-native";
 import { CameraPermission } from "../components/cameraPermission";
 import { ScannerCamera } from "../components/scannerCamera";
 import { ScannerStatus } from "../components/scannerStatus";
@@ -21,12 +21,10 @@ export function PairScreen() {
 
   if (!permission) {
     return (
-      <View className="flex-1 items-center justify-center bg-background">
-        <ActivityIndicator
-          accessibilityLabel={pairingCopy["camera.loading"]}
-          colorClassName="accent-muted-foreground"
-        />
-      </View>
+      <View
+        accessibilityLabel={pairingCopy["camera.loading"]}
+        className="flex-1 bg-sailcloth"
+      />
     );
   }
   if (!permission.granted) {

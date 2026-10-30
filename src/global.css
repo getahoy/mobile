@@ -62,9 +62,6 @@
   --spacing-orb: 240px;
   --spacing-welcome-orb: 300px;
   --spacing-signing-orb: 120px;
-  --spacing-talk-button: 112px;
-  --spacing-talk-ring: 128px;
-  --spacing-talk-zone: 176px;
 
   --color-night: #121110;
   --color-night-raised: #1c1b19;
@@ -122,16 +119,3 @@
   }
 }
 
-/* Screens not yet rebuilt still use the old shadcn names; each alias goes when its last screen is rebuilt. */
-@theme {
-  --color-background: var(--color-sailcloth);
-  --color-foreground: var(--color-ink);
-  --color-card: var(--color-paper);
-  --color-muted: var(--color-linen);
-  --color-muted-foreground: var(--color-driftwood);
-  --color-primary: var(--color-ink);
-  --color-primary-foreground: var(--color-on-ink);
-  --color-destructive: var(--color-flare);
-  --color-success: var(--color-kelp);
-  --color-border: var(--color-rope);
-}
