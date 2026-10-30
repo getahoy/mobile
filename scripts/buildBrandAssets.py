@@ -45,6 +45,12 @@ WORDMARK_PADDING_EM = 0.1
 WORDMARK_INKS = {"": (0x17, 0x16, 0x14, 0xFF), "Dark": (0xF2, 0xEF, 0xE8, 0xFF)}
 SCALES = {"": 1, "@2x": 2, "@3x": 3}
 
+PENNANT_POINTS = [(2, 1.5), (24, 1.5), (16.5, 10), (24, 18.5), (2, 18.5)]
+PENNANT_VIEWBOX = (26, 20)
+PENNANT_SIZE = (30, 22)
+PENNANT_STROKE = 2
+PENNANT_INK = (0, 0, 0, 0xFF)
+
 downloads: dict[str, bytes] = {}
 
 
@@ -93,6 +99,23 @@ def render_wordmark(ink: tuple, scale: int) -> Image.Image:
     return image
 
 
+def render_pennant(scale: int) -> Image.Image:
+    width, height = (side * scale for side in PENNANT_SIZE)
+    zoom = min(width / PENNANT_VIEWBOX[0], height / PENNANT_VIEWBOX[1])
+    offset_x = (width - PENNANT_VIEWBOX[0] * zoom) / 2
+    offset_y = (height - PENNANT_VIEWBOX[1] * zoom) / 2
+    points = [(offset_x + x * zoom, offset_y + y * zoom) for x, y in PENNANT_POINTS]
+    image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(image)
+    draw.polygon(points, fill=PENNANT_INK)
+    stroke = round(PENNANT_STROKE * zoom)
+    draw.line([*points, points[0]], fill=PENNANT_INK, width=stroke, joint="curve")
+    for x, y in points:
+        radius = stroke / 2
+        draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=PENNANT_INK)
+    return image
+
+
 def main() -> None:
     FONTS_DIR.mkdir(parents=True, exist_ok=True)
     LICENCES_DIR.mkdir(parents=True, exist_ok=True)
@@ -105,6 +128,8 @@ def main() -> None:
             image = render_wordmark(ink, scale)
             image.save(IMAGES_DIR / f"splashWordmark{theme}{suffix}.png")
             print(f"splashWordmark{theme}{suffix}.png {image.width}x{image.height}")
+    for suffix, scale in SCALES.items():
+        render_pennant(scale).save(IMAGES_DIR / f"pennant{suffix}.png")
 
 
 if __name__ == "__main__":

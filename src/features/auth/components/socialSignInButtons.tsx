@@ -1,5 +1,4 @@
 import { type SocialProviderId, socialProviderCatalog } from "@getahoy/lib";
-import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 
@@ -12,18 +11,18 @@ export function SocialSignInButtons({
   pending,
   onSelect,
 }: SocialSignInButtonsProps) {
-  return (
-    <View className="gap-2">
-      {socialProviderCatalog.map((provider) => (
-        <Button
-          key={provider.id}
-          variant="secondary"
-          disabled={pending}
-          onPress={() => onSelect(provider.id)}
-        >
-          <Text>{provider.label}</Text>
-        </Button>
-      ))}
-    </View>
-  );
+  return socialProviderCatalog.map((provider) => (
+    <Button
+      key={provider.id}
+      variant="secondary"
+      className="bg-transparent"
+      disabled={pending}
+      onPress={() => onSelect(provider.id)}
+    >
+      <Text aria-hidden className="font-mono text-callout">
+        {provider.id.charAt(0).toUpperCase()}
+      </Text>
+      <Text>{provider.label}</Text>
+    </Button>
+  ));
 }

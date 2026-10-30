@@ -13,9 +13,8 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaListener } from "react-native-safe-area-context";
 import { Uniwind, useUniwind } from "uniwind";
 import { GestureRoot } from "@/components/gestureRoot";
-import { authClient } from "@/features/auth/client/authClient";
-import { SessionLoading } from "@/features/auth/components/sessionLoading";
-import { useSplashHold } from "@/features/auth/hooks/useSplashHold";
+import { SigningIn } from "@/features/auth/components/signingIn";
+import { useSessionGate } from "@/features/auth/hooks/useSessionGate";
 import { useGalleryMenuItem } from "@/features/devGallery/hooks/useGalleryMenuItem";
 import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
 
@@ -23,9 +22,7 @@ export { ErrorFallback as ErrorBoundary } from "@/features/errors/components/err
 
 export default function RootLayout() {
   const { theme } = useUniwind();
-  const { data: session, isPending } = authClient.useSession();
-  const signedIn = Boolean(session);
-  useSplashHold(!isPending);
+  const { gate, signedIn } = useSessionGate();
   useGalleryMenuItem();
 
   return (
@@ -34,9 +31,8 @@ export default function RootLayout() {
         <LiveMacLinksProvider>
           <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
             <StatusBar style={theme === "dark" ? "light" : "dark"} />
-            {isPending ? (
-              <SessionLoading />
-            ) : (
+            {gate === "signingIn" ? <SigningIn slow={false} /> : null}
+            {gate === "ready" ? (
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Protected guard={signedIn} redirectTo="/welcome">
                   <Stack.Screen name="index" />
@@ -64,7 +60,7 @@ export default function RootLayout() {
                   <Stack.Screen name="dev/components" />
                 </Stack.Protected>
               </Stack>
-            )}
+            ) : null}
             <PortalHost />
           </ThemeProvider>
         </LiveMacLinksProvider>

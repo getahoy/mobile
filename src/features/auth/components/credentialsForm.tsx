@@ -1,6 +1,4 @@
-import { authCopy } from "@getahoy/lib";
 import { View } from "react-native";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import type { CredentialField } from "../forms/credentialFields";
@@ -9,7 +7,6 @@ import { FormError } from "./formError";
 type CredentialsFormProps<Name extends string> = {
   fields: readonly CredentialField<Name>[];
   values: Partial<Record<Name, string>>;
-  submitLabel: string;
   pending: boolean;
   errorMessage: string | null;
   onChange: (name: Name, text: string) => void;
@@ -19,20 +16,19 @@ type CredentialsFormProps<Name extends string> = {
 export function CredentialsForm<Name extends string>({
   fields,
   values,
-  submitLabel,
   pending,
   errorMessage,
   onChange,
   onSubmit,
 }: CredentialsFormProps<Name>) {
+  const lastField = fields[fields.length - 1]?.name;
   return (
-    <View className="gap-4">
+    <View className="gap-3.5">
       {fields.map((field) => (
-        <View key={field.name} className="gap-2">
+        <View key={field.name} className="gap-1.5">
           <Text
-            variant="bodySmall"
             nativeID={field.name}
-            className="pl-1 font-sans-medium"
+            className="pl-1 font-sans text-body-sm text-driftwood"
           >
             {field.label}
           </Text>
@@ -47,14 +43,14 @@ export function CredentialsForm<Name extends string>({
             autoCapitalize="none"
             autoCorrect={false}
             spellCheck={false}
+            invalid={errorMessage !== null}
             editable={!pending}
+            returnKeyType={field.name === lastField ? "go" : "next"}
+            {...(field.name === lastField ? { onSubmitEditing: onSubmit } : {})}
           />
         </View>
       ))}
       <FormError message={errorMessage} />
-      <Button disabled={pending} onPress={onSubmit}>
-        <Text>{pending ? authCopy["form.pending"] : submitLabel}</Text>
-      </Button>
     </View>
   );
 }

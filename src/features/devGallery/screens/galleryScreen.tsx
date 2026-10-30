@@ -7,6 +7,7 @@ import { ListRow } from "@/components/ui/listRow";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { haptics } from "@/lib/haptics";
+import { AuthSection } from "../components/authSection";
 import { BuildStamp } from "../components/buildStamp";
 import { ButtonsSection } from "../components/buttonsSection";
 import { ChoiceTagsSection } from "../components/choiceTagsSection";
@@ -67,6 +68,7 @@ export function GalleryScreen() {
         <SheetsSection onOpen={openSheet} />
         <OrbSection />
         <IconsSection />
+        <AuthSection />
       </ScrollView>
       <GallerySheets open={sheet} onClose={() => setSheet(null)} />
     </View>

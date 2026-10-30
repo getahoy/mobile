@@ -3,6 +3,7 @@ export const galleryCopy = {
   buildStamp: (commit: string, loadedAt: string) =>
     `Dev build ${commit}, loaded ${loadedAt}`,
   screenTitle: "Components",
+  auth: "Sign in",
   darkMode: "Dark mode",
   close: "Close",
   typography: "Text",
