@@ -19,7 +19,7 @@ export function CameraPermission({
   return (
     <View className="flex-1 justify-center gap-6 bg-background p-6">
       <View className="gap-2">
-        <Text variant="h3">{pairingCopy["scanner.title"]}</Text>
+        <Text variant="title">{pairingCopy["scanner.title"]}</Text>
         <Text className="text-muted-foreground">
           {pairingCopy[blocked ? "camera.blocked" : "camera.needed"]}
         </Text>

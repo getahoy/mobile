@@ -17,7 +17,7 @@ export function SocialSignInButtons({
       {socialProviderCatalog.map((provider) => (
         <Button
           key={provider.id}
-          variant="outline"
+          variant="secondary"
           disabled={pending}
           onPress={() => onSelect(provider.id)}
         >

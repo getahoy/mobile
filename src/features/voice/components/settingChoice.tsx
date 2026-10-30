@@ -27,7 +27,7 @@ export function SettingChoice<Option extends string>(
           <Button
             key={option}
             size="sm"
-            variant={option === selected ? "default" : "outline"}
+            variant={option === selected ? "primary" : "secondary"}
             accessibilityRole="radio"
             accessibilityState={{ checked: option === selected }}
             onPress={() => onSelect(option)}

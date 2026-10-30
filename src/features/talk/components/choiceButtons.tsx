@@ -1,5 +1,6 @@
 import type { CommandChoice } from "@getahoy/protocol";
 import { Button } from "@/components/ui/button";
+import { ChoiceTag } from "@/components/ui/choiceTag";
 import { Text } from "@/components/ui/text";
 import { talkCopy } from "../copy/talkCopy";
 
@@ -16,16 +17,11 @@ export function ChoiceButtons(props: ChoiceButtonsProps) {
   if (confirm && only) {
     return (
       <>
-        <Button
-          variant="destructive"
-          size="lg"
-          className="h-14"
-          onPress={() => onChoose(only.number)}
-        >
-          <Text className="text-lg">{only.label}</Text>
+        <Button variant="destructive" onPress={() => onChoose(only.number)}>
+          <Text>{only.label}</Text>
         </Button>
-        <Button variant="outline" size="lg" className="h-14" onPress={onCancel}>
-          <Text className="text-lg">{talkCopy.cancel}</Text>
+        <Button variant="ghost" onPress={onCancel}>
+          <Text>{talkCopy.cancel}</Text>
         </Button>
       </>
     );
@@ -33,16 +29,13 @@ export function ChoiceButtons(props: ChoiceButtonsProps) {
   return choices.map((choice) => (
     <Button
       key={choice.number}
-      variant="outline"
-      size="lg"
-      className="h-14 justify-start gap-4"
+      variant="secondary"
+      className="justify-start gap-4 px-4"
       accessibilityLabel={talkCopy.choiceLabel(choice.number, choice.label)}
       onPress={() => onChoose(choice.number)}
     >
-      <Text className="text-xl font-bold">{choice.number}</Text>
-      <Text className="text-lg" numberOfLines={1}>
-        {choice.label}
-      </Text>
+      <ChoiceTag number={choice.number} />
+      <Text numberOfLines={1}>{choice.label}</Text>
     </Button>
   ));
 }

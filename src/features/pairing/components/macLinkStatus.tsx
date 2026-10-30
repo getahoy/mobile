@@ -1,11 +1,9 @@
 import { ActivityIndicator, Pressable, View } from "react-native";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import type { MacLinkState } from "../connection/macLinkState";
 import { macCopy } from "../copy/macCopy";
-import { Icon } from "./icon";
-
-const MENU_ICON_SIZE = 20;
 
 export type MacCardAction = { label: string; onPress: () => void };
 
@@ -66,11 +64,7 @@ export function MacLinkStatus({
           onPress={onMore}
           className="size-9 items-center justify-center rounded-full"
         >
-          <Icon
-            name="ellipsis-horizontal"
-            size={MENU_ICON_SIZE}
-            colorClassName="accent-muted-foreground"
-          />
+          <Icon name="more" tintColorClassName="accent-driftwood" />
         </Pressable>
       </View>
       <Text
@@ -80,7 +74,7 @@ export function MacLinkStatus({
         {statusLine(state, macName)}
       </Text>
       {action ? (
-        <Button variant="outline" onPress={action.onPress}>
+        <Button variant="secondary" onPress={action.onPress}>
           <Text>{action.label}</Text>
         </Button>
       ) : null}

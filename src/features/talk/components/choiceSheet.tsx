@@ -1,10 +1,10 @@
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
+import { SheetBackground } from "@/components/ui/sheetBackground";
 import { Text } from "@/components/ui/text";
 import type { TalkState } from "../talkState";
 import { ChoiceButtons } from "./choiceButtons";
-import { SheetBackground } from "./sheetBackground";
 
 type ChoiceSheetProps = {
   state: TalkState;

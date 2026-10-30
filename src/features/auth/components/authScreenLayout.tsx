@@ -14,7 +14,7 @@ export function AuthScreenLayout({ title, children }: AuthScreenLayoutProps) {
         keyboardShouldPersistTaps="handled"
         contentContainerClassName="flex-grow justify-center gap-6 p-6"
       >
-        <Text variant="h3">{title}</Text>
+        <Text variant="title">{title}</Text>
         {children}
       </ScrollView>
     </KeyboardAvoidingView>

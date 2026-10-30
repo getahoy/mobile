@@ -1,12 +1,10 @@
 import { ActivityIndicator, View } from "react-native";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { macCopy } from "../copy/macCopy";
 import { pairingCopy } from "../copy/pairingCopy";
 import type { ClaimState } from "../hooks/useClaimMac";
-import { Icon } from "./icon";
-
-const CHECK_ICON_SIZE = 24;
 
 const progressCopy = {
   claiming: "pair.claiming",
@@ -41,9 +39,9 @@ export function ScannerStatus({ state, onScanAgain }: ScannerStatusProps) {
         <View className="absolute inset-x-0 bottom-0 px-5 pb-safe-offset-5">
           <View className={`${card} flex-row items-center`}>
             <Icon
-              name="checkmark-circle"
-              size={CHECK_ICON_SIZE}
-              colorClassName="accent-primary"
+              name="checkCircle"
+              size="lg"
+              tintColorClassName="accent-kelp"
             />
             <Text accessibilityLiveRegion="polite">
               {macCopy.pairedWith(state.macName)}

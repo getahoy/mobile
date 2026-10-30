@@ -2,7 +2,6 @@ import { authCopy } from "@getahoy/lib";
 import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import type { CredentialField } from "../forms/credentialFields";
 import { FormError } from "./formError";
@@ -30,7 +29,13 @@ export function CredentialsForm<Name extends string>({
     <View className="gap-4">
       {fields.map((field) => (
         <View key={field.name} className="gap-2">
-          <Label nativeID={field.name}>{field.label}</Label>
+          <Text
+            variant="bodySmall"
+            nativeID={field.name}
+            className="pl-1 font-sans-medium"
+          >
+            {field.label}
+          </Text>
           <Input
             aria-labelledby={field.name}
             value={values[field.name] ?? ""}

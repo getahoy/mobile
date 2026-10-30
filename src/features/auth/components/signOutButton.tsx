@@ -11,7 +11,7 @@ export function SignOutButton() {
   return (
     <View className="gap-2">
       <Button
-        variant="outline"
+        variant="secondary"
         disabled={pending || checking}
         onPress={signOut}
       >

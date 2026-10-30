@@ -1,8 +1,8 @@
 import { Linking, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { Icon } from "@/features/pairing/components/icon";
 import { talkCopy } from "../copy/talkCopy";
 import type { MicAccess } from "../recorder/useFileRecorder";
 import {
@@ -11,8 +11,6 @@ import {
   type TalkFailure,
   type TalkState,
 } from "../talkState";
-
-const DONE_ICON_SIZE = 18;
 
 type TalkStatusProps = {
   state: TalkState;
@@ -67,7 +65,7 @@ export function TalkStatus(props: TalkStatusProps) {
     return (
       <View className="items-center gap-2">
         <Text className="text-center">{talkCopy.micBlocked}</Text>
-        <Button variant="outline" onPress={() => void Linking.openSettings()}>
+        <Button variant="secondary" onPress={() => void Linking.openSettings()}>
           <Text>{talkCopy.openSettings}</Text>
         </Button>
       </View>
@@ -100,11 +98,7 @@ export function TalkStatus(props: TalkStatusProps) {
         className="flex-row items-center gap-1"
       >
         {done ? (
-          <Icon
-            name="checkmark-circle"
-            size={DONE_ICON_SIZE}
-            colorClassName="accent-success"
-          />
+          <Icon name="checkCircle" size="sm" tintColorClassName="accent-kelp" />
         ) : null}
         <Text
           className={`text-center ${done ? "text-success" : "text-muted-foreground"}`}
@@ -113,7 +107,7 @@ export function TalkStatus(props: TalkStatusProps) {
         </Text>
       </Animated.View>
       {canRetry ? (
-        <Button variant="outline" onPress={onTryAgain}>
+        <Button variant="secondary" onPress={onTryAgain}>
           <Text>{talkCopy.tryAgain}</Text>
         </Button>
       ) : null}

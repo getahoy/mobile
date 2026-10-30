@@ -10,12 +10,11 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { Icon } from "@/features/pairing/components/icon";
+import { Icon } from "@/components/ui/icon";
 import { talkCopy } from "../copy/talkCopy";
 import { ThinkingRing } from "./thinkingRing";
 import { VoiceRings } from "./voiceRings";
 
-const MIC_ICON_SIZE = 40;
 const HELD_SCALE = 1.08;
 
 type TalkButtonProps = {
@@ -67,11 +66,7 @@ export function TalkButton(props: TalkButtonProps) {
           style={grow}
           className={`size-talk-button items-center justify-center rounded-full ${tone} ${disabled ? "opacity-40" : ""}`}
         >
-          <Icon
-            name={listening ? "mic" : "mic-outline"}
-            size={MIC_ICON_SIZE}
-            colorClassName="accent-primary-foreground"
-          />
+          <Icon name="mic" size="xl" tintColorClassName="accent-on-ink" />
         </Animated.View>
       </View>
     </GestureDetector>

@@ -6,7 +6,7 @@ export function SheetBackground({ style }: BottomSheetBackgroundProps) {
     <View
       pointerEvents="none"
       style={style}
-      className="rounded-t-3xl bg-card"
+      className="rounded-t-sheet bg-paper shadow-float"
     />
   );
 }

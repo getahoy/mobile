@@ -35,7 +35,7 @@ export function EndedMacCard({ mac, reason, onDismissed }: EndedMacCardProps) {
         <Button className="flex-1" onPress={pairAgain}>
           <Text>{macCopy.pairAgain}</Text>
         </Button>
-        <Button className="flex-1" variant="outline" onPress={dismiss}>
+        <Button className="flex-1" variant="secondary" onPress={dismiss}>
           <Text>{macCopy.dismiss}</Text>
         </Button>
       </View>
