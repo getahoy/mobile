@@ -1,95 +1,129 @@
 @import "tailwindcss";
 @import "uniwind";
 
-@import "tw-animate-css";
-
 @theme {
-  --radius: 10px;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: "Inter-Regular";
+  --font-sans-medium: "Inter-Medium";
+  --font-mono: "GeistMono-Medium";
+  --font-fraunces: "FrauncesAhoy-Regular";
+  --font-fraunces-italic: "FrauncesAhoy-Italic";
+  --font-fraunces-light: "FrauncesAhoy-Light";
+  --font-fraunces-light-italic: "FrauncesAhoy-LightItalic";
+
+  --text-eyebrow: 11px;
+  --text-eyebrow--line-height: 15px;
+  --text-eyebrow--letter-spacing: 0.66px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-callout: 15px;
+  --text-callout--line-height: 21px;
+  --text-numeral: 16px;
+  --text-numeral--line-height: 20px;
+  --text-body: 17px;
+  --text-body--line-height: 26px;
+  --text-body--letter-spacing: -0.19px;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 26px;
+  --text-body-lg--letter-spacing: -0.2px;
+  --text-heard: 24px;
+  --text-heard--line-height: 28px;
+  --text-heard--letter-spacing: -0.24px;
+  --text-title: 28px;
+  --text-title--line-height: 31px;
+  --text-title--letter-spacing: -0.28px;
+  --text-heading: 40px;
+  --text-heading--line-height: 41px;
+  --text-heading--letter-spacing: -0.8px;
+  --text-display: 52px;
+  --text-display--line-height: 52px;
+  --text-display--letter-spacing: -1.56px;
+
+  --radius-tag: 7px;
+  --radius-thumb: 10px;
+  --radius-card: 24px;
+  --radius-sheet: 28px;
+  --radius-panel: 32px;
+
+  --shadow-float: 0 1px 0 rgba(23, 22, 20, 0.04), 0 16px 40px -16px rgba(23, 22, 20, 0.22);
+  --shadow-tag: 0 0 0 2px #f4f2ed, 0 4px 12px rgba(0, 0, 0, 0.35);
 
   --spacing-hairline: hairlineWidth();
   --spacing-viewfinder: 260px;
+  --spacing-orb: 240px;
   --spacing-talk-button: 112px;
   --spacing-talk-ring: 128px;
   --spacing-talk-zone: 176px;
 
-  --color-scrim: oklch(0 0 0 / 60%);
-  --color-on-scrim: oklch(1 0 0);
+  --color-night: #121110;
+  --color-night-raised: #1c1b19;
+  --color-white: #ffffff;
+  --color-scrim: rgba(0, 0, 0, 0.6);
+  --color-on-scrim: #f4f2ed;
+}
+
+@theme static {
+  --color-listen-core: #3a4cf0;
+  --color-listen-mid: #8e9aff;
+  --color-listen-edge: #e3e5ff;
+  --color-speak-core: #ff9a6b;
+  --color-speak-mid: #ffc9a8;
+  --color-speak-edge: #fbe4de;
 }
 
 @layer theme {
   :root {
     @variant light {
-      --color-background: oklch(1 0 0);
-      --color-foreground: oklch(0.145 0 0);
-      --color-card: oklch(1 0 0);
-      --color-card-foreground: oklch(0.145 0 0);
-      --color-popover: oklch(1 0 0);
-      --color-popover-foreground: oklch(0.145 0 0);
-      --color-primary: oklch(0.205 0 0);
-      --color-primary-foreground: oklch(0.985 0 0);
-      --color-secondary: oklch(0.97 0 0);
-      --color-secondary-foreground: oklch(0.205 0 0);
-      --color-muted: oklch(0.97 0 0);
-      --color-muted-foreground: oklch(0.556 0 0);
-      --color-accent: oklch(0.97 0 0);
-      --color-accent-foreground: oklch(0.205 0 0);
-      --color-destructive: oklch(0.577 0.245 27.325);
-      --color-success: oklch(0.527 0.154 150.069);
-      --color-border: oklch(0.922 0 0);
-      --color-input: oklch(0.922 0 0);
-      --color-ring: oklch(0.708 0 0);
-      --color-chart-1: oklch(0.646 0.222 41.116);
-      --color-chart-2: oklch(0.6 0.118 184.704);
-      --color-chart-3: oklch(0.398 0.07 227.392);
-      --color-chart-4: oklch(0.828 0.189 84.429);
-      --color-chart-5: oklch(0.769 0.188 70.08);
-      --color-sidebar: oklch(0.985 0 0);
-      --color-sidebar-foreground: oklch(0.145 0 0);
-      --color-sidebar-primary: oklch(0.205 0 0);
-      --color-sidebar-primary-foreground: oklch(0.985 0 0);
-      --color-sidebar-accent: oklch(0.97 0 0);
-      --color-sidebar-accent-foreground: oklch(0.205 0 0);
-      --color-sidebar-border: oklch(0.922 0 0);
-      --color-sidebar-ring: oklch(0.708 0 0);
+      --color-ink: #171614;
+      --color-on-ink: #ffffff;
+      --color-sailcloth: #f4f2ed;
+      --color-linen: #ebe8e1;
+      --color-paper: #fdfcfa;
+      --color-rope: #dedad0;
+      --color-driftwood: #6e6a62;
+      --color-fog: #a29d93;
+      --color-signal: #3a4cf0;
+      --color-on-signal: #ffffff;
+      --color-signal-mist: #e3e5ff;
+      --color-flare: #c8412b;
+      --color-on-flare: #ffffff;
+      --color-flare-mist: #fbe4de;
+      --color-kelp: #2e7352;
     }
 
     @variant dark {
-      --color-background: oklch(0.145 0 0);
-      --color-foreground: oklch(0.985 0 0);
-      --color-card: oklch(0.205 0 0);
-      --color-card-foreground: oklch(0.985 0 0);
-      --color-popover: oklch(0.205 0 0);
-      --color-popover-foreground: oklch(0.985 0 0);
-      --color-primary: oklch(0.922 0 0);
-      --color-primary-foreground: oklch(0.205 0 0);
-      --color-secondary: oklch(0.269 0 0);
-      --color-secondary-foreground: oklch(0.985 0 0);
-      --color-muted: oklch(0.269 0 0);
-      --color-muted-foreground: oklch(0.708 0 0);
-      --color-accent: oklch(0.269 0 0);
-      --color-accent-foreground: oklch(0.985 0 0);
-      --color-destructive: oklch(0.704 0.191 22.216);
-      --color-success: oklch(0.723 0.192 149.579);
-      --color-border: oklch(1 0 0 / 10%);
-      --color-input: oklch(1 0 0 / 15%);
-      --color-ring: oklch(0.556 0 0);
-      --color-chart-1: oklch(0.488 0.243 264.376);
-      --color-chart-2: oklch(0.696 0.17 162.48);
-      --color-chart-3: oklch(0.769 0.188 70.08);
-      --color-chart-4: oklch(0.627 0.265 303.9);
-      --color-chart-5: oklch(0.645 0.246 16.439);
-      --color-sidebar: oklch(0.205 0 0);
-      --color-sidebar-foreground: oklch(0.985 0 0);
-      --color-sidebar-primary: oklch(0.488 0.243 264.376);
-      --color-sidebar-primary-foreground: oklch(0.985 0 0);
-      --color-sidebar-accent: oklch(0.269 0 0);
-      --color-sidebar-accent-foreground: oklch(0.985 0 0);
-      --color-sidebar-border: oklch(1 0 0 / 10%);
-      --color-sidebar-ring: oklch(0.556 0 0);
+      --color-ink: #f2efe8;
+      --color-on-ink: #121110;
+      --color-sailcloth: #121110;
+      --color-linen: #191816;
+      --color-paper: #1f1e1b;
+      --color-rope: #2f2d29;
+      --color-driftwood: #a39e94;
+      --color-fog: #6b675f;
+      --color-signal: #8e9aff;
+      --color-on-signal: #121110;
+      --color-signal-mist: #23264a;
+      --color-flare: #ff7a5c;
+      --color-on-flare: #121110;
+      --color-flare-mist: #3a1f19;
+      --color-kelp: #5fbf8f;
     }
   }
+}
+
+/* Screens not yet rebuilt still use the old shadcn names; each alias goes when its last screen is rebuilt. */
+@theme {
+  --color-background: var(--color-sailcloth);
+  --color-foreground: var(--color-ink);
+  --color-card: var(--color-paper);
+  --color-muted: var(--color-linen);
+  --color-muted-foreground: var(--color-driftwood);
+  --color-primary: var(--color-ink);
+  --color-primary-foreground: var(--color-on-ink);
+  --color-destructive: var(--color-flare);
+  --color-success: var(--color-kelp);
+  --color-border: var(--color-rope);
 }

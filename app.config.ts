@@ -11,9 +11,24 @@ function gitCommit(): string {
   }
 }
 
+const SAILCLOTH = "#f4f2ed";
+const NIGHT = "#121110";
+const WORDMARK_WIDTH = 120;
+
+const FONT_FILES = [
+  "FrauncesAhoy-Light",
+  "FrauncesAhoy-LightItalic",
+  "FrauncesAhoy-Regular",
+  "FrauncesAhoy-Italic",
+  "Inter-Regular",
+  "Inter-Medium",
+  "GeistMono-Medium",
+].map((name) => `./assets/fonts/${name}.ttf`);
+
 const config: ExpoConfig = {
   extra: { gitCommit: gitCommit() },
   name: "Ahoy",
+  backgroundColor: SAILCLOTH,
   slug: "ahoy",
   version: "1.0.0",
   platforms: ["ios", "android"],
@@ -48,11 +63,16 @@ const config: ExpoConfig = {
     [
       "expo-splash-screen",
       {
-        backgroundColor: "#208AEF",
-        image: "./assets/images/splash-icon.png",
-        imageWidth: 76,
+        backgroundColor: SAILCLOTH,
+        image: "./assets/images/splashWordmark@3x.png",
+        imageWidth: WORDMARK_WIDTH,
+        dark: {
+          backgroundColor: NIGHT,
+          image: "./assets/images/splashWordmarkDark@3x.png",
+        },
       },
     ],
+    ["expo-font", { fonts: FONT_FILES }],
     "expo-secure-store",
     "expo-web-browser",
     [

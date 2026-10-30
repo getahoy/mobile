@@ -1,0 +1,38 @@
+import { type ClassValue, clsx } from "clsx";
+import { extendTailwindMerge } from "tailwind-merge";
+
+const merge = extendTailwindMerge({
+  extend: {
+    theme: {
+      text: [
+        "eyebrow",
+        "caption",
+        "footnote",
+        "body-sm",
+        "callout",
+        "numeral",
+        "body",
+        "body-lg",
+        "heard",
+        "title",
+        "heading",
+        "display",
+      ],
+      font: [
+        "sans",
+        "sans-medium",
+        "mono",
+        "fraunces",
+        "fraunces-italic",
+        "fraunces-light",
+        "fraunces-light-italic",
+      ],
+      radius: ["tag", "thumb", "card", "sheet", "panel"],
+      shadow: ["float", "tag"],
+    },
+  },
+});
+
+export function cn(...inputs: ClassValue[]): string {
+  return merge(clsx(inputs));
+}
