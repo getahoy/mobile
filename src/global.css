@@ -41,6 +41,12 @@
   --text-display: 52px;
   --text-display--line-height: 52px;
   --text-display--letter-spacing: -1.56px;
+  --text-wordmark: 52px;
+  --text-wordmark--line-height: 64px;
+  --text-wordmark--letter-spacing: -1.04px;
+  --text-welcome: 64px;
+  --text-welcome--line-height: 64px;
+  --text-welcome--letter-spacing: -1.92px;
 
   --radius-tag: 7px;
   --radius-thumb: 10px;
@@ -54,6 +60,7 @@
   --spacing-hairline: hairlineWidth();
   --spacing-viewfinder: 260px;
   --spacing-orb: 240px;
+  --spacing-welcome-orb: 300px;
   --spacing-talk-button: 112px;
   --spacing-talk-ring: 128px;
   --spacing-talk-zone: 176px;

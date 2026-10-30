@@ -15,6 +15,18 @@ export const easing = {
   inOut: Easing.bezier(0.65, 0, 0.35, 1),
 } as const;
 
+const easeOutCurve = Easing.bezierFn(0.22, 1, 0.36, 1);
+
+export function timelinePhase(
+  timeMs: number,
+  delayMs: number,
+  durationMs: number,
+): number {
+  "worklet";
+  const linear = Math.min(1, Math.max(0, (timeMs - delayMs) / durationMs));
+  return easeOutCurve(linear);
+}
+
 export const WORD_STAGGER_MS = 60;
 export const REDUCED_FADE_MS = duration.fast;
 

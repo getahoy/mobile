@@ -15,6 +15,7 @@ import { Uniwind, useUniwind } from "uniwind";
 import { GestureRoot } from "@/components/gestureRoot";
 import { authClient } from "@/features/auth/client/authClient";
 import { SessionLoading } from "@/features/auth/components/sessionLoading";
+import { useSplashHold } from "@/features/auth/hooks/useSplashHold";
 import { useGalleryMenuItem } from "@/features/devGallery/hooks/useGalleryMenuItem";
 import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
 
@@ -24,6 +25,7 @@ export default function RootLayout() {
   const { theme } = useUniwind();
   const { data: session, isPending } = authClient.useSession();
   const signedIn = Boolean(session);
+  useSplashHold(!isPending);
   useGalleryMenuItem();
 
   return (
@@ -36,7 +38,7 @@ export default function RootLayout() {
               <SessionLoading />
             ) : (
               <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Protected guard={signedIn}>
+                <Stack.Protected guard={signedIn} redirectTo="/welcome">
                   <Stack.Screen name="index" />
                   <Stack.Screen
                     name="pair"
@@ -51,6 +53,10 @@ export default function RootLayout() {
                   />
                 </Stack.Protected>
                 <Stack.Protected guard={!signedIn}>
+                  <Stack.Screen
+                    name="welcome"
+                    options={{ animation: "none" }}
+                  />
                   <Stack.Screen name="sign-in" />
                   <Stack.Screen name="sign-up" />
                 </Stack.Protected>

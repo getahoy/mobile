@@ -17,7 +17,10 @@ const merge = extendTailwindMerge({
         "title",
         "heading",
         "display",
+        "wordmark",
+        "welcome",
       ],
+      spacing: ["orb", "welcome-orb", "viewfinder", "hairline"],
       font: [
         "sans",
         "sans-medium",

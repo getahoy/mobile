@@ -12,7 +12,7 @@ import { duration, easing, useReducedMotion } from "@/lib/motion";
 import { type OrbTone, useOrbGradient } from "./orbGradient";
 
 const BREATH_HALF_CYCLE_MS = 1600;
-const BREATH_LOW_SCALE = 0.94;
+const BREATH_LOW_SCALE = 0.92;
 const LEVEL_GROWTH = 0.25;
 const LEVEL_EASE_MS = 120;
 const FOREVER = -1;
