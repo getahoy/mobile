@@ -11,6 +11,7 @@ import { HeardLine } from "./heardLine";
 import { ReplyCard } from "./replyCard";
 import { TalkBar } from "./talkBar";
 import { TalkReason } from "./talkReason";
+import { TryHints } from "./tryHints";
 
 type TalkPanelProps = { target: TalkTarget & { mac: PairedMac } };
 
@@ -41,6 +42,7 @@ export function TalkPanel({ target }: TalkPanelProps) {
     <>
       <View className="flex-1 justify-center gap-5 px-6">
         {heard ? <HeardLine text={heard} /> : null}
+        {heard || reply || thread ? null : <TryHints />}
         {reply ? (
           <ReplyCard reply={reply} onRetry={talk.flow.tryAgain} />
         ) : null}

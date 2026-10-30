@@ -48,6 +48,8 @@ export const talkCopy = {
   expiredTitle: "That screen changed. Ask again.",
   noneOfThese: "None of these",
   holdToAnswer: "Hold to answer",
+  trySaying: "Try saying",
+  examples: ["open Spotify", "close the grok tab", "click save"],
   close: "Close",
   choiceLabel: (number: number, label: string) => `Pick ${number}, ${label}`,
   statusLabel: (status: ThreadStatus) => threadStatusLabels[status],
