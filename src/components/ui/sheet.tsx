@@ -14,6 +14,7 @@ const OPEN = 0;
 type SheetProps = {
   open: boolean;
   onClose: () => void;
+  onClosed?: () => void;
   title: string;
   description?: string;
   tone?: "plain" | "danger";
@@ -24,6 +25,7 @@ type SheetProps = {
 export function Sheet({
   open,
   onClose,
+  onClosed,
   title,
   description,
   tone = "plain",
@@ -52,6 +54,7 @@ export function Sheet({
         backdropComponent={SheetBackdrop}
         onClose={() => {
           if (openNow.current) onClose();
+          onClosed?.();
         }}
       >
         <BottomSheetView>

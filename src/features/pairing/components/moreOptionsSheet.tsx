@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
@@ -21,14 +22,23 @@ type MoreOptionsSheetProps = {
 export function MoreOptionsSheet(props: MoreOptionsSheetProps) {
   const { open, mac, statusLine, macs, link, onClose } = props;
   const choices = macs.filter((candidate) => !candidate.ended);
+  const afterClose = useRef<(() => void) | null>(null);
   const run = (action: () => void) => () => {
     onClose();
     action();
+  };
+  const removeAfterClose = () => {
+    afterClose.current = props.onRemove;
+    onClose();
   };
   return (
     <Sheet
       open={open}
       onClose={onClose}
+      onClosed={() => {
+        afterClose.current?.();
+        afterClose.current = null;
+      }}
       title={mac.displayName}
       description={statusLine}
     >
@@ -55,7 +65,7 @@ export function MoreOptionsSheet(props: MoreOptionsSheetProps) {
           <Text>{link.label}</Text>
         </Button>
       ) : null}
-      <Button variant="outline" onPress={run(props.onRemove)}>
+      <Button variant="outline" onPress={removeAfterClose}>
         <Text className="text-flare">{macCopy.removeMac}</Text>
       </Button>
       <Button variant="ghost" onPress={onClose}>
