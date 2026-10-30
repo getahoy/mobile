@@ -14,6 +14,7 @@ export const macCopy = {
     ended: "Ended",
   },
   talkTo: "Talk to",
+  connectedWord: "Connected",
   connecting: "Connecting…",
   connected: "Connected · encrypted",
   locked: (mac: string) => `${mac} is locked. Unlock it to use Ahoy.`,

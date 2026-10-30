@@ -1,5 +1,6 @@
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { type ReactNode, useEffect, useRef } from "react";
+import { Portal } from "@rn-primitives/portal";
+import { type ReactNode, useEffect, useId, useRef } from "react";
 import { View } from "react-native";
 import { cn } from "@/lib/cn";
 import { DrainBar } from "./drainBar";
@@ -29,6 +30,7 @@ export function Sheet({
   drain,
   children,
 }: SheetProps) {
+  const portalName = useId();
   const sheet = useRef<BottomSheet>(null);
   const openNow = useRef(open);
 
@@ -39,41 +41,43 @@ export function Sheet({
   }, [open]);
 
   return (
-    <BottomSheet
-      ref={sheet}
-      index={CLOSED}
-      enablePanDownToClose
-      enableDynamicSizing
-      handleComponent={null}
-      backgroundComponent={SheetBackground}
-      backdropComponent={SheetBackdrop}
-      onClose={() => {
-        if (openNow.current) onClose();
-      }}
-    >
-      <BottomSheetView>
-        <View
-          accessibilityViewIsModal
-          className="overflow-hidden rounded-t-sheet"
-        >
+    <Portal name={portalName}>
+      <BottomSheet
+        ref={sheet}
+        index={CLOSED}
+        enablePanDownToClose
+        enableDynamicSizing
+        handleComponent={null}
+        backgroundComponent={SheetBackground}
+        backdropComponent={SheetBackdrop}
+        onClose={() => {
+          if (openNow.current) onClose();
+        }}
+      >
+        <BottomSheetView>
           <View
-            className={cn(
-              "gap-1 px-5 pt-3 pb-4",
-              tone === "danger" && "bg-flare-mist",
-            )}
+            accessibilityViewIsModal
+            className="overflow-hidden rounded-t-sheet"
           >
-            {drain ? <DrainBar {...drain} /> : null}
-            <View className="mb-3 h-1.5 w-9 self-center rounded-full bg-ink/20" />
-            <Text variant="title">{title}</Text>
-            {description ? (
-              <Text variant="bodySmall" className="text-driftwood">
-                {description}
-              </Text>
-            ) : null}
+            <View
+              className={cn(
+                "gap-1 px-5 pt-3 pb-4",
+                tone === "danger" && "bg-flare-mist",
+              )}
+            >
+              {drain ? <DrainBar {...drain} /> : null}
+              <View className="mb-3 h-1.5 w-9 self-center rounded-full bg-ink/20" />
+              <Text variant="title">{title}</Text>
+              {description ? (
+                <Text variant="bodySmall" className="text-driftwood">
+                  {description}
+                </Text>
+              ) : null}
+            </View>
+            <View className="gap-3 px-5 pt-2 pb-safe-offset-5">{children}</View>
           </View>
-          <View className="gap-3 px-5 pt-2 pb-safe-offset-5">{children}</View>
-        </View>
-      </BottomSheetView>
-    </BottomSheet>
+        </BottomSheetView>
+      </BottomSheet>
+    </Portal>
   );
 }

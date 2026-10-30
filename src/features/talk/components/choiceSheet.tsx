@@ -1,10 +1,13 @@
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { useEffect, useRef } from "react";
+import { CHOICE_TTL_MS } from "@getahoy/protocol";
 import { View } from "react-native";
-import { SheetBackground } from "@/components/ui/sheetBackground";
+import { Button } from "@/components/ui/button";
+import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/cn";
+import { talkCopy } from "../copy/talkCopy";
+import { useChoiceSheet } from "../hooks/useChoiceSheet";
 import type { TalkState } from "../talkState";
-import { ChoiceButtons } from "./choiceButtons";
+import { ChoiceRow } from "./choiceRow";
 
 type ChoiceSheetProps = {
   state: TalkState;
@@ -12,40 +15,58 @@ type ChoiceSheetProps = {
   onDismiss: () => void;
 };
 
-const CLOSED = -1;
-
 export function ChoiceSheet({ state, onChoose, onDismiss }: ChoiceSheetProps) {
-  const sheet = useRef<BottomSheet>(null);
-  const choosing = state.kind === "answered" && state.choices.length > 0;
-  const choices = choosing ? state.choices : [];
-  const message = choosing ? state.message : "";
-  const confirm = choosing && state.confirm;
-
-  useEffect(() => {
-    if (choosing) sheet.current?.snapToIndex(0);
-    else sheet.current?.close();
-  }, [choosing]);
-
+  const sheet = useChoiceSheet(state, onChoose, onDismiss);
+  const { shown, expired, picked } = sheet;
+  const confirm = shown?.confirm ?? false;
+  const [only] = shown?.choices ?? [];
+  const title = expired
+    ? talkCopy.expiredTitle
+    : confirm
+      ? (shown?.message ?? "")
+      : talkCopy.choiceTitle;
   return (
-    <BottomSheet
-      ref={sheet}
-      index={CLOSED}
-      enablePanDownToClose
-      enableDynamicSizing
-      onClose={onDismiss}
-      backgroundComponent={SheetBackground}
+    <Sheet
+      open={shown !== null}
+      onClose={sheet.dismiss}
+      title={title}
+      tone={confirm ? "danger" : "plain"}
+      {...(confirm || expired ? {} : { description: shown?.message ?? "" })}
+      {...(confirm
+        ? {}
+        : { drain: { durationMs: CHOICE_TTL_MS, running: !expired } })}
     >
-      <BottomSheetScrollView>
-        <View className="gap-3 px-6 pt-2 pb-safe-offset-6">
-          <Text className="text-lg font-semibold">{message}</Text>
-          <ChoiceButtons
-            choices={choices}
-            confirm={confirm}
-            onChoose={onChoose}
-            onCancel={onDismiss}
-          />
+      {confirm && only && !expired ? (
+        <Button variant="destructive" onPress={() => sheet.choose(only.number)}>
+          <Text>{only.label}</Text>
+        </Button>
+      ) : null}
+      {confirm ? null : (
+        <View className={cn(expired && "opacity-40")}>
+          {shown?.choices.map((choice) => (
+            <ChoiceRow
+              key={choice.number}
+              choice={choice}
+              picked={picked === choice.number}
+              disabled={expired}
+              onChoose={sheet.choose}
+            />
+          ))}
         </View>
-      </BottomSheetScrollView>
-    </BottomSheet>
+      )}
+      <Button variant="ghost" onPress={sheet.dismiss}>
+        <Text>{footerLabel(expired, confirm)}</Text>
+      </Button>
+      {confirm || expired ? null : (
+        <Text variant="footnote" className="text-center text-driftwood">
+          {talkCopy.sayNumber}
+        </Text>
+      )}
+    </Sheet>
   );
+}
+
+function footerLabel(expired: boolean, confirm: boolean): string {
+  if (expired) return talkCopy.close;
+  return confirm ? talkCopy.cancel : talkCopy.noneOfThese;
 }

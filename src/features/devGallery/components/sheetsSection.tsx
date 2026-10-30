@@ -12,6 +12,9 @@ export function SheetsSection({ onOpen }: SheetsSectionProps) {
       <Button variant="secondary" onPress={() => onOpen("choice")}>
         <Text>{galleryCopy.openChoiceSheet}</Text>
       </Button>
+      <Button variant="secondary" onPress={() => onOpen("twoMacs")}>
+        <Text>{galleryCopy.openTwoMacs}</Text>
+      </Button>
       <Button variant="secondary" onPress={() => onOpen("danger")}>
         <Text>{galleryCopy.openDangerSheet}</Text>
       </Button>

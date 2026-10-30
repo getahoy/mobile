@@ -25,7 +25,12 @@ export function MacsHomeScreen() {
         </>
       ) : null}
       {shown ? (
-        <HomeMac key={shown.publicKey} mac={shown} onChanged={reload} />
+        <HomeMac
+          key={shown.publicKey}
+          mac={shown}
+          macs={macs ?? []}
+          onChanged={reload}
+        />
       ) : null}
       {talkMac ? (
         <TalkPanel target={{ ...target, mac: talkMac }} />

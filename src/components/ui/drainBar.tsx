@@ -28,7 +28,7 @@ export function DrainBar({ durationMs, running }: DrainBarProps) {
   const width = useAnimatedStyle(() => ({ width: `${left.value * PERCENT}%` }));
 
   return (
-    <View aria-hidden className="absolute inset-x-0 top-0 h-0.5">
+    <View aria-hidden className="absolute inset-x-0 top-0 h-0.5 bg-rope">
       <Animated.View style={width} className="h-full bg-signal" />
     </View>
   );

@@ -20,6 +20,11 @@ export function endedMessage(reason: EndReason, mac: string): string {
   return endedMessages[reason](mac);
 }
 
+export function statusLine(status: MacStatus): string {
+  if (status.message) return status.message;
+  return status.tone === "connecting" ? macCopy.connecting : macCopy.connected;
+}
+
 function quiet(chip: string, message: string): MacStatus {
   return { chip, tone: "quiet", message };
 }

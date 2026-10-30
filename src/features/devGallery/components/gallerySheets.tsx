@@ -5,8 +5,9 @@ import { ChoiceTag } from "@/components/ui/choiceTag";
 import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
 import { galleryCopy } from "../copy/galleryCopy";
+import { TwoMacsSheet } from "./twoMacsSheet";
 
-export type GallerySheet = "choice" | "danger";
+export type GallerySheet = "choice" | "danger" | "twoMacs";
 
 const SAMPLE_CHOICES = [galleryCopy.primary, galleryCopy.secondary] as const;
 
@@ -18,6 +19,7 @@ type GallerySheetsProps = {
 export function GallerySheets({ open, onClose }: GallerySheetsProps) {
   return (
     <>
+      <TwoMacsSheet open={open === "twoMacs"} onClose={onClose} />
       <Sheet
         open={open === "choice"}
         onClose={onClose}

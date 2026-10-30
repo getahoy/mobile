@@ -1,5 +1,4 @@
 import { router } from "expo-router";
-import { Alert } from "react-native";
 import type { MacConnection } from "../connection/macConnection";
 import type { MacLinkState } from "../connection/macLinkState";
 import { macCopy } from "../copy/macCopy";
@@ -21,7 +20,7 @@ type MacCardActionsOptions = {
 
 export function useMacCardActions(options: MacCardActionsOptions) {
   const { mac, state, connection, onChanged } = options;
-  const confirmRemove = useUnpairMac(mac, connection, onChanged);
+  const removal = useUnpairMac(mac, connection, onChanged);
   const pairAgain = () =>
     router.push({ pathname: "/pair", params: { mac: mac.displayName } });
   const dismiss = () =>
@@ -29,22 +28,17 @@ export function useMacCardActions(options: MacCardActionsOptions) {
       .catch(() => undefined)
       .finally(onChanged);
   const actions = cardActions(state, connection, { pairAgain, dismiss });
-  const openMenu =
+  const link: MacCardAction | null =
     state.kind === "ended" || !connection
       ? null
-      : () =>
-          Alert.alert(mac.displayName, undefined, [
-            state.kind === "paused"
-              ? { text: macCopy.connect, onPress: () => connection.resume() }
-              : { text: macCopy.disconnect, onPress: () => connection.pause() },
-            {
-              text: macCopy.removeMac,
-              style: "destructive",
-              onPress: confirmRemove,
-            },
-            { text: macCopy.cancel, style: "cancel" },
-          ]);
-  return { actions, openMenu, confirmRemove };
+      : state.kind === "paused"
+        ? toggle(macCopy.connect, () => connection.resume())
+        : toggle(macCopy.disconnect, () => connection.pause());
+  return { actions, link, removal };
+}
+
+function toggle(label: string, onPress: () => void): MacCardAction {
+  return { label, tone: "primary", onPress };
 }
 
 type Navigation = { pairAgain: () => void; dismiss: () => void };

@@ -6,6 +6,8 @@ export const galleryCopy = {
   auth: "Sign in",
   home: "Home and talk",
   heardSample: "close the grok tab",
+  secondMacName: "Office Mac",
+  openTwoMacs: "Open More options with 2 Macs",
   darkMode: "Dark mode",
   close: "Close",
   typography: "Text",

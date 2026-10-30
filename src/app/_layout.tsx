@@ -1,7 +1,6 @@
 import "@/features/pairing/crypto/randomValues";
 import "@/global.css";
 
-import { authCopy } from "@getahoy/lib";
 import { PortalHost } from "@rn-primitives/portal";
 import { Stack } from "expo-router";
 import {
@@ -40,13 +39,7 @@ export default function RootLayout() {
                     name="pair"
                     options={{ presentation: "fullScreenModal" }}
                   />
-                  <Stack.Screen
-                    name="account"
-                    options={{
-                      headerShown: true,
-                      title: authCopy["account.title"],
-                    }}
-                  />
+                  <Stack.Screen name="account" />
                 </Stack.Protected>
                 <Stack.Protected guard={!signedIn}>
                   <Stack.Screen

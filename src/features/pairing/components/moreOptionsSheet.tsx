@@ -1,0 +1,67 @@
+import { View } from "react-native";
+import { Button } from "@/components/ui/button";
+import { Sheet } from "@/components/ui/sheet";
+import { Text } from "@/components/ui/text";
+import { macCopy } from "../copy/macCopy";
+import type { MacCardAction } from "../hooks/useMacCardActions";
+import type { PairedMac } from "../storage/pairedMacs";
+import { TalkToRow } from "./talkToRow";
+
+type MoreOptionsSheetProps = {
+  open: boolean;
+  mac: PairedMac;
+  statusLine: string;
+  macs: readonly PairedMac[];
+  onSelect: (publicKey: string) => void;
+  link: MacCardAction | null;
+  onRemove: () => void;
+  onClose: () => void;
+};
+
+export function MoreOptionsSheet(props: MoreOptionsSheetProps) {
+  const { open, mac, statusLine, macs, link, onClose } = props;
+  const choices = macs.filter((candidate) => !candidate.ended);
+  const run = (action: () => void) => () => {
+    onClose();
+    action();
+  };
+  return (
+    <Sheet
+      open={open}
+      onClose={onClose}
+      title={mac.displayName}
+      description={statusLine}
+    >
+      {choices.length > 1 ? (
+        <View className="gap-1 pb-2">
+          <Text variant="eyebrow" role="heading" className="pl-1">
+            {macCopy.talkTo}
+          </Text>
+          {choices.map((choice) => (
+            <TalkToRow
+              key={choice.publicKey}
+              mac={choice}
+              selected={choice.publicKey === mac.publicKey}
+              onSelect={(publicKey) => run(() => props.onSelect(publicKey))()}
+            />
+          ))}
+        </View>
+      ) : null}
+      {link ? (
+        <Button onPress={run(link.onPress)}>
+          <Text>{link.label}</Text>
+        </Button>
+      ) : null}
+      <Button
+        variant="secondary"
+        className="bg-transparent"
+        onPress={run(props.onRemove)}
+      >
+        <Text className="text-flare">{macCopy.removeMac}</Text>
+      </Button>
+      <Button variant="ghost" onPress={onClose}>
+        <Text>{macCopy.cancel}</Text>
+      </Button>
+    </Sheet>
+  );
+}

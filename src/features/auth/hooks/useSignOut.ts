@@ -4,10 +4,10 @@ import { authClient } from "../client/authClient";
 
 export function useSignOut(onSuccess?: () => void) {
   const { pending, errorMessage, submit } = useAuthRequest();
-  const { checking, confirmSignOut } = useConfirmSignOut();
+  const { checking, confirmSignOut, request } = useConfirmSignOut();
 
   const signOut = () =>
     void confirmSignOut(() => submit(() => authClient.signOut(), onSuccess));
 
-  return { pending, checking, errorMessage, signOut };
+  return { pending, checking, errorMessage, signOut, request };
 }
