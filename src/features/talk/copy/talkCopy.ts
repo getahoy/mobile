@@ -1,13 +1,13 @@
 import type { ThreadStatus } from "../threads/threadStore";
 
 const threadStatusLabels: Record<ThreadStatus, string> = {
-  open: "WAITING",
-  done: "DONE",
-  needsChoice: "WAITING",
-  refused: "STOPPED",
-  failed: "FAILED",
-  expired: "EXPIRED",
-  replaced: "REPLACED",
+  open: "Needs your choice",
+  done: "Done",
+  needsChoice: "Needs your choice",
+  refused: "Can’t do that",
+  failed: "Failed",
+  expired: "Expired",
+  replaced: "Replaced",
 };
 
 const MS_PER_SECOND = 1000;
@@ -45,8 +45,6 @@ export const talkCopy = {
   buttonHint: "Hold, say a command, then let go to send it.",
   cancel: "Cancel",
   choiceLabel: (number: number, label: string) => `Pick ${number}, ${label}`,
-  threadSummary: (status: ThreadStatus, steps: number) =>
-    `${threadStatusLabels[status]} · ${steps} steps`,
-  threadLine: (speaker: "you" | "ahoy", text: string) =>
-    speaker === "you" ? `You: “${text}”` : text,
+  statusLabel: (status: ThreadStatus) => threadStatusLabels[status],
+  followUp: (asked: string, answer: string) => `${asked} · ${answer}`,
 };

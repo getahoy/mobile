@@ -12,6 +12,7 @@ import { BuildStamp } from "../components/buildStamp";
 import { ButtonsSection } from "../components/buttonsSection";
 import { ChoiceTagsSection } from "../components/choiceTagsSection";
 import { type GallerySheet, GallerySheets } from "../components/gallerySheets";
+import { HomeSection } from "../components/homeSection";
 import { IconsSection } from "../components/iconsSection";
 import { InputsSection } from "../components/inputsSection";
 import { ListSection } from "../components/listSection";
@@ -69,6 +70,7 @@ export function GalleryScreen() {
         <OrbSection />
         <IconsSection />
         <AuthSection />
+        <HomeSection />
       </ScrollView>
       <GallerySheets open={sheet} onClose={() => setSheet(null)} />
     </View>

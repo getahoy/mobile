@@ -1,43 +1,37 @@
-import { router } from "expo-router";
-import { ActivityIndicator, ScrollView, View } from "react-native";
-import { Button } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
+import { View } from "react-native";
 import { TalkPanel } from "@/features/talk/components/talkPanel";
+import { useTalkTarget } from "@/features/talk/hooks/useTalkTarget";
 import { HomeHeader } from "../components/homeHeader";
+import { HomeMac } from "../components/homeMac";
 import { NoMacsYet } from "../components/noMacsYet";
-import { PairedMacItem } from "../components/pairedMacItem";
-import { homeCopy } from "../copy/homeCopy";
+import { useKeepMacsConnected } from "../hooks/useKeepMacsConnected";
 import { useLinkSync } from "../hooks/useLinkSync";
 import { usePairedMacs } from "../hooks/usePairedMacs";
 
 export function MacsHomeScreen() {
   const { macs, reload } = usePairedMacs();
   useLinkSync(reload);
+  useKeepMacsConnected(macs, reload);
+  const target = useTalkTarget(macs ?? []);
+  const shown = target.mac ?? macs?.[0] ?? null;
+  const { mac: talkMac } = target;
 
   return (
-    <View className="flex-1 bg-background">
-      <ScrollView
-        className="flex-1"
-        contentContainerClassName="gap-4 px-6 pt-safe-offset-4 pb-4"
-      >
-        <HomeHeader />
-        {macs === null ? (
-          <ActivityIndicator
-            accessibilityLabel={homeCopy.loading}
-            colorClassName="accent-muted-foreground"
-          />
-        ) : null}
-        {macs?.length === 0 ? <NoMacsYet /> : null}
-        {macs?.map((mac) => (
-          <PairedMacItem key={mac.publicKey} mac={mac} onChanged={reload} />
-        ))}
-        {macs && macs.length > 0 ? (
-          <Button variant="ghost" onPress={() => router.push("/pair")}>
-            <Text>{homeCopy.addAnother}</Text>
-          </Button>
-        ) : null}
-      </ScrollView>
-      <TalkPanel macs={macs ?? []} />
+    <View className="flex-1 bg-sailcloth pt-safe">
+      {macs?.length === 0 ? (
+        <>
+          <HomeHeader chip={<View />} />
+          <NoMacsYet />
+        </>
+      ) : null}
+      {shown ? (
+        <HomeMac key={shown.publicKey} mac={shown} onChanged={reload} />
+      ) : null}
+      {talkMac ? (
+        <TalkPanel target={{ ...target, mac: talkMac }} />
+      ) : (
+        <View className="flex-1" />
+      )}
     </View>
   );
 }

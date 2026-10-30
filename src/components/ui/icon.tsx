@@ -16,6 +16,7 @@ const symbols = {
   chevronLeft: { ios: "chevron.left", android: "chevron_left" },
   chevronDown: { ios: "chevron.down", android: "expand_more" },
   mac: { ios: "laptopcomputer", android: "laptop_mac" },
+  account: { ios: "person.crop.circle", android: "account_circle" },
 } as const satisfies Record<string, { ios: SFSymbol; android: AndroidSymbol }>;
 
 export type IconName = keyof typeof symbols;

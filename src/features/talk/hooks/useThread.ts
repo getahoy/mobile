@@ -1,10 +1,9 @@
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import type { TalkState } from "../talkState";
 import { noThreads, threadReducer } from "../threads/threadStore";
 
 export function useThread(state: TalkState) {
   const [threads, dispatch] = useReducer(threadReducer, noThreads);
-  const [expanded, setExpanded] = useState(false);
   const previous = useRef(state);
 
   useEffect(() => {
@@ -24,9 +23,7 @@ export function useThread(state: TalkState) {
     const asks = state.choices.length > 0;
     const result = { commandId, threadId, heard, message, status, asks };
     dispatch({ kind: "result", ...result });
-    setExpanded(false);
   }, [state]);
 
-  const toggle = () => setExpanded((open) => !open);
-  return { thread: threads.current, expanded, toggle };
+  return { thread: threads.current };
 }

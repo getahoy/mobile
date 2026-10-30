@@ -4,8 +4,8 @@ import { macCopy } from "../copy/macCopy";
 import { type PairedMac, removePairedMac } from "../storage/pairedMacs";
 import { flushPendingUnlinks, queueUnlink } from "../sync/linkSync";
 
-async function unpair(mac: PairedMac, connection: MacConnection) {
-  connection.sayGoodbye("removed");
+async function unpair(mac: PairedMac, connection: MacConnection | null) {
+  connection?.sayGoodbye("removed");
   await queueUnlink(mac.publicKey, "removed");
   await removePairedMac(mac.publicKey);
   await flushPendingUnlinks();
@@ -13,7 +13,7 @@ async function unpair(mac: PairedMac, connection: MacConnection) {
 
 export function useUnpairMac(
   mac: PairedMac,
-  connection: MacConnection,
+  connection: MacConnection | null,
   onRemoved: () => void,
 ) {
   const remove = () =>

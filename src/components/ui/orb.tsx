@@ -7,7 +7,6 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { cn } from "@/lib/cn";
 import { duration, easing, useReducedMotion } from "@/lib/motion";
 import { type OrbTone, useOrbGradient } from "./orbGradient";
 
@@ -66,7 +65,7 @@ export function Orb({
       style={grow}
       aria-hidden
       pointerEvents="none"
-      className={cn("size-orb", className)}
+      className={className ?? "size-orb"}
     >
       {/* Uniwind compiles radial-gradient() to an empty string, so the orb passes it to React Native directly. */}
       <View

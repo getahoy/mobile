@@ -1,27 +1,38 @@
 import { useSyncExternalStore } from "react";
 import type { LiveMacLinks } from "@/features/pairing/connection/liveMacLinks";
+import type { MacLinkState } from "@/features/pairing/connection/macLinkState";
 import { useLiveMacLinks } from "@/features/pairing/hooks/useLiveMacLinks";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
+import { useSelectedMac } from "@/features/pairing/storage/selectedMac";
 import type { TalkBlock } from "../talkState";
 
 export type TalkTarget = { mac: PairedMac | null; block: TalkBlock | null };
 
-function targetOf(macs: readonly PairedMac[], live: LiveMacLinks): TalkTarget {
+function blockOf(state: MacLinkState | null): TalkBlock | null {
+  if (state?.kind === "connected") return state.locked ? "locked" : null;
+  if (state?.kind === "paused") return "paused";
+  return "noMac";
+}
+
+function targetOf(
+  macs: readonly PairedMac[],
+  live: LiveMacLinks,
+  selectedKey: string | null,
+): TalkTarget {
   const reachable = macs.filter((mac) => !mac.ended);
   const stateOf = (mac: PairedMac) => live.state(mac.publicKey);
-  const connected = reachable.find((mac) => stateOf(mac)?.kind === "connected");
-  if (connected) {
-    const state = stateOf(connected);
-    const locked = state?.kind === "connected" && state.locked;
-    return { mac: connected, block: locked ? "locked" : null };
-  }
-  const paused = reachable.find((mac) => stateOf(mac)?.kind === "paused");
-  if (paused) return { mac: paused, block: "paused" };
-  return { mac: reachable[0] ?? null, block: "noMac" };
+  const mac =
+    reachable.find((candidate) => candidate.publicKey === selectedKey) ??
+    reachable.find((candidate) => stateOf(candidate)?.kind === "connected") ??
+    reachable[0] ??
+    null;
+  if (!mac) return { mac: null, block: "noMac" };
+  return { mac, block: blockOf(stateOf(mac)) };
 }
 
 export function useTalkTarget(macs: readonly PairedMac[]): TalkTarget {
   const live = useLiveMacLinks();
+  const { selectedKey } = useSelectedMac();
   useSyncExternalStore(live.onChange, live.version);
-  return targetOf(macs, live);
+  return targetOf(macs, live, selectedKey);
 }

@@ -4,6 +4,8 @@ export const galleryCopy = {
     `Dev build ${commit}, loaded ${loadedAt}`,
   screenTitle: "Components",
   auth: "Sign in",
+  home: "Home and talk",
+  heardSample: "close the grok tab",
   darkMode: "Dark mode",
   close: "Close",
   typography: "Text",
