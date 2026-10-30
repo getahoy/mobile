@@ -19,7 +19,7 @@ function timeout(signal: AbortSignal): Promise<Late> {
 // The ElevenLabs request is aborted before the device voice starts, so its audio can never play late.
 async function speakWithFallback(
   text: string,
-  { voice, signal }: SpeakOptions,
+  { voice, signal, onLevel }: SpeakOptions,
 ): Promise<void> {
   const fetching = new AbortController();
   const stopFetching = () => fetching.abort();
@@ -31,7 +31,9 @@ async function speakWithFallback(
   signal.removeEventListener("abort", stopFetching);
   fetching.abort();
   if (signal.aborted) return;
-  if (first.kind === "ready") return playSource({ uri: first.uri }, signal);
+  if (first.kind === "ready") {
+    return playSource({ uri: first.uri }, signal, onLevel);
+  }
   const reason = first.kind === "late" ? "timeout" : first.reason;
   logger.warn("voice", `Device voice instead of ElevenLabs: ${reason}`);
   return deviceVoice.speak(text, { voice, signal });

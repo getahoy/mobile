@@ -66,5 +66,5 @@ export function useTalk(mac: PairedMac | null) {
   }, [signedOut]);
 
   const { access, durationMs, level } = recorder;
-  return { state, access, durationMs, level, flow };
+  return { state, access, durationMs, level, flow, speech: voice.speech };
 }

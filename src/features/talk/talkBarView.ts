@@ -1,4 +1,3 @@
-import type { OrbMotion } from "@/components/ui/orb";
 import { talkCopy } from "./copy/talkCopy.ts";
 import type { MicAccess } from "./recorder/useFileRecorder";
 import type { TalkBlock, TalkState } from "./talkState";
@@ -8,7 +7,6 @@ type TalkBarView = {
   labelStyle: "text" | "timer";
   reason: string | null;
   disabled: boolean;
-  orb: OrbMotion | null;
 };
 
 type TalkBarInput = {
@@ -30,36 +28,33 @@ function reasonOf(input: TalkBarInput): string | null {
   return input.block ? blockReason(input.block, input.mac) : null;
 }
 
-export function talkBarView(input: TalkBarInput): TalkBarView {
-  const { state, mac, durationMs } = input;
-  const reason = reasonOf(input);
-  const base = {
-    reason,
-    disabled: reason !== null,
-    labelStyle: "text",
-  } as const;
+function labelOf(state: TalkState, mac: string, durationMs: number): string {
   switch (state.kind) {
     case "listening":
-      return {
-        ...base,
-        label: talkCopy.listening(durationMs),
-        labelStyle: "timer",
-        orb: "level",
-      };
+      return talkCopy.listening(durationMs);
     case "understanding":
-      return { ...base, label: talkCopy.understanding, orb: "breathe" };
-    case "sending": {
-      const label = state.slow ? talkCopy.checkMac : talkCopy.sending(mac);
-      return { ...base, label, orb: "breathe" };
-    }
+      return talkCopy.understanding;
+    case "sending":
+      return state.slow ? talkCopy.checkMac : talkCopy.sending(mac);
     case "ready":
     case "tooShort":
     case "answered":
     case "failed":
-      return { ...base, label: talkCopy.holdToTalk, orb: null };
+      return talkCopy.holdToTalk;
     default: {
       const unhandled: never = state;
       return unhandled;
     }
   }
+}
+
+export function talkBarView(input: TalkBarInput): TalkBarView {
+  const { state, mac, durationMs } = input;
+  const reason = reasonOf(input);
+  return {
+    label: labelOf(state, mac, durationMs),
+    labelStyle: state.kind === "listening" ? "timer" : "text",
+    reason,
+    disabled: reason !== null,
+  };
 }

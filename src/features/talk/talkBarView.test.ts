@@ -12,14 +12,13 @@ const ready = {
   durationMs: 0,
 } as const;
 
-test("idle bar invites a hold and shows no orb", () => {
+test("idle bar invites a hold", () => {
   const bar = talkBarView(ready);
   assert.equal(bar.label, talkCopy.holdToTalk);
   assert.equal(bar.disabled, false);
-  assert.equal(bar.orb, null);
 });
 
-test("listening shows a timer and a level orb", () => {
+test("listening shows a timer", () => {
   const bar = talkBarView({
     ...ready,
     state: { kind: "listening" },
@@ -27,14 +26,12 @@ test("listening shows a timer and a level orb", () => {
   });
   assert.equal(bar.label, talkCopy.listening(4000));
   assert.equal(bar.labelStyle, "timer");
-  assert.equal(bar.orb, "level");
 });
 
 test("a slow send says to check the Mac", () => {
   const state = { kind: "sending", heard: "open notes", slow: true } as const;
   const bar = talkBarView({ ...ready, state });
   assert.equal(bar.label, talkCopy.checkMac);
-  assert.equal(bar.orb, "breathe");
 });
 
 test("a blocked Mac disables the bar with its reason", () => {

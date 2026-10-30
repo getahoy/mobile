@@ -3,6 +3,7 @@ import type { SpeakVoice } from "@getahoy/protocol";
 export type SpeakOptions = {
   voice: SpeakVoice;
   signal: AbortSignal;
+  onLevel?: (level: number) => void;
 };
 
 export type VoiceEngine = {

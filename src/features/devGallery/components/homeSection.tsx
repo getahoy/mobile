@@ -8,7 +8,10 @@ import { macStatus } from "@/features/pairing/macStatus";
 import { HeardLine } from "@/features/talk/components/heardLine";
 import { ReplyCard } from "@/features/talk/components/replyCard";
 import { TalkBar } from "@/features/talk/components/talkBar";
+import { TryHints } from "@/features/talk/components/tryHints";
 import { talkCopy } from "@/features/talk/copy/talkCopy";
+import type { TalkState } from "@/features/talk/talkState";
+import { voiceActivity } from "@/features/talk/voiceActivity";
 import { galleryCopy } from "../copy/galleryCopy";
 import { GallerySection } from "./gallerySection";
 
@@ -75,11 +78,72 @@ const failed = {
 
 const bar = {
   macName: MAC,
-  level: 0.5,
   onStart: noop,
   onStop: noop,
   onInterrupted: noop,
 } as const;
+
+const SAMPLE_LEVEL = 0.5;
+const silent = { speaking: false, level: null };
+const ready: TalkState = { kind: "ready" };
+
+const barSamples: readonly {
+  id: string;
+  label: string;
+  labelStyle: "text" | "timer";
+  disabled: boolean;
+  state: TalkState;
+  speech: { speaking: boolean; level: number | null };
+}[] = [
+  {
+    id: "idle",
+    label: talkCopy.holdToTalk,
+    labelStyle: "text",
+    disabled: false,
+    state: ready,
+    speech: silent,
+  },
+  {
+    id: "listening",
+    label: talkCopy.listening(SAMPLE_LISTENING_MS),
+    labelStyle: "timer",
+    disabled: false,
+    state: { kind: "listening" },
+    speech: silent,
+  },
+  {
+    id: "understanding",
+    label: talkCopy.understanding,
+    labelStyle: "text",
+    disabled: false,
+    state: { kind: "understanding" },
+    speech: silent,
+  },
+  {
+    id: "speaking",
+    label: talkCopy.holdToTalk,
+    labelStyle: "text",
+    disabled: false,
+    state: ready,
+    speech: { speaking: true, level: SAMPLE_LEVEL },
+  },
+  {
+    id: "speakingPulse",
+    label: talkCopy.holdToTalk,
+    labelStyle: "text",
+    disabled: false,
+    state: ready,
+    speech: { speaking: true, level: null },
+  },
+  {
+    id: "disabled",
+    label: talkCopy.holdToTalk,
+    labelStyle: "text",
+    disabled: true,
+    state: ready,
+    speech: silent,
+  },
+];
 
 export function HomeSection() {
   return (
@@ -101,34 +165,17 @@ export function HomeSection() {
       <HeardLine text={galleryCopy.heardSample} />
       <ReplyCard reply={done} onRetry={noop} />
       <ReplyCard reply={failed} onRetry={noop} />
-      <TalkBar
-        {...bar}
-        label={talkCopy.holdToTalk}
-        labelStyle="text"
-        disabled={false}
-        orb={null}
-      />
-      <TalkBar
-        {...bar}
-        label={talkCopy.listening(SAMPLE_LISTENING_MS)}
-        labelStyle="timer"
-        disabled={false}
-        orb="level"
-      />
-      <TalkBar
-        {...bar}
-        label={talkCopy.understanding}
-        labelStyle="text"
-        disabled={false}
-        orb="breathe"
-      />
-      <TalkBar
-        {...bar}
-        label={talkCopy.holdToTalk}
-        labelStyle="text"
-        disabled
-        orb={null}
-      />
+      <TryHints />
+      {barSamples.map((sample) => (
+        <TalkBar
+          key={sample.id}
+          {...bar}
+          label={sample.label}
+          labelStyle={sample.labelStyle}
+          disabled={sample.disabled}
+          activity={voiceActivity(sample.state, sample.speech, SAMPLE_LEVEL)}
+        />
+      ))}
     </GallerySection>
   );
 }

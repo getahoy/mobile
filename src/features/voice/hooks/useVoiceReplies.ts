@@ -12,6 +12,10 @@ const DONE_SOUND = require("../../../../assets/sounds/done.m4a");
 
 type Answered = Extract<TalkState, { kind: "answered" }>;
 
+export type Speech = { speaking: boolean; level: number | null };
+
+const SILENT: Speech = { speaking: false, level: null };
+
 function useScreenReader(): boolean {
   const [enabled, setEnabled] = useState(false);
   useEffect(() => {
@@ -32,6 +36,7 @@ async function chime(signal: AbortSignal): Promise<void> {
 
 export function useVoiceReplies(state: TalkState, recording: boolean) {
   const [voice] = useState(createFallbackVoice);
+  const [speech, setSpeech] = useState<Speech>(SILENT);
   const screenReader = useScreenReader();
   const handled = useRef<string | null>(null);
 
@@ -46,18 +51,23 @@ export function useVoiceReplies(state: TalkState, recording: boolean) {
     if (state.kind !== "answered") return;
     if (handled.current === state.commandId) return;
     handled.current = state.commandId;
-    void reply(state, { recording, screenReader }, voice.speak);
+    const context = { recording, screenReader, speak: voice.speak };
+    void reply(state, context, setSpeech).finally(() => setSpeech(SILENT));
   }, [state, recording, screenReader, voice]);
 
-  return { stop: voice.stop };
+  return { stop: voice.stop, speech };
 }
 
-type Context = { recording: boolean; screenReader: boolean };
+type Context = {
+  recording: boolean;
+  screenReader: boolean;
+  speak: VoiceEngine["speak"];
+};
 
 async function reply(
   answered: Answered,
-  { recording, screenReader }: Context,
-  speak: VoiceEngine["speak"],
+  { recording, screenReader, speak }: Context,
+  report: (speech: Speech) => void,
 ): Promise<void> {
   const settings = readVoiceSettings();
   const line = answered.speech ?? answered.message;
@@ -78,5 +88,7 @@ async function reply(
   await preparePlayback(settings.speakInSilentMode).catch(() => undefined);
   const signal = new AbortController().signal;
   if (action === "chime") return chime(signal);
-  await speak(line, { voice: settings.voice, signal });
+  report({ speaking: true, level: null });
+  const onLevel = (level: number) => report({ speaking: true, level });
+  await speak(line, { voice: settings.voice, signal, onLevel });
 }

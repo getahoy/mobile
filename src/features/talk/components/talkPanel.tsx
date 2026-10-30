@@ -6,6 +6,7 @@ import type { TalkTarget } from "../hooks/useTalkTarget";
 import { useThread } from "../hooks/useThread";
 import { talkBarView } from "../talkBarView";
 import { talkView } from "../talkView";
+import { voiceActivity } from "../voiceActivity";
 import { ChoiceSheet } from "./choiceSheet";
 import { HeardLine } from "./heardLine";
 import { ReplyCard } from "./replyCard";
@@ -32,11 +33,13 @@ export function TalkPanel({ target }: TalkPanelProps) {
     onStop: talk.flow.release,
     onInterrupted: () => talk.flow.interrupt(),
   };
+  const activity = voiceActivity(talk.state, talk.speech, talk.level);
+  const answering = activity.tone === "listen" && activity.orb !== null;
   const answer = {
     ...hold,
-    label: bar.orb ? bar.label : talkCopy.holdToAnswer,
+    label: answering ? bar.label : talkCopy.holdToAnswer,
     labelStyle: bar.labelStyle,
-    held: bar.orb === "level",
+    held: activity.tone === "listen" && activity.dots === "level",
   };
   return (
     <>
@@ -54,7 +57,7 @@ export function TalkPanel({ target }: TalkPanelProps) {
             micBlocked={talk.access === "blocked"}
           />
         ) : null}
-        <TalkBar macName={mac} {...bar} level={talk.level} {...hold} />
+        <TalkBar macName={mac} {...bar} activity={activity} {...hold} />
       </View>
       <ChoiceSheet
         state={talk.state}
