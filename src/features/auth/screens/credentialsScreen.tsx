@@ -39,7 +39,7 @@ export function CredentialsScreen<Input extends Record<string, string>>(
   });
   const social = useSocialSignIn(authRequest);
   const overlay = useSigningInOverlay(authRequest);
-  const { pending, errorMessage } = authRequest;
+  const { pending, errorMessage } = overlay;
   const fromGoogle = overlay.source === "google";
   const submit = () => {
     overlay.track("credentials");
