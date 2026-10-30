@@ -47,7 +47,7 @@ export const talkCopy = {
   choiceTitle: "Which one?",
   expiredTitle: "That screen changed. Ask again.",
   noneOfThese: "None of these",
-  sayNumber: "or say a number",
+  holdToAnswer: "Hold to answer",
   close: "Close",
   choiceLabel: (number: number, label: string) => `Pick ${number}, ${label}`,
   statusLabel: (status: ThreadStatus) => threadStatusLabels[status],

@@ -1,6 +1,4 @@
-import { Linking, View } from "react-native";
-import { Button } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
+import { View } from "react-native";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
 import { talkCopy } from "../copy/talkCopy";
 import { useTalk } from "../hooks/useTalk";
@@ -12,6 +10,7 @@ import { ChoiceSheet } from "./choiceSheet";
 import { HeardLine } from "./heardLine";
 import { ReplyCard } from "./replyCard";
 import { TalkBar } from "./talkBar";
+import { TalkReason } from "./talkReason";
 
 type TalkPanelProps = { target: TalkTarget & { mac: PairedMac } };
 
@@ -27,6 +26,17 @@ export function TalkPanel({ target }: TalkPanelProps) {
     mac,
     durationMs: talk.durationMs,
   });
+  const hold = {
+    onStart: () => void talk.flow.press(),
+    onStop: talk.flow.release,
+    onInterrupted: () => talk.flow.interrupt(),
+  };
+  const answer = {
+    ...hold,
+    label: bar.orb ? bar.label : talkCopy.holdToAnswer,
+    labelStyle: bar.labelStyle,
+    held: bar.orb === "level",
+  };
   return (
     <>
       <View className="flex-1 justify-center gap-5 px-6">
@@ -37,35 +47,16 @@ export function TalkPanel({ target }: TalkPanelProps) {
       </View>
       <View className="gap-3.5 px-5 pb-safe-offset-2">
         {bar.reason ? (
-          <View className="items-center gap-2 px-4">
-            <Text variant="footnote" className="text-center text-driftwood">
-              {bar.reason}
-            </Text>
-            {talk.access === "blocked" ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onPress={() => void Linking.openSettings()}
-              >
-                <Text>{talkCopy.openSettings}</Text>
-              </Button>
-            ) : null}
-          </View>
+          <TalkReason
+            reason={bar.reason}
+            micBlocked={talk.access === "blocked"}
+          />
         ) : null}
-        <TalkBar
-          macName={mac}
-          label={bar.label}
-          labelStyle={bar.labelStyle}
-          disabled={bar.disabled}
-          orb={bar.orb}
-          level={talk.level}
-          onStart={() => void talk.flow.press()}
-          onStop={talk.flow.release}
-          onInterrupted={() => talk.flow.interrupt()}
-        />
+        <TalkBar macName={mac} {...bar} level={talk.level} {...hold} />
       </View>
       <ChoiceSheet
         state={talk.state}
+        answer={answer}
         onChoose={talk.flow.choose}
         onDismiss={talk.flow.dismissChoices}
       />

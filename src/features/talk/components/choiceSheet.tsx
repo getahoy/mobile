@@ -8,14 +8,21 @@ import { talkCopy } from "../copy/talkCopy";
 import { useChoiceSheet } from "../hooks/useChoiceSheet";
 import type { TalkState } from "../talkState";
 import { ChoiceRow } from "./choiceRow";
+import { type HoldControls, HoldToAnswer } from "./holdToAnswer";
 
 type ChoiceSheetProps = {
   state: TalkState;
+  answer: HoldControls;
   onChoose: (number: number) => void;
   onDismiss: () => void;
 };
 
-export function ChoiceSheet({ state, onChoose, onDismiss }: ChoiceSheetProps) {
+export function ChoiceSheet({
+  state,
+  answer,
+  onChoose,
+  onDismiss,
+}: ChoiceSheetProps) {
   const sheet = useChoiceSheet(state, onChoose, onDismiss);
   const { shown, expired, picked } = sheet;
   const confirm = shown?.confirm ?? false;
@@ -54,14 +61,10 @@ export function ChoiceSheet({ state, onChoose, onDismiss }: ChoiceSheetProps) {
           ))}
         </View>
       )}
+      {confirm || expired ? null : <HoldToAnswer controls={answer} />}
       <Button variant="ghost" onPress={sheet.dismiss}>
         <Text>{footerLabel(expired, confirm)}</Text>
       </Button>
-      {confirm || expired ? null : (
-        <Text variant="footnote" className="text-center text-driftwood">
-          {talkCopy.sayNumber}
-        </Text>
-      )}
     </Sheet>
   );
 }
