@@ -3,6 +3,7 @@ import {
   endReasonSchema,
   type GoodbyeReason,
 } from "@getahoy/protocol";
+import { logger } from "@/features/logging/logger";
 import { loadDeviceKeys } from "../storage/deviceKeys";
 import { type PairedMac, updatePairedMac } from "../storage/pairedMacs";
 import { connectToMac, type MacLink } from "./connectToMac";
@@ -136,17 +137,22 @@ export class MacConnection {
 
   async #handle(event: MacEvent, attempt: number): Promise<void> {
     if (attempt !== this.#attempt) return;
-    if (event.kind === "status") {
-      this.#setState({ kind: "connected", locked: event.locked });
-      return;
+    switch (event.kind) {
+      case "status":
+        return this.#setState({ kind: "connected", locked: event.locked });
+      case "goodbye":
+        return this.#goodbye(event.reason);
+      case "commandReply":
+        return;
+      case "closed":
+        this.#dropSession();
+        if (this.#state.kind !== "connected") return;
+        return this.#settleUnreachable(attempt);
+      default: {
+        const unhandled: never = event;
+        return unhandled;
+      }
     }
-    if (event.kind === "goodbye") {
-      await this.#goodbye(event.reason);
-      return;
-    }
-    this.#dropSession();
-    if (this.#state.kind !== "connected") return;
-    await this.#settleUnreachable(attempt);
   }
 
   async #settleUnreachable(attempt: number): Promise<void> {
@@ -184,6 +190,7 @@ export class MacConnection {
   }
 
   #setState(state: MacLinkState): void {
+    if (__DEV__) logger.info("macLink", state.kind);
     this.#state = state;
     this.#options.live.reportState(this.#options.mac.publicKey, state);
     if (this.#retryTimer) clearTimeout(this.#retryTimer);

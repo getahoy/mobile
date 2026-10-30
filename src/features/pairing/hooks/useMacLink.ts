@@ -3,6 +3,7 @@ import type { MacLinkState } from "../connection/macLinkState";
 import type { PairedMac } from "../storage/pairedMacs";
 import { useLiveMacLinks } from "./useLiveMacLinks";
 import { useMacConnections } from "./useMacConnections";
+import { useSteadyLinkState } from "./useSteadyLinkState";
 
 const CONNECTING: MacLinkState = { kind: "connecting" };
 
@@ -13,8 +14,9 @@ export function useMacLink(mac: PairedMac) {
     live.state(mac.publicKey),
   );
   const connection = connections.connection(mac.publicKey);
-  const state: MacLinkState = mac.ended
+  const current: MacLinkState = mac.ended
     ? { kind: "ended", reason: mac.ended.reason }
     : (reported ?? connection?.state() ?? CONNECTING);
+  const state = useSteadyLinkState(current);
   return { state, connection };
 }
