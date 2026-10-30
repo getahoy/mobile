@@ -2,6 +2,7 @@ import { ImpactFeedbackStyle, impactAsync } from "expo-haptics";
 import { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, AppState } from "react-native";
 import type { TalkState } from "@/features/talk/talkState";
+import { refreshVoiceIds } from "../client/voicesApi";
 import { playSource, preparePlayback } from "../engine/audioPlayback";
 import { createFallbackVoice } from "../engine/fallbackVoice";
 import type { VoiceEngine } from "../engine/voiceEngine";
@@ -39,6 +40,10 @@ export function useVoiceReplies(state: TalkState, recording: boolean) {
   const [speech, setSpeech] = useState<Speech>(SILENT);
   const screenReader = useScreenReader();
   const handled = useRef<string | null>(null);
+
+  useEffect(() => {
+    void refreshVoiceIds().catch(() => undefined);
+  }, []);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (appState) => {

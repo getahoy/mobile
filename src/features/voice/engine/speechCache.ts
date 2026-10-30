@@ -2,11 +2,13 @@ import type { SpeakVoice } from "@getahoy/protocol";
 import { CryptoDigestAlgorithm, digestStringAsync } from "expo-crypto";
 import { Directory, File, Paths } from "expo-file-system";
 import { z } from "zod";
+import { readVoiceId } from "../storage/voiceIds";
 import { voiceStorage } from "../storage/voiceSettings";
 import { touchCache } from "./cacheOrder";
 
 const ORDER_KEY = "voice.cacheOrder";
 const AUDIO_EXTENSION = ".mp3";
+const UNKNOWN_VOICE_ID = "unknown";
 
 const orderSchema = z.array(z.string());
 
@@ -40,8 +42,11 @@ function remember(key: string): void {
   voiceStorage.set(ORDER_KEY, JSON.stringify(order));
 }
 
+// The server voice id is part of the key, so changing a voice on the server never replays old audio.
 export function speechKey(text: string, voice: SpeakVoice): Promise<string> {
-  return digestStringAsync(CryptoDigestAlgorithm.SHA256, `${voice}\n${text}`);
+  const voiceId = readVoiceId(voice) ?? UNKNOWN_VOICE_ID;
+  const material = `${voice}\n${voiceId}\n${text}`;
+  return digestStringAsync(CryptoDigestAlgorithm.SHA256, material);
 }
 
 export function cachedSpeech(key: string): string | null {
