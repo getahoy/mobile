@@ -1,5 +1,5 @@
 import type { OrbMotion } from "@/components/ui/orb";
-import { talkCopy } from "./copy/talkCopy";
+import { talkCopy } from "./copy/talkCopy.ts";
 import type { MicAccess } from "./recorder/useFileRecorder";
 import type { TalkBlock, TalkState } from "./talkState";
 
