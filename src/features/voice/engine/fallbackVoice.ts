@@ -5,31 +5,38 @@ import { type PreparedSpeech, prepareSpeech } from "./elevenLabsVoice";
 import type { SpeakOptions, VoiceEngine } from "./voiceEngine";
 
 // Past this the device voice speaks instead, so a slow network never leaves silence.
-const FIRST_AUDIO_MS = 1500;
+const FIRST_AUDIO_MS = 2500;
 
 type Late = { kind: "late" };
 
-function timeout(signal: AbortSignal): Promise<Late> {
-  return new Promise((resolve) => {
-    const timer = setTimeout(() => resolve({ kind: "late" }), FIRST_AUDIO_MS);
-    signal.addEventListener("abort", () => clearTimeout(timer));
+function firstAudio(
+  preparing: Promise<PreparedSpeech>,
+): Promise<PreparedSpeech | Late> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<Late>((resolve) => {
+    timer = setTimeout(() => resolve({ kind: "late" }), FIRST_AUDIO_MS);
+  });
+  return Promise.race([preparing, late]).finally(() => clearTimeout(timer));
+}
+
+function prepareAndCache(text: string, voice: SpeakOptions["voice"]) {
+  const requestedAt = Date.now();
+  const unstoppable = new AbortController().signal;
+  return prepareSpeech(text, voice, unstoppable).then((prepared) => {
+    const waitedMs = Date.now() - requestedAt;
+    if (__DEV__)
+      logger.info("voice", `Speech ${prepared.kind} in ${waitedMs} ms`);
+    return prepared;
   });
 }
 
-// The ElevenLabs request is aborted before the device voice starts, so its audio can never play late.
+// A late download keeps going so the cache has the phrase next time, but only
+// audio that is ready before the deadline is ever played.
 async function speakWithFallback(
   text: string,
   { voice, signal, onLevel }: SpeakOptions,
 ): Promise<void> {
-  const fetching = new AbortController();
-  const stopFetching = () => fetching.abort();
-  signal.addEventListener("abort", stopFetching);
-  const first: PreparedSpeech | Late = await Promise.race([
-    prepareSpeech(text, voice, fetching.signal),
-    timeout(fetching.signal),
-  ]);
-  signal.removeEventListener("abort", stopFetching);
-  fetching.abort();
+  const first = await firstAudio(prepareAndCache(text, voice));
   if (signal.aborted) return;
   if (first.kind === "ready") {
     return playSource({ uri: first.uri }, signal, onLevel);
