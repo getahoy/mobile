@@ -8,9 +8,8 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { pairingCopy } from "../copy/pairingCopy";
-import { type ZoomDirection, zoomPercent } from "../zoomScale";
+import { PERCENT, type ZoomDirection, zoomPercent } from "../zoomScale";
 
-const PERCENT = 100;
 const accessibilityActions = [{ name: "increment" }, { name: "decrement" }];
 
 type ZoomTrackProps = {

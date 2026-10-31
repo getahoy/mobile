@@ -1,26 +1,37 @@
+import type { BarcodeSettings } from "expo-camera";
 import { View } from "react-native";
-import { GestureDetector } from "react-native-gesture-handler";
+import {
+  GestureDetector,
+  type PinchGesture,
+} from "react-native-gesture-handler";
 import { pairingCopy } from "../copy/pairingCopy";
-import type { ScannerZoomState } from "../hooks/useScannerZoom";
 import { ScannerCamera } from "./scannerCamera";
+
+const qrCodesOnly: BarcodeSettings = { barcodeTypes: ["qr"] };
 
 type ScannerPreviewProps = {
   torchOn: boolean;
-  zoom: ScannerZoomState;
+  cameraZoom: number;
+  pinch: PinchGesture;
   onScan: (code: string) => void;
 };
 
-export function ScannerPreview({ torchOn, zoom, onScan }: ScannerPreviewProps) {
+export function ScannerPreview({
+  torchOn,
+  cameraZoom,
+  pinch,
+  onScan,
+}: ScannerPreviewProps) {
   return (
-    <GestureDetector gesture={zoom.pinch}>
+    <GestureDetector gesture={pinch}>
       <View className="absolute inset-0">
         <ScannerCamera
           accessibilityLabel={pairingCopy["camera.label"]}
           className="flex-1"
           facing="back"
           enableTorch={torchOn}
-          zoom={zoom.cameraZoom}
-          barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+          zoom={cameraZoom}
+          barcodeScannerSettings={qrCodesOnly}
           onBarcodeScanned={(scan) => onScan(scan.data)}
         />
       </View>

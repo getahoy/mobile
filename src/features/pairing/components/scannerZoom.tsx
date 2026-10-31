@@ -34,19 +34,19 @@ export function ScannerZoom({ zoom, visible }: ScannerZoomProps) {
             icon="plus"
             label={pairingCopy["scanner.zoomIn"]}
             disabled={zoomLimitReached(zoom.level, "in")}
-            onStep={() => zoom.step("in")}
+            onStep={() => zoom.step("in", "ease")}
           />
           <ZoomTrack
             level={zoom.level}
             liveLevel={zoom.liveLevel}
-            onAdjust={zoom.step}
+            onAdjust={(direction) => zoom.step(direction, "jump")}
             onLayout={zoom.onTrackLayout}
           />
           <ZoomStepButton
             icon="minus"
             label={pairingCopy["scanner.zoomOut"]}
             disabled={zoomLimitReached(zoom.level, "out")}
-            onStep={() => zoom.step("out")}
+            onStep={() => zoom.step("out", "ease")}
           />
         </View>
       </GestureDetector>

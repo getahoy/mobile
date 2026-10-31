@@ -19,8 +19,12 @@ export function PairScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [torchOn, setTorchOn] = useState(false);
   const { state, claim, scanAgain } = useClaimMac(() => router.back());
-  const zoom = useScannerZoom(state.kind);
+  const zoom = useScannerZoom();
   const close = () => router.back();
+  const scanAgainFromStart = () => {
+    zoom.reset();
+    scanAgain();
+  };
 
   if (!permission) {
     return (
@@ -46,7 +50,8 @@ export function PairScreen() {
       <StatusBar style="light" />
       <ScannerPreview
         torchOn={torchOn}
-        zoom={zoom}
+        cameraZoom={zoom.cameraZoom}
+        pinch={zoom.pinch}
         onScan={(code) => {
           if (state.kind === "scanning") void claim(code);
         }}
@@ -58,7 +63,7 @@ export function PairScreen() {
         onClose={close}
         onToggleTorch={() => setTorchOn((on) => !on)}
       />
-      <ScannerStatus state={state} onScanAgain={scanAgain} />
+      <ScannerStatus state={state} onScanAgain={scanAgainFromStart} />
     </View>
   );
 }

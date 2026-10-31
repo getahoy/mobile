@@ -1,45 +1,59 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import { Platform } from "react-native";
-import { withTiming } from "react-native-reanimated";
+import {
+  useAnimatedReaction,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { haptics } from "@/lib/haptics";
 import { duration, easing, useReducedMotion } from "@/lib/motion";
 import {
   type CameraZoomCurve,
+  clampZoomLevel,
   MIN_ZOOM_LEVEL,
   nextZoomLevel,
   toCameraZoom,
   type ZoomDirection,
   zoomLimitReached,
 } from "../zoomScale";
-import type { ClaimState } from "./useClaimMac";
-import { useZoomDrag } from "./useZoomDrag";
-import { useZoomPinch } from "./useZoomPinch";
+import { useZoomGestures } from "./useZoomGestures";
 
 // expo-camera maps its zoom prop exponentially on iOS and linearly on Android.
 const ZOOM_CURVE: CameraZoomCurve =
   Platform.OS === "android" ? "linear" : "exponential";
 
+export type ZoomMotion = "ease" | "jump";
+
 export type ScannerZoomState = ReturnType<typeof useScannerZoom>;
 
-export function useScannerZoom(claimKind: ClaimState["kind"]) {
+export function useScannerZoom() {
   const reducedMotion = useReducedMotion();
-  const { level, liveLevel, targetLevel, pinch } = useZoomPinch(ZOOM_CURVE);
-  const { drag, onTrackLayout } = useZoomDrag(liveLevel, targetLevel);
+  const [level, setLevel] = useState(MIN_ZOOM_LEVEL);
+  const liveLevel = useSharedValue(MIN_ZOOM_LEVEL);
+  const targetLevel = useSharedValue(MIN_ZOOM_LEVEL);
+  const gestures = useZoomGestures({
+    liveLevel,
+    targetLevel,
+    curve: ZOOM_CURVE,
+  });
 
-  useEffect(() => {
-    if (claimKind !== "scanning") return;
-    targetLevel.value = MIN_ZOOM_LEVEL;
-    liveLevel.value = MIN_ZOOM_LEVEL;
-  }, [claimKind, liveLevel, targetLevel]);
+  useAnimatedReaction(
+    () => liveLevel.value,
+    (current, previous) => {
+      if (current !== previous) scheduleOnRN(setLevel, clampZoomLevel(current));
+    },
+  );
 
-  const step = (direction: ZoomDirection): boolean => {
+  const step = (direction: ZoomDirection, motion: ZoomMotion): boolean => {
     const current = targetLevel.value;
     if (zoomLimitReached(current, direction)) return false;
     const target = nextZoomLevel(current, direction);
     targetLevel.value = target;
-    liveLevel.value = reducedMotion
-      ? target
-      : withTiming(target, { duration: duration.base, easing: easing.out });
+    liveLevel.value =
+      reducedMotion || motion === "jump"
+        ? target
+        : withTiming(target, { duration: duration.base, easing: easing.out });
     if (zoomLimitReached(target, direction)) {
       haptics.zoomLimit();
       return false;
@@ -48,13 +62,17 @@ export function useScannerZoom(claimKind: ClaimState["kind"]) {
     return true;
   };
 
+  const reset = () => {
+    targetLevel.value = MIN_ZOOM_LEVEL;
+    liveLevel.value = MIN_ZOOM_LEVEL;
+  };
+
   return {
     cameraZoom: toCameraZoom(level, ZOOM_CURVE),
     level,
     liveLevel,
-    pinch,
-    drag,
-    onTrackLayout,
+    ...gestures,
     step,
+    reset,
   };
 }

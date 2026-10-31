@@ -1,14 +1,12 @@
 export const MIN_ZOOM_LEVEL = 0;
-export const MAX_ZOOM_LEVEL = 1;
 export const ZOOM_LEVEL_STEPS = 6;
-const CAMERA_ZOOM_MIN = 0;
-const CAMERA_ZOOM_MAX = 1;
+export const PERCENT = 100;
+const MAX_ZOOM_LEVEL = 1;
 const EXPONENTIAL_MAX_CAMERA_ZOOM = 0.4;
 const EXPONENTIAL_PINCH_GAIN = 0.25;
 const LINEAR_ONE_X_CAMERA_ZOOM = 0.125;
 const LINEAR_ZOOM_RANGE = 4.8;
 const STEP_TOLERANCE = 0.001;
-const PERCENT = 100;
 
 export type CameraZoomCurve = "exponential" | "linear";
 export type ZoomDirection = "in" | "out";
@@ -19,22 +17,14 @@ export function clampZoomLevel(level: number): number {
   return Math.min(MAX_ZOOM_LEVEL, Math.max(MIN_ZOOM_LEVEL, level));
 }
 
-function clampCameraZoom(cameraZoom: number): number {
-  "worklet";
-  if (!Number.isFinite(cameraZoom)) return CAMERA_ZOOM_MIN;
-  return Math.min(CAMERA_ZOOM_MAX, Math.max(CAMERA_ZOOM_MIN, cameraZoom));
-}
-
 export function toCameraZoom(level: number, curve: CameraZoomCurve): number {
   "worklet";
   const safeLevel = clampZoomLevel(level);
   switch (curve) {
     case "exponential":
-      return clampCameraZoom(safeLevel * EXPONENTIAL_MAX_CAMERA_ZOOM);
+      return safeLevel * EXPONENTIAL_MAX_CAMERA_ZOOM;
     case "linear":
-      return clampCameraZoom(
-        LINEAR_ONE_X_CAMERA_ZOOM * LINEAR_ZOOM_RANGE ** safeLevel,
-      );
+      return LINEAR_ONE_X_CAMERA_ZOOM * LINEAR_ZOOM_RANGE ** safeLevel;
     default: {
       const unhandled: never = curve;
       return unhandled;
