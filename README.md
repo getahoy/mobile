@@ -1,6 +1,21 @@
+<img src="assets/readme-banner.png" alt="ahoy / mobile: the iPhone app. Hold to talk." width="100%">
+
+**Ahoy** is a voice assistant that lets you control your Mac from your phone. This repo is the phone app.
+
+[▶ Watch the 1:45 demo](https://drive.google.com/file/d/1JMgSd2bm7LtUCs2WxiTNWuo0-bijqs4p/view?usp=sharing) · [All Ahoy repos](https://github.com/getahoy)
+
 # Ahoy mobile
 
 Expo app for iOS and Android: sign in, then talk to your Mac.
+
+## What it does
+
+- **Pair with your Mac** by scanning the QR code the Mac app shows.
+- **Hold to talk.** It only listens while you hold the button, then sends your words to your Mac.
+- **Shows what happened**, with a short "Done" card for every command.
+- **Asks when it isn't sure.** If two things match, a "Which one?" sheet lets you say or tap the number.
+- **Confirms risky actions** like deleting or sending, by tap only.
+- **Talks back** with short spoken replies, on the phone or the Mac.
 
 ## Setup
 
