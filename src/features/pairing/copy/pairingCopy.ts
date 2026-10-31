@@ -4,6 +4,9 @@ export const pairingCopy = {
     "Point your camera at the QR code on your Mac. Open Ahoy from the Mac menubar to show it.",
   "scanner.close": "Close",
   "scanner.torch": "Torch",
+  "scanner.zoomIn": "Zoom in",
+  "scanner.zoomOut": "Zoom out",
+  "scanner.zoom": "Zoom",
   "pair.claiming": "Pairing with your Mac…",
   "pair.finishing": "Finishing pairing on your Mac…",
   "pair.notFinished":

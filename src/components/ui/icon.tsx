@@ -10,6 +10,8 @@ const symbols = {
   close: { ios: "xmark", android: "close" },
   torchOn: { ios: "flashlight.on.fill", android: "flashlight_on" },
   torchOff: { ios: "flashlight.off.fill", android: "flashlight_off" },
+  minus: { ios: "minus", android: "remove" },
+  plus: { ios: "plus", android: "add" },
   eye: { ios: "eye", android: "visibility" },
   eyeSlash: { ios: "eye.slash", android: "visibility_off" },
   chevronRight: { ios: "chevron.right", android: "chevron_right" },
