@@ -28,7 +28,7 @@ export function TalkBar(props: TalkBarProps) {
     onInterrupted: props.onInterrupted,
   });
   return (
-    <View className="h-15 items-center justify-center">
+    <View>
       {activity.orb ? (
         <View
           pointerEvents="none"

@@ -55,7 +55,9 @@ export function TalkPanel({ target }: TalkPanelProps) {
         ) : null}
       </View>
       <Animated.View entering={rise} className="gap-3.5 px-5 pb-safe-offset-2">
-        {heard || reply || thread || activity.orb ? null : <TryHints />}
+        {heard || reply || thread || activity.orb || bar.disabled ? null : (
+          <TryHints />
+        )}
         {bar.reason ? (
           <TalkReason
             reason={bar.reason}
