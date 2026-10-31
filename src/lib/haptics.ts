@@ -14,6 +14,8 @@ export const haptics = {
   talkStart: () => quietly(impactAsync(ImpactFeedbackStyle.Medium)),
   talkEnd: () => quietly(impactAsync(ImpactFeedbackStyle.Light)),
   choicePicked: () => quietly(selectionAsync()),
+  zoomStep: () => quietly(selectionAsync()),
+  zoomLimit: () => quietly(impactAsync(ImpactFeedbackStyle.Medium)),
   confirmOpen: () =>
     quietly(notificationAsync(NotificationFeedbackType.Warning)),
   success: () => quietly(notificationAsync(NotificationFeedbackType.Success)),
