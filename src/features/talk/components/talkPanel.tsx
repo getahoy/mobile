@@ -50,12 +50,12 @@ export function TalkPanel({ target }: TalkPanelProps) {
     <>
       <View className="flex-1 justify-center gap-5 px-6">
         {heard ? <HeardLine text={heard} /> : null}
-        {heard || reply || thread ? null : <TryHints />}
         {reply ? (
           <ReplyCard reply={reply} onRetry={talk.flow.tryAgain} />
         ) : null}
       </View>
       <Animated.View entering={rise} className="gap-3.5 px-5 pb-safe-offset-2">
+        {heard || reply || thread || activity.orb ? null : <TryHints />}
         {bar.reason ? (
           <TalkReason
             reason={bar.reason}

@@ -2,7 +2,6 @@ import { View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { Orb } from "@/components/ui/orb";
-import { cn } from "@/lib/cn";
 import { talkCopy } from "../copy/talkCopy";
 import { useTalkBarHold } from "../hooks/useTalkBarHold";
 import type { VoiceActivity } from "../voiceActivity";
@@ -29,7 +28,7 @@ export function TalkBar(props: TalkBarProps) {
     onInterrupted: props.onInterrupted,
   });
   return (
-    <View className="h-19 items-center justify-center">
+    <View className="h-15 items-center justify-center">
       {activity.orb ? (
         <View
           pointerEvents="none"
@@ -51,10 +50,7 @@ export function TalkBar(props: TalkBarProps) {
           accessibilityLabel={talkCopy.buttonLabel(macName)}
           accessibilityHint={talkCopy.buttonHint}
           accessibilityState={{ disabled, busy: activity.orb !== null }}
-          className={cn(
-            "h-19 w-full flex-row items-center justify-center gap-3 rounded-full",
-            disabled ? "bg-linen" : "bg-ink",
-          )}
+          className="h-15 w-full flex-row items-center gap-3 rounded-full bg-ink pr-4.5 pl-2"
         >
           <TalkBarContent
             label={label}

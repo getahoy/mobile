@@ -12,9 +12,6 @@ export function VoiceDot({ level, weight }: VoiceDotProps) {
     transform: [{ scaleY: 1 + level.value * weight * TALLEST_STRETCH }],
   }));
   return (
-    <Animated.View
-      style={stretch}
-      className="size-1.5 rounded-full bg-on-ink"
-    />
+    <Animated.View style={stretch} className="size-1.5 rounded-full bg-ink" />
   );
 }
