@@ -1,7 +1,8 @@
+import type { ReactNode } from "react";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 
-type ScannerViewfinderProps = { hint: string };
+type ScannerViewfinderProps = { hint: ReactNode };
 
 const brackets = [
   "top-0 left-0 rounded-tl-viewfinder-bracket border-t-4 border-l-4",

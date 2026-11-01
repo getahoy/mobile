@@ -4,6 +4,7 @@ import type { GoodbyeReason } from "@getahoy/protocol";
 import { listPairingLinks, unlinkPairing } from "../client/pairingApi";
 import type { LiveMacLinks } from "../connection/liveMacLinks";
 import { clearDeviceKeys, loadDeviceKeys } from "../storage/deviceKeys";
+import { clearEndedNotice } from "../storage/endedNotice";
 import { clearPairedMacs, readPairedMacs } from "../storage/pairedMacs";
 import {
   clearPendingUnlinks,
@@ -69,5 +70,6 @@ export async function unpairEverything(live: LiveMacLinks): Promise<void> {
   for (const mac of macs) await queueUnlink(mac.publicKey, "signed_out");
   await flushPendingUnlinks();
   await Promise.all([clearPairedMacs(), clearPendingUnlinks()]);
+  clearEndedNotice();
   await clearDeviceKeys();
 }

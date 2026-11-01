@@ -39,10 +39,39 @@ export const macCopy = {
   moreOptions: (mac: string) => `More options for ${mac}`,
   cancel: "Cancel",
   ended: {
-    removed: (mac: string) => `${mac} disconnected this phone.`,
-    replaced: (mac: string) => `${mac} is now paired with a different phone.`,
-    signed_out: (mac: string) => `You signed out of Ahoy on ${mac}.`,
+    removed: {
+      title: "Disconnected from your Mac.",
+      before: "",
+      after: " removed this phone. Scan a new code to pair again.",
+      short: (mac: string) => `${mac} disconnected this phone.`,
+    },
+    signed_out: {
+      title: "Signed out on your Mac.",
+      before: "You signed out of Ahoy on ",
+      after: ", which also unpaired this phone. Scan a new code to pair again.",
+      short: (mac: string) => `You signed out of Ahoy on ${mac}.`,
+    },
+    replaced: {
+      title: "Your Mac paired another phone.",
+      before: "",
+      after:
+        " is now paired with a different phone. Scan a new code to pair this one again.",
+      short: (mac: string) => `${mac} is now paired with a different phone.`,
+    },
   },
+  endedWhen: {
+    justNow: "Just now",
+    minutes: (count: number) =>
+      count === 1 ? "1 minute ago" : `${count} minutes ago`,
+    hours: (count: number) =>
+      count === 1 ? "1 hour ago" : `${count} hours ago`,
+    whileClosed: (when: string) => `${when} · while Ahoy was closed`,
+  },
+  stillPairedBefore: "You’re still paired with ",
+  stillPairedAfter: ".",
+  endedScanBefore: "On ",
+  endedScanAfter:
+    ", open Ahoy from the menubar and scan the code it shows. Any other Mac works too.",
   dismiss: "Dismiss",
   removeTitle: (mac: string) => `Remove ${mac}?`,
   removeBody: (mac: string) =>

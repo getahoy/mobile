@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { View } from "react-native";
+import { Text } from "@/components/ui/text";
 import { PermissionGateView } from "@/features/permissions/components/permissionGateView";
 import { TurnedOnPill } from "@/features/permissions/components/turnedOnPill";
 import { localNetworkIntroPending } from "@/features/permissions/localNetworkIntro";
@@ -12,9 +13,11 @@ import { ScannerViewfinder } from "../components/scannerViewfinder";
 import { ScannerZoom } from "../components/scannerZoom";
 import { macCopy } from "../copy/macCopy";
 import { pairingCopy } from "../copy/pairingCopy";
+import type { EndedNotice } from "../endedPairing";
 import { useCameraGate } from "../hooks/useCameraGate";
 import { useClaimMac } from "../hooks/useClaimMac";
 import { useScannerZoom } from "../hooks/useScannerZoom";
+import { useEndedNotice } from "../storage/endedNotice";
 
 const close = () => router.back();
 
@@ -23,12 +26,25 @@ function leaveAfterPairing() {
   else router.back();
 }
 
+function scannerHint(mac: string | undefined, ended: EndedNotice | null) {
+  if (mac) return macCopy.pairAgainHint(mac);
+  if (!ended) return pairingCopy["scanner.hint"];
+  return (
+    <>
+      {macCopy.endedScanBefore}
+      <Text className="font-sans-medium text-on-scrim">{ended.deviceName}</Text>
+      {macCopy.endedScanAfter}
+    </>
+  );
+}
+
 export function PairScreen() {
   const { mac, resumed } = useLocalSearchParams<{
     mac?: string;
     resumed?: string;
   }>();
   const camera = useCameraGate(resumed === "1");
+  const ended = useEndedNotice().notice;
   const [torchOn, setTorchOn] = useState(false);
   const { state, claim } = useClaimMac(leaveAfterPairing);
   const zoom = useScannerZoom();
@@ -39,7 +55,7 @@ export function PairScreen() {
       <PermissionGateView kind="camera" gate={camera.gate} onClose={close} />
     );
   }
-  const hint = mac ? macCopy.pairAgainHint(mac) : pairingCopy["scanner.hint"];
+  const hint = scannerHint(mac, ended);
   const notice = camera.turnedOn ? (
     <TurnedOnPill kind="camera" look="scanner" onHidden={camera.hideTurnedOn} />
   ) : null;

@@ -8,9 +8,10 @@ const ENDED_NOTICE_KEY = "pairing.endedNotice";
 const endedNoticeStorage = createMMKV({ id: "ahoy.endedNotice" });
 
 const endedNoticeSchema: z.ZodType<EndedNotice> = z.object({
-  macName: z.string(),
+  deviceName: z.string(),
   reason: endReasonSchema,
   at: z.int(),
+  whileClosed: z.boolean(),
 });
 
 function parseNotice(text: string | undefined): EndedNotice | null {

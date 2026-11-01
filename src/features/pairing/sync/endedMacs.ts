@@ -7,11 +7,18 @@ import {
   writePairedMacs,
 } from "../storage/pairedMacs";
 
+// An end learned this soon after launch happened while Ahoy was closed: the
+// first link sync and the first handshake both run in this window.
+const LAUNCH_WINDOW_MS = 15_000;
+const launchedAt = Date.now();
+
 export async function endPairedMac(
   publicKey: string,
   reason: EndReason,
 ): Promise<void> {
-  const ending = { reason, at: Date.now() };
+  const at = Date.now();
+  const whileClosed = at - launchedAt < LAUNCH_WINDOW_MS;
+  const ending = { reason, at, whileClosed };
   const ended = endPairing(await readPairedMacs(), publicKey, ending);
   if (!ended) return;
   await writePairedMacs(ended.macs);

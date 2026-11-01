@@ -1,11 +1,9 @@
 import { View } from "react-native";
-import { TurnedOnPill } from "@/features/permissions/components/turnedOnPill";
 import { useLocalNetworkIntro } from "@/features/permissions/hooks/useLocalNetworkIntro";
-import { useTurnedOnNotice } from "@/features/permissions/hooks/useTurnedOnNotice";
 import { TalkPanel } from "@/features/talk/components/talkPanel";
 import { useTalkTarget } from "@/features/talk/hooks/useTalkTarget";
-import { EndedNoticeCard } from "../components/endedNoticeCard";
 import { HomeMac } from "../components/homeMac";
+import { HomeNotices } from "../components/homeNotices";
 import { NoMacsYet } from "../components/noMacsYet";
 import { useKeepMacsConnected } from "../hooks/useKeepMacsConnected";
 import { useLinkSync } from "../hooks/useLinkSync";
@@ -17,23 +15,11 @@ export function MacsHomeScreen() {
   useLinkSync(reload);
   const introPending = useLocalNetworkIntro((macs?.length ?? 0) > 0);
   useKeepMacsConnected(introPending ? null : macs, reload);
-  const { notice, clear } = useTurnedOnNotice();
   const ended = useEndedNotice();
   const target = useTalkTarget(macs ?? []);
   const { mac } = target;
-  const endedCard = ended.notice ? (
-    <EndedNoticeCard notice={ended.notice} onDismiss={ended.dismiss} />
-  ) : null;
-  const turnedOn = notice ? (
-    <TurnedOnPill
-      key={notice.key}
-      kind={notice.kind}
-      look="home"
-      onHidden={clear}
-    />
-  ) : null;
 
-  if (macs?.length === 0) return <NoMacsYet notice={endedCard} />;
+  if (macs?.length === 0) return <NoMacsYet ended={ended.notice} />;
 
   return (
     <View className="flex-1 bg-sailcloth pt-safe">
@@ -45,12 +31,11 @@ export function MacsHomeScreen() {
           onChanged={reload}
         />
       ) : null}
-      {endedCard ? <View className="px-5 pt-2">{endedCard}</View> : null}
       {mac ? (
         <TalkPanel
           key={mac.publicKey}
           target={{ ...target, mac }}
-          notice={turnedOn}
+          notice={<HomeNotices macName={mac.displayName} />}
         />
       ) : (
         <View className="flex-1" />

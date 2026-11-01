@@ -16,6 +16,7 @@ const merge = extendTailwindMerge({
         "numeral",
         "body",
         "body-lg",
+        "note",
         "heard",
         "title",
         "headline",

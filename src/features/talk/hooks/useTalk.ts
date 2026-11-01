@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { authClient } from "@/features/auth/client/authClient";
 import { useLiveMacLinks } from "@/features/pairing/hooks/useLiveMacLinks";
+import { clearEndedNotice } from "@/features/pairing/storage/endedNotice";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
 import { useVoiceReplies } from "@/features/voice/hooks/useVoiceReplies";
 import { readVoiceSettings } from "@/features/voice/storage/voiceSettings";
@@ -45,6 +46,7 @@ export function useTalk(mac: PairedMac | null) {
       session,
       speakOn,
       onPress: (choosingFor) => {
+        clearEndedNotice();
         latest.current.stopVoice();
         signalPress(session(), choosingFor);
       },
