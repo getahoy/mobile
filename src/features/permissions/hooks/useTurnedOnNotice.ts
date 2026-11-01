@@ -10,6 +10,8 @@ const AFTER_RESTART = "afterRestart";
 
 // iOS restarts the app after a privacy change, so the return from Settings
 // is read from storage at launch.
+export type TurnedOnNotice = ReturnType<typeof useTurnedOnNotice>;
+
 export function useTurnedOnNotice() {
   const { turnedOn, at } = useLocalSearchParams<{
     turnedOn?: string;

@@ -1,5 +1,6 @@
 import { View } from "react-native";
 import { useLocalNetworkIntro } from "@/features/permissions/hooks/useLocalNetworkIntro";
+import { useTurnedOnNotice } from "@/features/permissions/hooks/useTurnedOnNotice";
 import { TalkPanel } from "@/features/talk/components/talkPanel";
 import { useTalkTarget } from "@/features/talk/hooks/useTalkTarget";
 import { HomeMac } from "../components/homeMac";
@@ -16,6 +17,7 @@ export function MacsHomeScreen() {
   const introPending = useLocalNetworkIntro((macs?.length ?? 0) > 0);
   useKeepMacsConnected(introPending ? null : macs, reload);
   const ended = useEndedNotice();
+  const turnedOn = useTurnedOnNotice();
   const target = useTalkTarget(macs ?? []);
   const { mac } = target;
 
@@ -35,7 +37,7 @@ export function MacsHomeScreen() {
         <TalkPanel
           key={`${mac.publicKey}:talk`}
           target={{ ...target, mac }}
-          notice={<HomeNotices macName={mac.displayName} />}
+          notice={<HomeNotices macName={mac.displayName} turnedOn={turnedOn} />}
         />
       ) : (
         <View className="flex-1" />

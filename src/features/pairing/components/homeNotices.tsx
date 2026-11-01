@@ -1,12 +1,11 @@
 import { TurnedOnPill } from "@/features/permissions/components/turnedOnPill";
-import { useTurnedOnNotice } from "@/features/permissions/hooks/useTurnedOnNotice";
+import type { TurnedOnNotice } from "@/features/permissions/hooks/useTurnedOnNotice";
 import { useEndedNotice } from "../storage/endedNotice";
 import { EndedNote } from "./endedNote";
 
-type HomeNoticesProps = { macName: string };
+type HomeNoticesProps = { macName: string; turnedOn: TurnedOnNotice };
 
-export function HomeNotices({ macName }: HomeNoticesProps) {
-  const turnedOn = useTurnedOnNotice();
+export function HomeNotices({ macName, turnedOn }: HomeNoticesProps) {
   const ended = useEndedNotice();
   return (
     <>
