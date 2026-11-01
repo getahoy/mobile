@@ -1,5 +1,4 @@
 import { talkCopy } from "./copy/talkCopy.ts";
-import type { MicAccess } from "./recorder/useFileRecorder";
 import type { TalkBlock, TalkState } from "./talkState";
 
 type TalkBarView = {
@@ -12,7 +11,6 @@ type TalkBarView = {
 type TalkBarInput = {
   state: TalkState;
   block: TalkBlock | null;
-  access: MicAccess;
   mac: string;
   durationMs: number;
 };
@@ -21,11 +19,6 @@ function blockReason(block: TalkBlock, mac: string): string {
   if (block === "locked") return talkCopy.locked(mac);
   if (block === "paused") return talkCopy.paused(mac);
   return talkCopy.noMac;
-}
-
-function reasonOf(input: TalkBarInput): string | null {
-  if (input.access === "blocked") return talkCopy.micBlocked;
-  return input.block ? blockReason(input.block, input.mac) : null;
 }
 
 function labelOf(state: TalkState, mac: string, durationMs: number): string {
@@ -49,8 +42,8 @@ function labelOf(state: TalkState, mac: string, durationMs: number): string {
 }
 
 export function talkBarView(input: TalkBarInput): TalkBarView {
-  const { state, mac, durationMs } = input;
-  const reason = reasonOf(input);
+  const { state, block, mac, durationMs } = input;
+  const reason = block ? blockReason(block, mac) : null;
   return {
     label: labelOf(state, mac, durationMs),
     labelStyle: state.kind === "listening" ? "timer" : "text",

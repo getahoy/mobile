@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
@@ -19,9 +20,12 @@ import { TryHints } from "./tryHints";
 const LAUNCH_RISE_MS = 900;
 const rise = FadeInDown.duration(LAUNCH_RISE_MS).easing(easing.out);
 
-type TalkPanelProps = { target: TalkTarget & { mac: PairedMac } };
+type TalkPanelProps = {
+  target: TalkTarget & { mac: PairedMac };
+  notice: ReactNode;
+};
 
-export function TalkPanel({ target }: TalkPanelProps) {
+export function TalkPanel({ target, notice }: TalkPanelProps) {
   const talk = useTalk(target.block ? null : target.mac);
   const { thread } = useThread(talk.state);
   const mac = target.mac.displayName;
@@ -29,7 +33,6 @@ export function TalkPanel({ target }: TalkPanelProps) {
   const bar = talkBarView({
     state: talk.state,
     block: target.block,
-    access: talk.access,
     mac,
     durationMs: talk.durationMs,
   });
@@ -49,6 +52,7 @@ export function TalkPanel({ target }: TalkPanelProps) {
   return (
     <>
       <View className="flex-1 justify-center gap-5 px-6">
+        {notice}
         {heard ? <HeardLine text={heard} /> : null}
         {reply ? (
           <ReplyCard reply={reply} onRetry={talk.flow.tryAgain} />
@@ -58,12 +62,7 @@ export function TalkPanel({ target }: TalkPanelProps) {
         {heard || reply || thread || activity.orb || bar.disabled ? null : (
           <TryHints />
         )}
-        {bar.reason ? (
-          <TalkReason
-            reason={bar.reason}
-            micBlocked={talk.access === "blocked"}
-          />
-        ) : null}
+        {bar.reason ? <TalkReason reason={bar.reason} /> : null}
         <TalkBar macName={mac} {...bar} activity={activity} {...hold} />
       </Animated.View>
       <ChoiceSheet

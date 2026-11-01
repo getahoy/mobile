@@ -17,13 +17,14 @@ import { askMac, choiceRequest, commandRequest } from "./askMac";
 import type { MacRequest } from "./sendCommand";
 import { uploadFailure } from "./uploadFailure";
 
-type TalkRecorder = Pick<
-  FileRecorder,
-  "access" | "requestAccess" | "start" | "stop" | "discard"
->;
+type TalkRecorder = Pick<FileRecorder, "start" | "stop" | "discard">;
+
+export type MicRefusal = "needed" | "failed";
 
 type TalkFlowOptions = {
   recorder: () => TalkRecorder;
+  micAllowed: () => Promise<boolean>;
+  onMicRefused: (refusal: MicRefusal) => void;
   session: () => MacSession | null;
   speakOn: () => SpeakTarget;
   onPress: (choosingFor: string | null) => void;
@@ -64,16 +65,19 @@ export class TalkFlow {
     this.#attempt += 1;
     this.#options.onPress(this.#choosingFor);
     const attempt = this.#attempt;
-    const recorder = this.#options.recorder();
-    const allowed =
-      recorder.access === "granted" || (await recorder.requestAccess());
+    const { micAllowed, onMicRefused, recorder } = this.#options;
+    const allowed = await micAllowed().catch(() => false);
     if (attempt !== this.#attempt) return;
+    if (!allowed) onMicRefused("needed");
     if (!allowed || this.#releasedEarly) return this.#settle(READY);
-    const started = await recorder.start().then(
-      () => true,
-      () => false,
-    );
+    const started = await recorder()
+      .start()
+      .then(
+        () => true,
+        () => false,
+      );
     if (attempt !== this.#attempt) return this.#stopOrphan();
+    if (!started) onMicRefused("failed");
     if (!started) return this.#settle(READY);
     if (this.#releasedEarly) return this.#discard(TOO_SHORT);
     this.#phase = "listening";

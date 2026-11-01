@@ -39,8 +39,6 @@ export const talkCopy = {
   noMac: "Connect to your Mac to talk.",
   locked: (mac: string) => `${mac} is locked. Unlock it to use Ahoy.`,
   paused: (mac: string) => `${mac} is paused. Tap Connect to talk.`,
-  micBlocked: "Ahoy needs the microphone to hear your command.",
-  openSettings: "Open Settings",
   buttonLabel: (mac: string) => `Hold to talk to ${mac}`,
   buttonHint: "Hold, say a command, then let go to send it.",
   cancel: "Cancel",

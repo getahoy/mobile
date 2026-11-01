@@ -7,7 +7,6 @@ const MAC = "Studio Mac";
 const ready = {
   state: { kind: "ready" },
   block: null,
-  access: "granted",
   mac: MAC,
   durationMs: 0,
 } as const;
@@ -38,9 +37,4 @@ test("a blocked Mac disables the bar with its reason", () => {
   const bar = talkBarView({ ...ready, block: "paused" });
   assert.equal(bar.disabled, true);
   assert.equal(bar.reason, talkCopy.paused(MAC));
-});
-
-test("a blocked microphone wins over the Mac reason", () => {
-  const bar = talkBarView({ ...ready, block: "locked", access: "blocked" });
-  assert.equal(bar.reason, talkCopy.micBlocked);
 });
