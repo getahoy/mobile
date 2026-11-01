@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { APP_SCHEME } from "@getahoy/lib";
 import type { ExpoConfig } from "expo/config";
+import { systemPrompts } from "./src/features/permissions/copy/systemPrompts.ts";
 
 function gitCommit(): string {
   try {
@@ -39,8 +40,7 @@ const config: ExpoConfig = {
   ios: {
     bundleIdentifier: "com.getahoy.mobile",
     infoPlist: {
-      NSLocalNetworkUsageDescription:
-        "Ahoy connects to your Mac on your local network.",
+      NSLocalNetworkUsageDescription: systemPrompts.net,
       NSBonjourServices: ["_ahoy._tcp"],
       NSAppTransportSecurity: {
         NSAllowsLocalNetworking: true,
@@ -76,8 +76,7 @@ const config: ExpoConfig = {
     [
       "expo-camera",
       {
-        cameraPermission:
-          "Ahoy uses the camera to scan the pairing code on your Mac.",
+        cameraPermission: systemPrompts.camera,
         recordAudioAndroid: false,
         barcodeScannerEnabled: true,
       },
@@ -85,8 +84,7 @@ const config: ExpoConfig = {
     [
       "expo-audio",
       {
-        microphonePermission:
-          "Ahoy records only while you hold the talk button.",
+        microphonePermission: systemPrompts.mic,
         recordAudioAndroid: true,
       },
     ],
