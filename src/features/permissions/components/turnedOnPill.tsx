@@ -1,39 +1,32 @@
-import { cva } from "class-variance-authority";
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/cn";
 import { duration } from "@/lib/motion";
 import { permissionCopy } from "../copy/permissionCopy";
 import type { PermissionKind } from "../permissionKind";
 
 const NOTICE_MS = 1800;
 
-const pill = cva(
-  "h-8 flex-row items-center gap-2 self-center rounded-full px-3.5",
-  {
-    variants: {
-      look: { home: "bg-linen", scanner: "bg-scrim-pill" },
-    },
+const looks = {
+  home: { pill: "bg-linen", dot: "bg-kelp", label: "text-ink" },
+  scanner: {
+    pill: "bg-scrim-pill",
+    dot: "bg-on-scrim-kelp",
+    label: "text-on-scrim",
   },
-);
-
-const dot = cva("size-1.75 rounded-full", {
-  variants: { look: { home: "bg-kelp", scanner: "bg-on-scrim-kelp" } },
-});
-
-const label = cva("font-sans-medium", {
-  variants: { look: { home: "text-ink", scanner: "text-on-scrim" } },
-});
+} as const;
 
 type TurnedOnPillProps = {
   kind: PermissionKind;
-  look: "home" | "scanner";
+  look: keyof typeof looks;
   onHidden: () => void;
 };
 
 export function TurnedOnPill({ kind, look, onHidden }: TurnedOnPillProps) {
   const hide = useRef(onHidden);
+  const colors = looks[look];
 
   useEffect(() => {
     hide.current = onHidden;
@@ -50,10 +43,13 @@ export function TurnedOnPill({ kind, look, onHidden }: TurnedOnPillProps) {
       accessibilityLiveRegion="polite"
       entering={FadeIn.duration(duration.base)}
       exiting={FadeOut.duration(duration.base)}
-      className={pill({ look })}
+      className={cn(
+        "h-8 flex-row items-center gap-2 self-center rounded-full px-3.5",
+        colors.pill,
+      )}
     >
-      <View className={dot({ look })} />
-      <Text variant="footnote" className={label({ look })}>
+      <View className={cn("size-1.75 rounded-full", colors.dot)} />
+      <Text variant="footnote" className={cn("font-sans-medium", colors.label)}>
         {permissionCopy.isOn(kind)}
       </Text>
     </Animated.View>

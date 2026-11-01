@@ -1,11 +1,11 @@
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { settingsMockCopy as copy } from "../../copy/settingsMockCopy";
-import type { PermissionKind } from "../../permissionKind";
+import type { DevicePermission } from "../../permissionKind";
 import { AndroidInfoRow } from "./androidInfoRow";
 import { AndroidMockHeader } from "./androidMockHeader";
 
-type AndroidAppInfoFrameProps = { kind: PermissionKind; pressed: boolean };
+type AndroidAppInfoFrameProps = { kind: DevicePermission; pressed: boolean };
 
 export function AndroidAppInfoFrame({
   kind,

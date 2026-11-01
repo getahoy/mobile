@@ -4,15 +4,13 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { duration, easing } from "@/lib/motion";
+import { MockFade } from "./mockFade";
 
 const KNOB_TRAVEL = 16;
 
 type MockToggleProps = { on: boolean };
 
 export function MockToggle({ on }: MockToggleProps) {
-  const fill = useAnimatedStyle(() => ({
-    opacity: withTiming(on ? 1 : 0, { duration: duration.base }),
-  }));
   const knob = useAnimatedStyle(() => ({
     transform: [
       {
@@ -25,8 +23,9 @@ export function MockToggle({ on }: MockToggleProps) {
   }));
   return (
     <View className="h-6 w-10 rounded-full bg-rope p-0.5">
-      <Animated.View
-        style={fill}
+      <MockFade
+        shown={on}
+        speed="base"
         className="absolute inset-0 rounded-full bg-kelp"
       />
       <Animated.View

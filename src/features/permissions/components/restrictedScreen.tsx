@@ -1,12 +1,12 @@
 import { permissionCopy } from "../copy/permissionCopy";
-import type { PermissionKind } from "../permissionKind";
+import type { DevicePermission } from "../permissionKind";
 import { PermissionLayout } from "./permissionLayout";
 import { PermissionMessage } from "./permissionMessage";
 
-type RestrictedScreenProps = { kind: PermissionKind; onClose: () => void };
+type RestrictedScreenProps = { kind: DevicePermission; onClose: () => void };
 
 export function RestrictedScreen({ kind, onClose }: RestrictedScreenProps) {
-  const copy = permissionCopy.kind(kind);
+  const copy = permissionCopy.device(kind);
   return (
     <PermissionLayout onClose={onClose}>
       <PermissionMessage

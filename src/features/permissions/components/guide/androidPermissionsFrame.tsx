@@ -1,8 +1,9 @@
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/cn";
+import { permissionCopy } from "../../copy/permissionCopy";
 import { settingsMockCopy as copy } from "../../copy/settingsMockCopy";
-import type { PermissionKind } from "../../permissionKind";
+import type { DevicePermission } from "../../permissionKind";
 import { AndroidMockHeader } from "./androidMockHeader";
 import { MockPress } from "./mockPress";
 
@@ -10,7 +11,10 @@ const sectionLabel =
   "absolute left-6.5 font-sans-medium text-driftwood text-mock-label uppercase";
 const card = "absolute inset-x-3 overflow-hidden rounded-mock bg-paper";
 
-type AndroidPermissionsFrameProps = { kind: PermissionKind; pressed: boolean };
+type AndroidPermissionsFrameProps = {
+  kind: DevicePermission;
+  pressed: boolean;
+};
 
 export function AndroidPermissionsFrame({
   kind,
@@ -37,7 +41,7 @@ export function AndroidPermissionsFrame({
         <View className="h-10.5 justify-center px-3.5">
           <MockPress pressed={pressed} />
           <Text variant="footnote" className="font-sans-medium">
-            {copy.androidTarget(kind)}
+            {permissionCopy.device(kind).name}
           </Text>
         </View>
       </View>

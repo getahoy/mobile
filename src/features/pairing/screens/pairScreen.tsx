@@ -41,7 +41,7 @@ export function PairScreen() {
   }
   const hint = mac ? macCopy.pairAgainHint(mac) : pairingCopy["scanner.hint"];
   const notice = camera.turnedOn ? (
-    <TurnedOnPill kind="camera" look="scanner" onHidden={camera.settle} />
+    <TurnedOnPill kind="camera" look="scanner" onHidden={camera.hideTurnedOn} />
   ) : null;
   return (
     <View className="flex-1 bg-scrim">

@@ -5,6 +5,7 @@ import { transcribeRecording } from "../client/transcribeApi";
 import {
   deleteRecording,
   type FileRecorder,
+  type MicRefusal,
 } from "../recorder/useFileRecorder";
 import {
   MAX_RECORDING_MS,
@@ -19,11 +20,8 @@ import { uploadFailure } from "./uploadFailure";
 
 type TalkRecorder = Pick<FileRecorder, "start" | "stop" | "discard">;
 
-export type MicRefusal = "needed" | "failed";
-
 type TalkFlowOptions = {
   recorder: () => TalkRecorder;
-  micAllowed: () => Promise<boolean>;
   onMicRefused: (refusal: MicRefusal) => void;
   session: () => MacSession | null;
   speakOn: () => SpeakTarget;
@@ -65,20 +63,9 @@ export class TalkFlow {
     this.#attempt += 1;
     this.#options.onPress(this.#choosingFor);
     const attempt = this.#attempt;
-    const { micAllowed, onMicRefused, recorder } = this.#options;
-    const allowed = await micAllowed().catch(() => false);
-    if (attempt !== this.#attempt) return;
-    if (!allowed) onMicRefused("needed");
-    if (!allowed || this.#releasedEarly) return this.#settle(READY);
-    const started = await recorder()
-      .start()
-      .then(
-        () => true,
-        () => false,
-      );
+    const started = await this.#options.recorder().start();
     if (attempt !== this.#attempt) return this.#stopOrphan();
-    if (!started) onMicRefused("failed");
-    if (!started) return this.#settle(READY);
+    if (started !== "recording") return this.#refuse(started);
     if (this.#releasedEarly) return this.#discard(TOO_SHORT);
     this.#phase = "listening";
     haptics.talkStart();
@@ -161,6 +148,11 @@ export class TalkFlow {
     const choosing = answered && state.choices.length > 0;
     this.#choosingFor = choosing ? request.commandId : null;
     this.#settle(state);
+  }
+
+  #refuse(refusal: MicRefusal): void {
+    this.#settle(READY);
+    this.#options.onMicRefused(refusal);
   }
 
   async #discard(next: TalkState): Promise<void> {

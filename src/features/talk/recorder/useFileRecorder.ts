@@ -8,7 +8,12 @@ import {
 } from "expo-audio";
 import { File } from "expo-file-system";
 import { useCallback } from "react";
+import { permissionAccess } from "@/features/permissions/platform/permissionAccess";
 import { voiceLevel } from "./voiceLevel";
+
+export type MicRefusal = "needed" | "failed";
+
+type RecordingStart = "recording" | MicRefusal;
 
 const STATE_INTERVAL_MS = 100;
 
@@ -40,10 +45,21 @@ export function useFileRecorder() {
   const recorder = useAudioRecorder(COMMAND_RECORDING);
   const recorderState = useAudioRecorderState(recorder, STATE_INTERVAL_MS);
 
-  const start = useCallback(async (): Promise<void> => {
-    await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
-    await recorder.prepareToRecordAsync();
-    recorder.record();
+  // Read access fresh every time: Android "Only this time" access expires.
+  const start = useCallback(async (): Promise<RecordingStart> => {
+    const stage = await permissionAccess.mic.read().catch(() => null);
+    if (stage !== "granted") return "needed";
+    try {
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
+      });
+      await recorder.prepareToRecordAsync();
+      recorder.record();
+      return "recording";
+    } catch {
+      return "failed";
+    }
   }, [recorder]);
 
   const stop = useCallback(async (): Promise<string | null> => {

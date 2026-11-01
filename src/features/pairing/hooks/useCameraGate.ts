@@ -13,5 +13,5 @@ export function useCameraGate(resumed: boolean) {
       setTurnedOn(true);
     },
   });
-  return { gate, turnedOn, settle: () => setTurnedOn(false) };
+  return { gate, turnedOn, hideTurnedOn: () => setTurnedOn(false) };
 }

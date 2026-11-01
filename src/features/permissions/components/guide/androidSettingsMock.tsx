@@ -1,24 +1,38 @@
 import type { AndroidFrame } from "../../guideTimeline";
-import type { PermissionKind } from "../../permissionKind";
+import type { DevicePermission } from "../../permissionKind";
 import { AndroidAppInfoFrame } from "./androidAppInfoFrame";
 import { AndroidChoiceFrame } from "./androidChoiceFrame";
 import { AndroidPermissionsFrame } from "./androidPermissionsFrame";
-import { MockFrame } from "./mockFrame";
+import { MockFade } from "./mockFade";
 
-type AndroidSettingsMockProps = { kind: PermissionKind; frame: AndroidFrame };
+const layer = "absolute inset-0";
+
+type AndroidSettingsMockProps = { kind: DevicePermission; frame: AndroidFrame };
 
 export function AndroidSettingsMock({ kind, frame }: AndroidSettingsMockProps) {
   return (
     <>
-      <MockFrame shown={frame.screen === "appInfo"}>
+      <MockFade
+        shown={frame.screen === "appInfo"}
+        speed="base"
+        className={layer}
+      >
         <AndroidAppInfoFrame kind={kind} pressed={frame.permissionsPressed} />
-      </MockFrame>
-      <MockFrame shown={frame.screen === "permissions"}>
+      </MockFade>
+      <MockFade
+        shown={frame.screen === "permissions"}
+        speed="base"
+        className={layer}
+      >
         <AndroidPermissionsFrame kind={kind} pressed={frame.targetPressed} />
-      </MockFrame>
-      <MockFrame shown={frame.screen === "choice"}>
+      </MockFade>
+      <MockFade
+        shown={frame.screen === "choice"}
+        speed="base"
+        className={layer}
+      >
         <AndroidChoiceFrame kind={kind} frame={frame} />
-      </MockFrame>
+      </MockFade>
     </>
   );
 }

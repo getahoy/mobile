@@ -3,15 +3,15 @@ import { Icon, type IconName } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { permissionCopy } from "../../copy/permissionCopy";
 import { settingsMockCopy } from "../../copy/settingsMockCopy";
-import type { IosFrame } from "../../guideTimeline";
+import { IOS_SETTINGS_ROWS, type IosFrame } from "../../guideTimeline";
 import type { PermissionKind } from "../../permissionKind";
 import { IosSettingsRow } from "./iosSettingsRow";
 
-const rows: readonly { kind: PermissionKind; icon: IconName }[] = [
-  { kind: "net", icon: "wifi" },
-  { kind: "camera", icon: "camera" },
-  { kind: "mic", icon: "mic" },
-];
+const rowIcons: Record<PermissionKind, IconName> = {
+  net: "wifi",
+  camera: "camera",
+  mic: "mic",
+};
 
 type IosSettingsMockProps = { frame: IosFrame };
 
@@ -31,11 +31,11 @@ export function IosSettingsMock({ frame }: IosSettingsMockProps) {
         {settingsMockCopy.iosSection}
       </Text>
       <View className="absolute inset-x-3 top-24 overflow-hidden rounded-mock bg-paper">
-        {rows.map((row, index) => (
+        {IOS_SETTINGS_ROWS.map((kind, index) => (
           <IosSettingsRow
-            key={row.kind}
-            label={permissionCopy.kind(row.kind).name}
-            icon={row.icon}
+            key={kind}
+            label={permissionCopy.kind(kind).name}
+            icon={rowIcons[kind]}
             on={index !== frame.targetRow || frame.targetOn}
             divided={index > 0}
           />

@@ -38,8 +38,7 @@ export function PermissionGateView({
     case "guide":
       return (
         <SettingsGuideScreen
-          kind={kind}
-          look={permissionPlatform.settingsLook}
+          target={{ look: permissionPlatform.settingsLook, kind }}
           onOpenSettings={gate.openSettings}
           onClose={onClose}
         />

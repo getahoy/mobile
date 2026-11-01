@@ -3,7 +3,7 @@ import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/cn";
 import { settingsMockCopy as copy } from "../../copy/settingsMockCopy";
 import type { AndroidFrame } from "../../guideTimeline";
-import type { PermissionKind } from "../../permissionKind";
+import type { DevicePermission } from "../../permissionKind";
 import { AndroidMockHeader } from "./androidMockHeader";
 import { MockPress } from "./mockPress";
 import { MockRadio } from "./mockRadio";
@@ -11,7 +11,7 @@ import { MockRadio } from "./mockRadio";
 const ALLOW_CHOICE = 0;
 const DENY_CHOICE = 2;
 
-type AndroidChoiceFrameProps = { kind: PermissionKind; frame: AndroidFrame };
+type AndroidChoiceFrameProps = { kind: DevicePermission; frame: AndroidFrame };
 
 export function AndroidChoiceFrame({ kind, frame }: AndroidChoiceFrameProps) {
   const selectedChoice = frame.picked ? ALLOW_CHOICE : DENY_CHOICE;

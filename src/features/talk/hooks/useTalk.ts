@@ -5,18 +5,12 @@ import { AppState } from "react-native";
 import { authClient } from "@/features/auth/client/authClient";
 import { useLiveMacLinks } from "@/features/pairing/hooks/useLiveMacLinks";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
-import { permissionAccess } from "@/features/permissions/platform/permissionAccess";
 import { useVoiceReplies } from "@/features/voice/hooks/useVoiceReplies";
 import { readVoiceSettings } from "@/features/voice/storage/voiceSettings";
-import { useFileRecorder } from "../recorder/useFileRecorder";
+import { type MicRefusal, useFileRecorder } from "../recorder/useFileRecorder";
 import { signalPress } from "../sending/askMac";
-import { type MicRefusal, TalkFlow } from "../sending/talkFlow";
+import { TalkFlow } from "../sending/talkFlow";
 import type { TalkState } from "../talkState";
-
-// Read fresh before every recording: Android "Only this time" access expires.
-function micAllowed(): Promise<boolean> {
-  return permissionAccess.mic.read().then((stage) => stage === "granted");
-}
 
 function openMicrophoneGate(refusal: MicRefusal): void {
   const params = refusal === "failed" ? { failed: "1" } : {};
@@ -47,7 +41,6 @@ export function useTalk(mac: PairedMac | null) {
     };
     return new TalkFlow({
       recorder: () => latest.current.recorder,
-      micAllowed,
       onMicRefused: openMicrophoneGate,
       session,
       speakOn,

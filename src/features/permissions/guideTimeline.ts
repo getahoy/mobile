@@ -1,6 +1,10 @@
-import type { PermissionKind } from "./permissionKind";
+import type { DevicePermission, PermissionKind } from "./permissionKind";
 
 export type SettingsLook = "ios" | "android";
+
+export type GuideTarget =
+  | { look: "ios"; kind: PermissionKind }
+  | { look: "android"; kind: DevicePermission };
 
 export type FingerPoint = {
   x: number;
@@ -39,7 +43,11 @@ const IOS_STEPS: Frames<number> = [1, 1, 1, 2];
 const ANDROID_STEPS: Frames<number> = [1, 1, 1, 1, 2, 2, 3];
 const IOS_TOGGLE_ON_FROM = 2;
 
-const IOS_ROW: Record<PermissionKind, number> = { net: 0, camera: 1, mic: 2 };
+export const IOS_SETTINGS_ROWS: readonly PermissionKind[] = [
+  "net",
+  "camera",
+  "mic",
+];
 const IOS_FIRST_ROW_TOP = 96;
 const IOS_ROW_HEIGHT = 40;
 const IOS_TOGGLE_FROM_RIGHT = 44;
@@ -68,7 +76,7 @@ export function frameDuration(look: SettingsLook, frame: number): number {
 }
 
 export function iosFrame(kind: PermissionKind, frame: number): IosFrame {
-  const targetRow = IOS_ROW[kind];
+  const targetRow = IOS_SETTINGS_ROWS.indexOf(kind);
   const toggle = {
     x: IOS_TOGGLE_FROM_RIGHT,
     y: IOS_FIRST_ROW_TOP + IOS_ROW_HEIGHT * targetRow + IOS_ROW_HEIGHT / 2,
