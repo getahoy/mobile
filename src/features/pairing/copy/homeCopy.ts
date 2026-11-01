@@ -1,4 +1,5 @@
 export const homeCopy = {
+  wordmark: "Ahoy",
   account: "Account",
   emptyTitle: "Pair your Mac",
   emptyBody:

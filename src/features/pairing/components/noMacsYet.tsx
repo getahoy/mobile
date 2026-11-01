@@ -6,16 +6,19 @@ import { homeCopy } from "../copy/homeCopy";
 
 export function NoMacsYet() {
   return (
-    <View className="flex-1 justify-center gap-3 px-6">
-      <Text variant="title" className="text-center">
-        {homeCopy.emptyTitle}
-      </Text>
-      <Text variant="bodySmall" className="text-center text-driftwood">
-        {homeCopy.emptyBody}
-      </Text>
-      <Button className="mt-5" onPress={() => router.push("/pair")}>
-        <Text>{homeCopy.scan}</Text>
-      </Button>
-    </View>
+    <>
+      <View className="flex-1 justify-center gap-3 px-8 pb-10">
+        <Text variant="title">{homeCopy.emptyTitle}</Text>
+        <Text className="text-driftwood">{homeCopy.emptyBody}</Text>
+      </View>
+      <View className="px-5 pb-safe-offset-2">
+        <Button
+          className="active:scale-97 active:opacity-100"
+          onPress={() => router.push("/pair")}
+        >
+          <Text>{homeCopy.scan}</Text>
+        </Button>
+      </View>
+    </>
   );
 }
