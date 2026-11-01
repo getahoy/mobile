@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { View } from "react-native";
 import { ConfirmSheet } from "@/components/ui/confirmSheet";
+import { permissionCopy } from "@/features/permissions/copy/permissionCopy";
+import { useLocalNetworkCheck } from "@/features/permissions/hooks/useLocalNetworkCheck";
 import { useMacCardActions } from "../hooks/useMacCardActions";
 import { useMacLink } from "../hooks/useMacLink";
 import { macStatus, statusLine } from "../macStatus";
@@ -28,6 +30,10 @@ export function HomeMac({ mac, macs, onChanged }: HomeMacProps) {
     connection,
     onChanged,
   });
+  const openLocalNetwork = useLocalNetworkCheck(mac.publicKey, state);
+  const help = openLocalNetwork
+    ? { label: permissionCopy.checkLocalNetwork, onPress: openLocalNetwork }
+    : null;
   const canOpen = state.kind !== "ended";
   const chip = (
     <MacChip
@@ -41,7 +47,11 @@ export function HomeMac({ mac, macs, onChanged }: HomeMacProps) {
       <HomeHeader chip={chip} />
       {status.message ? (
         <View className="px-5 pt-2">
-          <MacMessageCard message={status.message} actions={actions} />
+          <MacMessageCard
+            message={status.message}
+            actions={actions}
+            help={help}
+          />
         </View>
       ) : null}
       <MoreOptionsSheet

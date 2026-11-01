@@ -49,6 +49,14 @@ export default function RootLayout() {
                     options={{ presentation: "fullScreenModal" }}
                   />
                   <Stack.Screen name="account" />
+                  <Stack.Screen
+                    name="microphone"
+                    options={{ presentation: "fullScreenModal" }}
+                  />
+                  <Stack.Screen
+                    name="local-network"
+                    options={{ presentation: "fullScreenModal" }}
+                  />
                 </Stack.Protected>
                 <Stack.Protected guard={!signedIn}>
                   <Stack.Screen

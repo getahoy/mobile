@@ -157,6 +157,7 @@ export function HomeSection() {
               <MacMessageCard
                 message={status.message}
                 actions={sampleActions(state)}
+                help={null}
               />
             ) : null}
           </View>
