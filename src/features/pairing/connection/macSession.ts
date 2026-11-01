@@ -11,7 +11,7 @@ import { decodeJson, encodeJson } from "./jsonBytes";
 const PING_INTERVAL_MS = 10_000;
 const PONG_TIMEOUT_MS = 5000;
 
-export type CommandReply = Extract<
+type CommandReply = Extract<
   CommandFrame,
   { type: "command.received" | "command.result" }
 >;

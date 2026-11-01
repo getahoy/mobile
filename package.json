@@ -9,7 +9,6 @@
     "@getahoy/protocol": "file:../shared/packages/protocol",
     "@gorhom/bottom-sheet": "^5.2.14",
     "@rn-primitives/portal": "^1.5.3",
-    "@rn-primitives/slot": "^1.5.2",
     "@rn-primitives/switch": "^1.5.2",
     "better-auth": "1.7.11",
     "class-variance-authority": "^0.7.1",

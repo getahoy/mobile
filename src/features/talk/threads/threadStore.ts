@@ -1,6 +1,6 @@
 import type { CommandStatus } from "@getahoy/protocol";
 
-export type ThreadLine = { id: string; speaker: "you" | "ahoy"; text: string };
+type ThreadLine = { id: string; speaker: "you" | "ahoy"; text: string };
 
 export type ThreadStatus = CommandStatus | "open" | "expired" | "replaced";
 

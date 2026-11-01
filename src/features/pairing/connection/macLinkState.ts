@@ -14,7 +14,7 @@ export type MacLinkState =
   | { kind: "unrecognised" }
   | { kind: "ended"; reason: EndReason };
 
-export type MacLinkKind = MacLinkState["kind"];
+type MacLinkKind = MacLinkState["kind"];
 
 const RETRYING_KINDS: readonly MacLinkKind[] = [
   "unreachable",

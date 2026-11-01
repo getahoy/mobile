@@ -6,7 +6,7 @@ import {
 import { createMMKV } from "react-native-mmkv";
 import { z } from "zod";
 
-export const SPEAK_POLICIES = ["problems", "everything", "off"] as const;
+const SPEAK_POLICIES = ["problems", "everything", "off"] as const;
 
 const SETTINGS_KEY = "voice.settings";
 const INDIA_REGION = "IN";

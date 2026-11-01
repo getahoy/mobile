@@ -1,5 +1,5 @@
 export const MIN_ZOOM_LEVEL = 0;
-export const ZOOM_LEVEL_STEPS = 6;
+const ZOOM_LEVEL_STEPS = 6;
 export const PERCENT = 100;
 const MAX_ZOOM_LEVEL = 1;
 const EXPONENTIAL_MAX_CAMERA_ZOOM = 0.4;
@@ -32,10 +32,7 @@ export function toCameraZoom(level: number, curve: CameraZoomCurve): number {
   }
 }
 
-export function fromCameraZoom(
-  cameraZoom: number,
-  curve: CameraZoomCurve,
-): number {
+function fromCameraZoom(cameraZoom: number, curve: CameraZoomCurve): number {
   "worklet";
   switch (curve) {
     case "exponential":

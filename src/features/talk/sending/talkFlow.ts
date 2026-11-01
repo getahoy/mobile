@@ -17,7 +17,7 @@ import { askMac, choiceRequest, commandRequest } from "./askMac";
 import type { MacRequest } from "./sendCommand";
 import { uploadFailure } from "./uploadFailure";
 
-export type TalkRecorder = Pick<
+type TalkRecorder = Pick<
   FileRecorder,
   "access" | "requestAccess" | "start" | "stop" | "discard"
 >;

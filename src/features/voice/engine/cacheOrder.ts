@@ -1,4 +1,4 @@
-export const MAX_CACHED_PHRASES = 50;
+const MAX_CACHED_PHRASES = 50;
 
 export type CacheTouch = { order: string[]; evicted: string[] };
 
