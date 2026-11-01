@@ -33,7 +33,7 @@ export function MacsHomeScreen() {
       ) : null}
       {mac ? (
         <TalkPanel
-          key={mac.publicKey}
+          key={`${mac.publicKey}:talk`}
           target={{ ...target, mac }}
           notice={<HomeNotices macName={mac.displayName} />}
         />
