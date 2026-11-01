@@ -10,7 +10,6 @@ import { haptics } from "@/lib/haptics";
 import { duration, easing, useReducedMotion } from "@/lib/motion";
 import {
   type CameraZoomCurve,
-  clampZoomLevel,
   MIN_ZOOM_LEVEL,
   nextZoomLevel,
   toCameraZoom,
@@ -41,7 +40,7 @@ export function useScannerZoom() {
   useAnimatedReaction(
     () => liveLevel.value,
     (current, previous) => {
-      if (current !== previous) scheduleOnRN(setLevel, clampZoomLevel(current));
+      if (current !== previous) scheduleOnRN(setLevel, current);
     },
   );
 

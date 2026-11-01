@@ -13,7 +13,7 @@ export type ZoomDirection = "in" | "out";
 
 export function clampZoomLevel(level: number): number {
   "worklet";
-  if (!Number.isFinite(level)) return MIN_ZOOM_LEVEL;
+  if (Number.isNaN(level)) return MIN_ZOOM_LEVEL;
   return Math.min(MAX_ZOOM_LEVEL, Math.max(MIN_ZOOM_LEVEL, level));
 }
 
