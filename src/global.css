@@ -52,12 +52,16 @@
   --radius-thumb: 10px;
   --radius-card: 24px;
   --radius-sheet: 28px;
+  --radius-viewfinder-bracket: 36px;
+  --radius-viewfinder-scrim: 1024px;
 
   --shadow-float: 0 1px 0 rgba(23, 22, 20, 0.04), 0 16px 40px -16px rgba(23, 22, 20, 0.22);
   --shadow-tag: 0 0 0 2px #f4f2ed, 0 4px 12px rgba(0, 0, 0, 0.35);
 
   --spacing-hairline: hairlineWidth();
   --spacing-viewfinder: 260px;
+  --spacing-viewfinder-gap: 12px;
+  --spacing-viewfinder-reach: 1000px;
   --spacing-orb: 240px;
   --spacing-welcome-orb: 300px;
   --spacing-signing-orb: 120px;
