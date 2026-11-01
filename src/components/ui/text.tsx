@@ -10,6 +10,7 @@ const textVariants = cva("text-ink", {
     variant: {
       display: "font-fraunces-light text-display",
       heading: "font-fraunces-light text-heading",
+      headline: "font-fraunces text-headline",
       title: "font-fraunces text-title",
       heard: "font-fraunces-italic text-heard text-driftwood",
       body: "font-sans text-body",
@@ -27,10 +28,16 @@ type TextVariant = NonNullable<VariantProps<typeof textVariants>["variant"]>;
 const DISPLAY_SIZES: readonly TextVariant[] = [
   "display",
   "heading",
+  "headline",
   "title",
   "heard",
 ];
-const HEADINGS: readonly TextVariant[] = ["display", "heading", "title"];
+const HEADINGS: readonly TextVariant[] = [
+  "display",
+  "heading",
+  "headline",
+  "title",
+];
 
 export const TextClassContext = createContext<string | undefined>(undefined);
 

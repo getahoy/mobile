@@ -3,6 +3,9 @@ import { withUniwind } from "uniwind";
 
 const symbols = {
   mic: { ios: "mic.fill", android: "mic" },
+  camera: { ios: "camera", android: "photo_camera" },
+  wifi: { ios: "wifi", android: "wifi" },
+  arrowLeft: { ios: "arrow.left", android: "arrow_back" },
   settings: { ios: "gearshape", android: "settings" },
   more: { ios: "ellipsis", android: "more_horiz" },
   check: { ios: "checkmark", android: "check" },

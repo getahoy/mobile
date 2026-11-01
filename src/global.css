@@ -10,6 +10,14 @@
   --font-fraunces-light: "FrauncesAhoy-Light";
   --font-fraunces-light-italic: "FrauncesAhoy-LightItalic";
 
+  --text-mock-label: 10px;
+  --text-mock-label--line-height: 12px;
+  --text-mock-label--letter-spacing: 0.6px;
+  --text-mock-caption: 11px;
+  --text-mock-caption--line-height: 14px;
+  --text-mock-title: 22px;
+  --text-mock-title--line-height: 28px;
+  --text-mock-title--letter-spacing: -0.22px;
   --text-eyebrow: 11px;
   --text-eyebrow--line-height: 15px;
   --text-eyebrow--letter-spacing: 0.66px;
@@ -38,6 +46,9 @@
   --text-title: 28px;
   --text-title--line-height: 31px;
   --text-title--letter-spacing: -0.28px;
+  --text-headline: 34px;
+  --text-headline--line-height: 37px;
+  --text-headline--letter-spacing: -0.51px;
   --text-heading: 40px;
   --text-heading--line-height: 41px;
   --text-heading--letter-spacing: -0.8px;
@@ -53,6 +64,7 @@
 
   --radius-tag: 7px;
   --radius-thumb: 10px;
+  --radius-mock: 14px;
   --radius-card: 24px;
   --radius-sheet: 28px;
   --radius-viewfinder-bracket: 36px;
@@ -60,6 +72,7 @@
 
   --shadow-float: 0 1px 0 rgba(23, 22, 20, 0.04), 0 16px 40px -16px rgba(23, 22, 20, 0.22);
   --shadow-tag: 0 0 0 2px #f4f2ed, 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-knob: 0 1px 3px rgba(0, 0, 0, 0.25);
 
   --spacing-hairline: hairlineWidth();
   --spacing-viewfinder: 260px;
@@ -68,11 +81,15 @@
   --spacing-orb: 240px;
   --spacing-welcome-orb: 300px;
   --spacing-signing-orb: 120px;
+  --spacing-guide: 232px;
+  --spacing-finger: 30px;
 
   --color-night: #121110;
   --color-white: #ffffff;
   --color-scrim: rgba(0, 0, 0, 0.6);
   --color-on-scrim: #f4f2ed;
+  --color-scrim-pill: rgba(18, 17, 16, 0.72);
+  --color-on-scrim-kelp: #5fbf8f;
 }
 
 @theme static {
