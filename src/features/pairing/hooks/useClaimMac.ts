@@ -1,5 +1,5 @@
 import { errorMessages } from "@getahoy/lib";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { pairingCopy } from "../copy/pairingCopy";
 import {
   type ClaimOutcome,
@@ -25,7 +25,15 @@ export type ClaimState =
 export function useClaimMac(onPaired: () => void) {
   const [state, setState] = useState<ClaimState>({ kind: "scanning" });
   const busy = useRef(false);
+  const pairedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const changes = usePairedMacsChanges();
+
+  useEffect(
+    () => () => {
+      if (pairedTimer.current) clearTimeout(pairedTimer.current);
+    },
+    [],
+  );
 
   const claim = async (scanned: string) => {
     if (busy.current) return;
@@ -46,7 +54,7 @@ export function useClaimMac(onPaired: () => void) {
     }
     setState({ kind: "paired", macName: outcome.mac.displayName });
     changes.announce();
-    setTimeout(onPaired, PAIRED_CONFIRMATION_MS);
+    pairedTimer.current = setTimeout(onPaired, PAIRED_CONFIRMATION_MS);
   };
 
   const scanAgain = () => {
