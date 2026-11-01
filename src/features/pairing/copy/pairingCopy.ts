@@ -12,13 +12,6 @@ export const pairingCopy = {
   "pair.notFinished":
     "Your Mac didn’t finish pairing. Check it’s online and try again.",
   "pair.scanAgain": "Scan again",
-  "camera.loading": "Checking camera access…",
-  "camera.needed":
-    "Ahoy uses the camera only to scan the pairing code on your Mac.",
-  "camera.allow": "Allow camera",
-  "camera.blocked":
-    "Camera access is off for Ahoy. Turn it on in Settings to scan the code.",
-  "camera.openSettings": "Open Settings",
   "camera.label": "Camera view for scanning the pairing code",
   "scan.notAhoy":
     "That is not an Ahoy pairing code. Scan the code on your Mac.",

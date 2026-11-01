@@ -14,6 +14,7 @@ type ScannerPreviewProps = {
   cameraZoom: number;
   pinch: PinchGesture;
   onScan: (code: string) => void;
+  onCameraFailed: () => void;
 };
 
 export function ScannerPreview({
@@ -21,6 +22,7 @@ export function ScannerPreview({
   cameraZoom,
   pinch,
   onScan,
+  onCameraFailed,
 }: ScannerPreviewProps) {
   return (
     <GestureDetector gesture={pinch}>
@@ -33,6 +35,7 @@ export function ScannerPreview({
           zoom={cameraZoom}
           barcodeScannerSettings={qrCodesOnly}
           onBarcodeScanned={(scan) => onScan(scan.data)}
+          onMountError={onCameraFailed}
         />
       </View>
     </GestureDetector>

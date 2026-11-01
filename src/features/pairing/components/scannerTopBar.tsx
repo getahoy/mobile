@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
@@ -5,6 +6,7 @@ import { pairingCopy } from "../copy/pairingCopy";
 
 type ScannerTopBarProps = {
   torchOn: boolean;
+  notice: ReactNode;
   onClose: () => void;
   onToggleTorch: () => void;
 };
@@ -13,6 +15,7 @@ const roundButton = "size-11 items-center justify-center rounded-full bg-scrim";
 
 export function ScannerTopBar({
   torchOn,
+  notice,
   onClose,
   onToggleTorch,
 }: ScannerTopBarProps) {
@@ -26,9 +29,11 @@ export function ScannerTopBar({
       >
         <Icon name="close" size="lg" tintColorClassName="accent-on-scrim" />
       </Pressable>
-      <Text className="font-sans-medium text-on-scrim">
-        {pairingCopy["scanner.title"]}
-      </Text>
+      {notice ?? (
+        <Text className="font-sans-medium text-on-scrim">
+          {pairingCopy["scanner.title"]}
+        </Text>
+      )}
       <Pressable
         accessibilityRole="switch"
         accessibilityState={{ checked: torchOn }}
