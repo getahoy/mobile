@@ -21,10 +21,7 @@ test("connecting on first launch shows at once", () => {
 
 test("deliberate states never wait", () => {
   assert.equal(isLinkBlip(connected, { kind: "paused" }), false);
-  assert.equal(
-    isLinkBlip(connected, { kind: "ended", reason: "removed" }),
-    false,
-  );
+  assert.equal(isLinkBlip(connected, { kind: "unrecognised" }), false);
   assert.equal(
     isLinkBlip(connected, { kind: "connected", locked: true }),
     false,

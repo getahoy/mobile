@@ -11,12 +11,7 @@ function mac(publicKey: string): PairedMac {
     lanPort: null,
     pairedAt: 0,
     paused: false,
-    ended: null,
   };
-}
-
-function endedMac(publicKey: string): PairedMac {
-  return { ...mac(publicKey), ended: { reason: "removed", at: 0 } };
 }
 
 const keys = (macs: readonly PairedMac[]) => macs.map((m) => m.publicKey);
@@ -31,12 +26,6 @@ test("removed Macs stop", () => {
   const plan = syncPlan(["a", "b"], [mac("a")]);
   assert.deepEqual(keys(plan.start), []);
   assert.deepEqual(plan.stop, ["b"]);
-});
-
-test("ended Macs stop and never start", () => {
-  const plan = syncPlan(["a"], [endedMac("a"), endedMac("c")]);
-  assert.deepEqual(keys(plan.start), []);
-  assert.deepEqual(plan.stop, ["a"]);
 });
 
 test("running Macs are left alone", () => {

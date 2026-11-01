@@ -44,18 +44,6 @@ const expected: readonly (readonly [MacLinkState, MacStatus])[] = [
     { kind: "unrecognised" },
     quiet(chip.notRecognised, macCopy.unrecognised(MAC)),
   ],
-  [
-    { kind: "ended", reason: "removed" },
-    quiet(chip.ended, macCopy.endedRemoved(MAC)),
-  ],
-  [
-    { kind: "ended", reason: "replaced" },
-    quiet(chip.ended, macCopy.endedReplaced(MAC)),
-  ],
-  [
-    { kind: "ended", reason: "signed_out" },
-    quiet(chip.ended, macCopy.endedSignedOut(MAC)),
-  ],
 ];
 
 test("every link state has its chip, tone and message", () => {
