@@ -7,12 +7,13 @@ export function TryHints() {
   return (
     <Animated.View
       entering={FadeIn.duration(duration.base)}
-      className="items-center gap-2.5"
+      className="items-center gap-2.5 pb-6.5"
     >
       {talkCopy.examples.map((example) => (
         <Text
           key={example}
-          className="font-fraunces-italic text-body-lg text-fog"
+          numberOfLines={1}
+          className="text-center font-fraunces-italic text-example text-fog"
         >
           {talkCopy.heard(example)}
         </Text>

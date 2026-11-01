@@ -29,6 +29,9 @@
   --text-body-lg: 18px;
   --text-body-lg--line-height: 26px;
   --text-body-lg--letter-spacing: -0.2px;
+  --text-example: 26px;
+  --text-example--line-height: 32.5px;
+  --text-example--letter-spacing: -0.26px;
   --text-heard: 30px;
   --text-heard--line-height: 35px;
   --text-heard--letter-spacing: -0.3px;
