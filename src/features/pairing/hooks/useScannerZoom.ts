@@ -62,17 +62,11 @@ export function useScannerZoom() {
     return true;
   };
 
-  const reset = () => {
-    targetLevel.value = MIN_ZOOM_LEVEL;
-    liveLevel.value = MIN_ZOOM_LEVEL;
-  };
-
   return {
     cameraZoom: toCameraZoom(level, ZOOM_CURVE),
     level,
     liveLevel,
     ...gestures,
     step,
-    reset,
   };
 }

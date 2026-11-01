@@ -32,10 +32,7 @@ export function PairScreen() {
   const [torchOn, setTorchOn] = useState(false);
   const { state, claim, scanAgain } = useClaimMac(leaveAfterPairing);
   const zoom = useScannerZoom();
-  const scanAgainFromStart = () => {
-    zoom.reset();
-    scanAgain();
-  };
+  const cameraLive = state.kind === "scanning" || state.kind === "failed";
 
   if (camera.gate.screen !== "granted") {
     return (
@@ -59,14 +56,14 @@ export function PairScreen() {
         onCameraFailed={camera.gate.fail}
       />
       <ScannerViewfinder hint={hint} />
-      <ScannerZoom zoom={zoom} visible={state.kind === "scanning"} />
+      <ScannerZoom zoom={zoom} visible={cameraLive} />
       <ScannerTopBar
         torchOn={torchOn}
         notice={notice}
         onClose={close}
         onToggleTorch={() => setTorchOn((on) => !on)}
       />
-      <ScannerStatus state={state} onScanAgain={scanAgainFromStart} />
+      <ScannerStatus state={state} onScanAgain={scanAgain} />
     </View>
   );
 }
