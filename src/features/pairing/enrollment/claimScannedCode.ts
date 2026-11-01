@@ -9,9 +9,11 @@ import type { PairedMac } from "../storage/pairedMacs";
 
 const MS_PER_SECOND = 1000;
 
-export type ClaimOutcome =
-  | { kind: "claimed"; mac: PairedMac }
-  | { kind: "failed"; message: string };
+type Failed = { kind: "failed"; message: string };
+
+export type ClaimOutcome = { kind: "claimed"; mac: PairedMac } | Failed;
+
+type ScannedCode = { kind: "read"; qr: PairingQr } | Failed;
 
 function readQr(scanned: string): PairingQr | null {
   try {
@@ -22,12 +24,16 @@ function readQr(scanned: string): PairingQr | null {
   }
 }
 
-export async function claimScannedCode(scanned: string): Promise<ClaimOutcome> {
+export function readScannedCode(scanned: string): ScannedCode {
   const qr = readQr(scanned);
   if (!qr) return { kind: "failed", message: pairingCopy["scan.notAhoy"] };
   if (qr.exp * MS_PER_SECOND <= Date.now()) {
     return { kind: "failed", message: pairingCopy["scan.expired"] };
   }
+  return { kind: "read", qr };
+}
+
+export async function claimScannedCode(qr: PairingQr): Promise<ClaimOutcome> {
   const keys = await loadDeviceKeys();
   const proof = pairingProof({
     pairingSecret: decodeBytes(qr.psk),
@@ -50,7 +56,6 @@ export async function claimScannedCode(scanned: string): Promise<ClaimOutcome> {
     lanPort: qr.lan?.port ?? null,
     pairedAt: Date.now(),
     paused: false,
-    ended: null,
   };
   return { kind: "claimed", mac };
 }

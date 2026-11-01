@@ -1,5 +1,4 @@
 import { ActivityIndicator, View } from "react-native";
-import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { macCopy } from "../copy/macCopy";
@@ -11,11 +10,11 @@ const progressCopy = {
   finishing: "pair.finishing",
 } as const;
 
-type ScannerStatusProps = { state: ClaimState; onScanAgain: () => void };
+type ScannerStatusProps = { state: ClaimState };
 
 const dock = "absolute inset-x-0 bottom-0 px-5 pb-safe-offset-5";
 
-export function ScannerStatus({ state, onScanAgain }: ScannerStatusProps) {
+export function ScannerStatus({ state }: ScannerStatusProps) {
   switch (state.kind) {
     case "scanning":
       return null;
@@ -49,11 +48,14 @@ export function ScannerStatus({ state, onScanAgain }: ScannerStatusProps) {
     case "failed":
       return (
         <View className={dock}>
-          <View className="gap-4 rounded-card bg-paper p-5">
-            <Text role="alert">{state.message}</Text>
-            <Button onPress={onScanAgain}>
-              <Text>{pairingCopy["pair.scanAgain"]}</Text>
-            </Button>
+          <View className="self-center rounded-card bg-night px-5 py-3">
+            <Text
+              role="alert"
+              accessibilityLiveRegion="polite"
+              className="text-center text-on-scrim"
+            >
+              {state.message}
+            </Text>
           </View>
         </View>
       );

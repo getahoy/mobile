@@ -11,7 +11,6 @@ export const pairingCopy = {
   "pair.finishing": "Finishing pairing on your Mac…",
   "pair.notFinished":
     "Your Mac didn’t finish pairing. Check it’s online and try again.",
-  "pair.scanAgain": "Scan again",
   "camera.label": "Camera view for scanning the pairing code",
   "scan.notAhoy":
     "That is not an Ahoy pairing code. Scan the code on your Mac.",
