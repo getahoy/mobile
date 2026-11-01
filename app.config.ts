@@ -37,7 +37,6 @@ const config: ExpoConfig = {
   scheme: APP_SCHEME,
   userInterfaceStyle: "automatic",
   ios: {
-    icon: "./assets/expo.icon",
     bundleIdentifier: "com.getahoy.mobile",
     infoPlist: {
       NSLocalNetworkUsageDescription:
@@ -51,9 +50,8 @@ const config: ExpoConfig = {
   android: {
     package: "com.getahoy.mobile",
     adaptiveIcon: {
-      backgroundColor: "#E6F4FE",
+      backgroundColor: SAILCLOTH,
       foregroundImage: "./assets/images/android-icon-foreground.png",
-      backgroundImage: "./assets/images/android-icon-background.png",
       monochromeImage: "./assets/images/android-icon-monochrome.png",
     },
     predictiveBackGestureEnabled: false,
