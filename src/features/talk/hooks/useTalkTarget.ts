@@ -19,12 +19,11 @@ function targetOf(
   live: LiveMacLinks,
   selectedKey: string | null,
 ): TalkTarget {
-  const reachable = macs.filter((mac) => !mac.ended);
   const stateOf = (mac: PairedMac) => live.state(mac.publicKey);
   const mac =
-    reachable.find((candidate) => candidate.publicKey === selectedKey) ??
-    reachable.find((candidate) => stateOf(candidate)?.kind === "connected") ??
-    reachable[0] ??
+    macs.find((candidate) => candidate.publicKey === selectedKey) ??
+    macs.find((candidate) => stateOf(candidate)?.kind === "connected") ??
+    macs[0] ??
     null;
   if (!mac) return { mac: null, block: "noMac" };
   return { mac, block: blockOf(stateOf(mac)) };

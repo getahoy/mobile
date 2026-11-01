@@ -32,9 +32,6 @@ const states: readonly (readonly [string, MacLinkState])[] = [
   ["tooOld", { kind: "macTooOld" }],
   ["tooNew", { kind: "macTooNew" }],
   ["unrecognised", { kind: "unrecognised" }],
-  ["removed", { kind: "ended", reason: "removed" }],
-  ["replaced", { kind: "ended", reason: "replaced" }],
-  ["signedOut", { kind: "ended", reason: "signed_out" }],
 ];
 
 function action(label: string, tone: MacCardAction["tone"]): MacCardAction {
@@ -42,12 +39,6 @@ function action(label: string, tone: MacCardAction["tone"]): MacCardAction {
 }
 
 function sampleActions(state: MacLinkState): MacCardAction[] {
-  if (state.kind === "ended") {
-    return [
-      action(macCopy.pairAgain, "primary"),
-      action(macCopy.dismiss, "outline"),
-    ];
-  }
   if (state.kind === "paused") return [action(macCopy.connect, "primary")];
   if (state.kind === "unrecognised") {
     return [action(macCopy.pairAgain, "outline")];

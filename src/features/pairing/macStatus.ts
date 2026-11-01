@@ -1,4 +1,3 @@
-import type { EndReason } from "@getahoy/protocol";
 import type { MacLinkState } from "./connection/macLinkState";
 import { macCopy } from "./copy/macCopy.ts";
 
@@ -9,16 +8,6 @@ export type MacStatus = {
   tone: MacTone;
   message: string | null;
 };
-
-const endedMessages: Record<EndReason, (mac: string) => string> = {
-  removed: macCopy.endedRemoved,
-  replaced: macCopy.endedReplaced,
-  signed_out: macCopy.endedSignedOut,
-};
-
-function endedMessage(reason: EndReason, mac: string): string {
-  return endedMessages[reason](mac);
-}
 
 export function statusLine(status: MacStatus): string {
   if (status.message) return status.message;
@@ -55,8 +44,6 @@ export function macStatus(state: MacLinkState, mac: string): MacStatus {
       return quiet(chip.updateNeeded, macCopy.macTooNew);
     case "unrecognised":
       return quiet(chip.notRecognised, macCopy.unrecognised(mac));
-    case "ended":
-      return quiet(chip.ended, endedMessage(state.reason, mac));
     default: {
       const unhandled: never = state;
       return unhandled;

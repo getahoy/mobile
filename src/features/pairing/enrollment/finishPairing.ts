@@ -1,6 +1,7 @@
 import { encodeBytes } from "@getahoy/crypto";
 import { listPairingLinks } from "../client/pairingApi";
 import { loadDeviceKeys } from "../storage/deviceKeys";
+import { clearEndedNotice } from "../storage/endedNotice";
 import { type PairedMac, savePairedMac } from "../storage/pairedMacs";
 
 const POLL_INTERVAL_MS = 1000;
@@ -25,6 +26,7 @@ export async function finishPairing(mac: PairedMac): Promise<boolean> {
   while (Date.now() < deadline) {
     if (await linkIsActive(device, mac.publicKey)) {
       await savePairedMac({ ...mac, pairedAt: Date.now() });
+      clearEndedNotice();
       return true;
     }
     await wait(POLL_INTERVAL_MS);

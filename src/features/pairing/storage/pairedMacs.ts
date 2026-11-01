@@ -11,6 +11,10 @@ const pairedMacSchema = z.object({
   lanPort: z.int().nullable(),
   pairedAt: z.int(),
   paused: z.boolean().default(false),
+});
+
+// Older builds kept an ended Mac in the list; settleEndedMacs migrates it.
+const storedMacSchema = pairedMacSchema.extend({
   ended: z
     .object({ reason: endReasonSchema, at: z.int() })
     .nullable()
@@ -18,21 +22,26 @@ const pairedMacSchema = z.object({
 });
 
 export type PairedMac = z.infer<typeof pairedMacSchema>;
+type StoredMac = z.infer<typeof storedMacSchema>;
 
-const pairedMacListSchema = z.array(pairedMacSchema);
+const storedMacListSchema = z.array(storedMacSchema);
 
-export async function readPairedMacs(): Promise<PairedMac[]> {
+export async function readStoredMacs(): Promise<StoredMac[]> {
   const text = await SecureStore.getItemAsync(PAIRED_MACS_ENTRY);
   if (text === null) return [];
   try {
-    const parsed = pairedMacListSchema.safeParse(JSON.parse(text));
+    const parsed = storedMacListSchema.safeParse(JSON.parse(text));
     return parsed.success ? parsed.data : [];
   } catch {
     return [];
   }
 }
 
-async function writePairedMacs(list: PairedMac[]): Promise<void> {
+export async function readPairedMacs(): Promise<PairedMac[]> {
+  return (await readStoredMacs()).filter((mac) => !mac.ended);
+}
+
+export async function writePairedMacs(list: PairedMac[]): Promise<void> {
   await SecureStore.setItemAsync(PAIRED_MACS_ENTRY, JSON.stringify(list));
 }
 
@@ -47,7 +56,7 @@ export async function savePairedMac(mac: PairedMac): Promise<void> {
 
 export async function updatePairedMac(
   publicKey: string,
-  change: Partial<Pick<PairedMac, "paused" | "ended">>,
+  change: Partial<Pick<PairedMac, "paused">>,
 ): Promise<void> {
   const stored = await readPairedMacs();
   const updated = stored.map((mac) =>

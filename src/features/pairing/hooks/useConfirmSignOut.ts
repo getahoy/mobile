@@ -6,7 +6,7 @@ import { serverReachable, unpairEverything } from "../sync/linkSync";
 import { useLiveMacLinks } from "./useLiveMacLinks";
 
 async function signOutBody(): Promise<string | null> {
-  const macs = (await readPairedMacs()).filter((mac) => !mac.ended);
+  const macs = await readPairedMacs();
   if (macs.length === 0) return null;
   const names = macs.map((mac) => mac.displayName).join(", ");
   const online = await serverReachable().catch(() => false);

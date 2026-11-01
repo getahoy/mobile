@@ -7,6 +7,7 @@ import { logger } from "@/features/logging/logger";
 import { markReachedOnLan } from "@/features/permissions/storage/localNetworkMemory";
 import { loadDeviceKeys } from "../storage/deviceKeys";
 import { type PairedMac, updatePairedMac } from "../storage/pairedMacs";
+import { endPairedMac } from "../sync/endedMacs";
 import { connectToMac, type MacLink } from "./connectToMac";
 import type { LiveMacLinks } from "./liveMacLinks";
 import {
@@ -86,8 +87,7 @@ export class MacConnection {
 
   foreground(): void {
     this.#foreground = true;
-    const { kind } = this.#state;
-    if (!this.#session && kind !== "paused" && kind !== "ended") this.connect();
+    if (!this.#session && this.#state.kind !== "paused") this.connect();
   }
 
   background(): void {
@@ -177,9 +177,7 @@ export class MacConnection {
 
   async #end(reason: EndReason): Promise<void> {
     this.stop();
-    const ended = { reason, at: Date.now() };
-    await updatePairedMac(this.#options.mac.publicKey, { ended });
-    this.#setState({ kind: "ended", reason });
+    await endPairedMac(this.#options.mac.publicKey, reason);
     this.#options.onEnded();
   }
 

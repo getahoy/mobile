@@ -1,17 +1,16 @@
 import { View } from "react-native";
-import { Text } from "@/components/ui/text";
 import { TurnedOnPill } from "@/features/permissions/components/turnedOnPill";
 import { useLocalNetworkIntro } from "@/features/permissions/hooks/useLocalNetworkIntro";
 import { useTurnedOnNotice } from "@/features/permissions/hooks/useTurnedOnNotice";
 import { TalkPanel } from "@/features/talk/components/talkPanel";
 import { useTalkTarget } from "@/features/talk/hooks/useTalkTarget";
-import { HomeHeader } from "../components/homeHeader";
+import { EndedNoticeCard } from "../components/endedNoticeCard";
 import { HomeMac } from "../components/homeMac";
 import { NoMacsYet } from "../components/noMacsYet";
-import { homeCopy } from "../copy/homeCopy";
 import { useKeepMacsConnected } from "../hooks/useKeepMacsConnected";
 import { useLinkSync } from "../hooks/useLinkSync";
 import { usePairedMacs } from "../hooks/usePairedMacs";
+import { useEndedNotice } from "../storage/endedNotice";
 
 export function MacsHomeScreen() {
   const { macs, reload } = usePairedMacs();
@@ -19,9 +18,12 @@ export function MacsHomeScreen() {
   const introPending = useLocalNetworkIntro((macs?.length ?? 0) > 0);
   useKeepMacsConnected(introPending ? null : macs, reload);
   const { notice, clear } = useTurnedOnNotice();
+  const ended = useEndedNotice();
   const target = useTalkTarget(macs ?? []);
-  const shown = target.mac ?? macs?.[0] ?? null;
-  const { mac: talkMac } = target;
+  const { mac } = target;
+  const endedCard = ended.notice ? (
+    <EndedNoticeCard notice={ended.notice} onDismiss={ended.dismiss} />
+  ) : null;
   const turnedOn = notice ? (
     <TurnedOnPill
       key={notice.key}
@@ -31,33 +33,25 @@ export function MacsHomeScreen() {
     />
   ) : null;
 
-  if (macs?.length === 0) {
-    return (
-      <View className="flex-1 bg-sailcloth pt-safe">
-        <HomeHeader
-          chip={
-            <Text variant="title" className="pl-1">
-              {homeCopy.wordmark}
-            </Text>
-          }
-        />
-        <NoMacsYet />
-      </View>
-    );
-  }
+  if (macs?.length === 0) return <NoMacsYet notice={endedCard} />;
 
   return (
     <View className="flex-1 bg-sailcloth pt-safe">
-      {shown ? (
+      {mac ? (
         <HomeMac
-          key={shown.publicKey}
-          mac={shown}
+          key={mac.publicKey}
+          mac={mac}
           macs={macs ?? []}
           onChanged={reload}
         />
       ) : null}
-      {talkMac ? (
-        <TalkPanel target={{ ...target, mac: talkMac }} notice={turnedOn} />
+      {endedCard ? <View className="px-5 pt-2">{endedCard}</View> : null}
+      {mac ? (
+        <TalkPanel
+          key={mac.publicKey}
+          target={{ ...target, mac }}
+          notice={turnedOn}
+        />
       ) : (
         <View className="flex-1" />
       )}

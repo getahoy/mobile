@@ -21,7 +21,6 @@ type MoreOptionsSheetProps = {
 
 export function MoreOptionsSheet(props: MoreOptionsSheetProps) {
   const { open, mac, statusLine, macs, link, onClose } = props;
-  const choices = macs.filter((candidate) => !candidate.ended);
   const afterClose = useRef<(() => void) | null>(null);
   const run = (action: () => void) => () => {
     onClose();
@@ -42,12 +41,12 @@ export function MoreOptionsSheet(props: MoreOptionsSheetProps) {
       title={mac.displayName}
       description={statusLine}
     >
-      {choices.length > 1 ? (
+      {macs.length > 1 ? (
         <View className="gap-1 pb-2">
           <Text variant="eyebrow" role="heading" className="pl-1">
             {macCopy.talkTo}
           </Text>
-          {choices.map((choice) => (
+          {macs.map((choice) => (
             <TalkToRow
               key={choice.publicKey}
               mac={choice}

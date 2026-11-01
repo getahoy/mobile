@@ -60,7 +60,10 @@ export function useTalk(mac: PairedMac | null) {
     const subscription = AppState.addEventListener("change", (appState) => {
       if (appState !== "active") flow.interrupt();
     });
-    return () => subscription.remove();
+    return () => {
+      subscription.remove();
+      flow.interrupt();
+    };
   }, [flow]);
 
   useEffect(() => {

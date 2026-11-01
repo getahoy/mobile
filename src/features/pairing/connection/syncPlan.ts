@@ -6,11 +6,10 @@ export function syncPlan(
   running: Iterable<string>,
   macs: readonly PairedMac[],
 ): SyncPlan {
-  const wanted = macs.filter((mac) => !mac.ended);
-  const wantedKeys = new Set(wanted.map((mac) => mac.publicKey));
+  const wantedKeys = new Set(macs.map((mac) => mac.publicKey));
   const runningKeys = new Set(running);
   return {
-    start: wanted.filter((mac) => !runningKeys.has(mac.publicKey)),
+    start: macs.filter((mac) => !runningKeys.has(mac.publicKey)),
     stop: [...runningKeys].filter((key) => !wantedKeys.has(key)),
   };
 }

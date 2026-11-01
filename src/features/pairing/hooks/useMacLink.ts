@@ -14,9 +14,7 @@ export function useMacLink(mac: PairedMac) {
     live.state(mac.publicKey),
   );
   const connection = connections.connection(mac.publicKey);
-  const current: MacLinkState = mac.ended
-    ? { kind: "ended", reason: mac.ended.reason }
-    : (reported ?? connection?.state() ?? CONNECTING);
+  const current: MacLinkState = reported ?? connection?.state() ?? CONNECTING;
   const state = useSteadyLinkState(current);
   return { state, connection };
 }

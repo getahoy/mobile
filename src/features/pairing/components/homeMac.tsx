@@ -34,12 +34,11 @@ export function HomeMac({ mac, macs, onChanged }: HomeMacProps) {
   const help = openLocalNetwork
     ? { label: permissionCopy.checkLocalNetwork, onPress: openLocalNetwork }
     : null;
-  const canOpen = state.kind !== "ended";
   const chip = (
     <MacChip
       name={mac.displayName}
       status={status}
-      onPress={canOpen ? () => setMenuOpen(true) : null}
+      onPress={() => setMenuOpen(true)}
     />
   );
   return (

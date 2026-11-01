@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import type { MacConnection } from "../connection/macConnection";
 import type { MacLinkState } from "../connection/macLinkState";
 import { macCopy } from "../copy/macCopy";
-import { type PairedMac, removePairedMac } from "../storage/pairedMacs";
+import type { PairedMac } from "../storage/pairedMacs";
 import { useUnpairMac } from "./useUnpairMac";
 
 export type MacCardAction = {
@@ -23,17 +23,12 @@ export function useMacCardActions(options: MacCardActionsOptions) {
   const removal = useUnpairMac(mac, connection, onChanged);
   const pairAgain = () =>
     router.push({ pathname: "/pair", params: { mac: mac.displayName } });
-  const dismiss = () =>
-    void removePairedMac(mac.publicKey)
-      .catch(() => undefined)
-      .finally(onChanged);
-  const actions = cardActions(state, connection, { pairAgain, dismiss });
-  const link: MacCardAction | null =
-    state.kind === "ended" || !connection
-      ? null
-      : state.kind === "paused"
-        ? toggle(macCopy.connect, () => connection.resume())
-        : toggle(macCopy.disconnect, () => connection.pause());
+  const actions = cardActions(state, connection, pairAgain);
+  const link: MacCardAction | null = !connection
+    ? null
+    : state.kind === "paused"
+      ? toggle(macCopy.connect, () => connection.resume())
+      : toggle(macCopy.disconnect, () => connection.pause());
   return { actions, link, removal };
 }
 
@@ -41,20 +36,11 @@ function toggle(label: string, onPress: () => void): MacCardAction {
   return { label, tone: "primary", onPress };
 }
 
-type Navigation = { pairAgain: () => void; dismiss: () => void };
-
 function cardActions(
   state: MacLinkState,
   connection: MacConnection | null,
-  navigation: Navigation,
+  pairAgain: () => void,
 ): MacCardAction[] {
-  const { pairAgain, dismiss } = navigation;
-  if (state.kind === "ended") {
-    return [
-      { label: macCopy.pairAgain, tone: "primary", onPress: pairAgain },
-      { label: macCopy.dismiss, tone: "outline", onPress: dismiss },
-    ];
-  }
   if (state.kind === "unrecognised") {
     return [{ label: macCopy.pairAgain, tone: "outline", onPress: pairAgain }];
   }

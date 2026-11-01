@@ -11,7 +11,6 @@ const sampleMac = (publicKey: string, displayName: string): PairedMac => ({
   lanPort: null,
   pairedAt: 0,
   paused: false,
-  ended: null,
 });
 
 const macs = [

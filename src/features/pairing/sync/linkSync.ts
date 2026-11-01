@@ -4,17 +4,14 @@ import type { GoodbyeReason } from "@getahoy/protocol";
 import { listPairingLinks, unlinkPairing } from "../client/pairingApi";
 import type { LiveMacLinks } from "../connection/liveMacLinks";
 import { clearDeviceKeys, loadDeviceKeys } from "../storage/deviceKeys";
-import {
-  clearPairedMacs,
-  readPairedMacs,
-  updatePairedMac,
-} from "../storage/pairedMacs";
+import { clearPairedMacs, readPairedMacs } from "../storage/pairedMacs";
 import {
   clearPendingUnlinks,
   queuePendingUnlink,
   readPendingUnlinks,
   settlePendingUnlink,
 } from "../storage/pendingUnlinks";
+import { endPairedMac } from "./endedMacs";
 
 const REACHABILITY_TIMEOUT_MS = 3000;
 
@@ -40,8 +37,8 @@ export async function queueUnlink(macKey: string, reason: UnlinkReason) {
   await queuePendingUnlink({ devicePublicKey, peerPublicKey: macKey, reason });
 }
 
-export async function markEndedMacs(): Promise<void> {
-  const live = (await readPairedMacs()).filter((mac) => !mac.ended);
+export async function endRevokedMacs(): Promise<void> {
+  const live = await readPairedMacs();
   if (live.length === 0) return;
   const keys = await loadDeviceKeys();
   const listed = await listPairingLinks(encodeBytes(keys.publicKey));
@@ -51,8 +48,7 @@ export async function markEndedMacs(): Promise<void> {
       (l) => l.peerPublicKey === mac.publicKey,
     );
     if (!link || link.active) continue;
-    const ended = { reason: link.reason ?? "removed", at: Date.now() };
-    await updatePairedMac(mac.publicKey, { ended });
+    await endPairedMac(mac.publicKey, link.reason ?? "removed");
   }
 }
 
@@ -69,7 +65,7 @@ export async function serverReachable(): Promise<boolean> {
 
 export async function unpairEverything(live: LiveMacLinks): Promise<void> {
   live.goodbyeAll("signed_out");
-  const macs = (await readPairedMacs()).filter((mac) => !mac.ended);
+  const macs = await readPairedMacs();
   for (const mac of macs) await queueUnlink(mac.publicKey, "signed_out");
   await flushPendingUnlinks();
   await Promise.all([clearPairedMacs(), clearPendingUnlinks()]);

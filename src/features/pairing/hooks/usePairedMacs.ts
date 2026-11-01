@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { authClient } from "@/features/auth/client/authClient";
 import { type PairedMac, readPairedMacs } from "../storage/pairedMacs";
 import { claimPairingsFor } from "../storage/pairingOwner";
+import { settleStoredEndedMacs } from "../sync/endedMacs";
 import { usePairedMacsChanges } from "./usePairedMacsChanges";
 
 export function usePairedMacs() {
@@ -11,7 +12,10 @@ export function usePairedMacs() {
   const userId = authClient.useSession().data?.user.id ?? null;
   const reload = useCallback(() => {
     if (!userId) return;
-    void claimPairingsFor(userId).then(readPairedMacs).then(setMacs);
+    void claimPairingsFor(userId)
+      .then(settleStoredEndedMacs)
+      .then(readPairedMacs)
+      .then(setMacs);
   }, [userId]);
 
   useFocusEffect(reload);

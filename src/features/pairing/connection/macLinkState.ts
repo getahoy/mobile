@@ -1,4 +1,3 @@
-import type { EndReason } from "@getahoy/protocol";
 import { getNetworkStateAsync, NetworkStateType } from "expo-network";
 
 export type MacLinkState =
@@ -11,8 +10,7 @@ export type MacLinkState =
   | { kind: "unreachable"; onCellular: boolean }
   | { kind: "macTooOld" }
   | { kind: "macTooNew" }
-  | { kind: "unrecognised" }
-  | { kind: "ended"; reason: EndReason };
+  | { kind: "unrecognised" };
 
 type MacLinkKind = MacLinkState["kind"];
 

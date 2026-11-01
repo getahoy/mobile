@@ -11,7 +11,6 @@ export const macCopy = {
     mobileData: "Mobile data",
     updateNeeded: "Update needed",
     notRecognised: "Not recognised",
-    ended: "Ended",
   },
   talkTo: "Talk to",
   connectedWord: "Connected",
@@ -39,10 +38,11 @@ export const macCopy = {
   removeMac: "Remove this Mac",
   moreOptions: (mac: string) => `More options for ${mac}`,
   cancel: "Cancel",
-  endedRemoved: (mac: string) => `${mac} removed this phone.`,
-  endedReplaced: (mac: string) =>
-    `${mac} is now paired with a different phone.`,
-  endedSignedOut: (mac: string) => `You signed out of Ahoy on ${mac}.`,
+  ended: {
+    removed: (mac: string) => `${mac} disconnected this phone.`,
+    replaced: (mac: string) => `${mac} is now paired with a different phone.`,
+    signed_out: (mac: string) => `You signed out of Ahoy on ${mac}.`,
+  },
   dismiss: "Dismiss",
   removeTitle: (mac: string) => `Remove ${mac}?`,
   removeBody: (mac: string) =>

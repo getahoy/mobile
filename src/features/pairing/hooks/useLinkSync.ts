@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { AppState } from "react-native";
-import { flushPendingUnlinks, markEndedMacs } from "../sync/linkSync";
+import { endRevokedMacs, flushPendingUnlinks } from "../sync/linkSync";
 
 async function syncLinks(onSynced: () => void): Promise<void> {
   await flushPendingUnlinks().catch(() => undefined);
-  await markEndedMacs().catch(() => undefined);
+  await endRevokedMacs().catch(() => undefined);
   onSynced();
 }
 

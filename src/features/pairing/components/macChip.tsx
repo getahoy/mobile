@@ -14,7 +14,7 @@ const dotTones = {
 type MacChipProps = {
   name: string;
   status: MacStatus;
-  onPress: (() => void) | null;
+  onPress: () => void;
 };
 
 export function MacChip({ name, status, onPress }: MacChipProps) {
@@ -23,8 +23,7 @@ export function MacChip({ name, status, onPress }: MacChipProps) {
       role="button"
       accessibilityLabel={macCopy.moreOptions(name)}
       aria-haspopup="dialog"
-      disabled={!onPress}
-      onPress={onPress ?? undefined}
+      onPress={onPress}
       className="h-9 shrink flex-row items-center gap-2 rounded-full border border-rope bg-paper pr-3 pl-2.5 active:bg-linen"
     >
       <StatusDot
@@ -43,13 +42,11 @@ export function MacChip({ name, status, onPress }: MacChipProps) {
           {status.chip}
         </Text>
       ) : null}
-      {onPress ? (
-        <Icon
-          name="chevronDown"
-          size="sm"
-          tintColorClassName="accent-driftwood"
-        />
-      ) : null}
+      <Icon
+        name="chevronDown"
+        size="sm"
+        tintColorClassName="accent-driftwood"
+      />
     </Pressable>
   );
 }

@@ -1,13 +1,25 @@
 import { router } from "expo-router";
+import type { ReactNode } from "react";
 import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { homeCopy } from "../copy/homeCopy";
+import { HomeHeader } from "./homeHeader";
 
-export function NoMacsYet() {
+type NoMacsYetProps = { notice: ReactNode };
+
+export function NoMacsYet({ notice }: NoMacsYetProps) {
   return (
-    <>
+    <View className="flex-1 bg-sailcloth pt-safe">
+      <HomeHeader
+        chip={
+          <Text variant="title" className="pl-1">
+            {homeCopy.wordmark}
+          </Text>
+        }
+      />
       <View className="flex-1 justify-center gap-3 px-8 pb-10">
+        {notice}
         <Text variant="title">{homeCopy.emptyTitle}</Text>
         <Text className="text-driftwood">{homeCopy.emptyBody}</Text>
       </View>
@@ -19,6 +31,6 @@ export function NoMacsYet() {
           <Text>{homeCopy.scan}</Text>
         </Button>
       </View>
-    </>
+    </View>
   );
 }
