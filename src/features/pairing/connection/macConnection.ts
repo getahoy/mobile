@@ -4,6 +4,7 @@ import {
   type GoodbyeReason,
 } from "@getahoy/protocol";
 import { logger } from "@/features/logging/logger";
+import { markReachedOnLan } from "@/features/permissions/storage/localNetworkMemory";
 import { loadDeviceKeys } from "../storage/deviceKeys";
 import { type PairedMac, updatePairedMac } from "../storage/pairedMacs";
 import { connectToMac, type MacLink } from "./connectToMac";
@@ -131,6 +132,7 @@ export class MacConnection {
     this.#session = session;
     this.#lastReason = null;
     this.#options.live.register(this.#options.mac.publicKey, session);
+    markReachedOnLan(this.#options.mac.publicKey);
     session.onEvent((event) => void this.#handle(event, attempt));
     this.#setState({ kind: "connected", locked: false });
   }
