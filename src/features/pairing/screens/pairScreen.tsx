@@ -6,8 +6,11 @@ import { Text } from "@/components/ui/text";
 import { PermissionGateView } from "@/features/permissions/components/permissionGateView";
 import { TurnedOnPill } from "@/features/permissions/components/turnedOnPill";
 import { localNetworkIntroPending } from "@/features/permissions/localNetworkIntro";
+import {
+  type ScannerHint,
+  ScannerMessageSlot,
+} from "../components/scannerMessageSlot";
 import { ScannerPreview } from "../components/scannerPreview";
-import { ScannerStatus } from "../components/scannerStatus";
 import { ScannerTopBar } from "../components/scannerTopBar";
 import { ScannerViewfinder } from "../components/scannerViewfinder";
 import { ScannerZoom } from "../components/scannerZoom";
@@ -15,7 +18,7 @@ import { macCopy } from "../copy/macCopy";
 import { pairingCopy } from "../copy/pairingCopy";
 import type { EndedNotice } from "../endedPairing";
 import { useCameraGate } from "../hooks/useCameraGate";
-import { useClaimMac } from "../hooks/useClaimMac";
+import { usePairScanner } from "../hooks/usePairScanner";
 import { useScannerZoom } from "../hooks/useScannerZoom";
 import { useEndedNotice } from "../storage/endedNotice";
 
@@ -26,16 +29,31 @@ function leaveAfterPairing() {
   else router.back();
 }
 
-function scannerHint(mac: string | undefined, ended: EndedNotice | null) {
-  if (mac) return macCopy.pairAgainHint(mac);
-  if (!ended) return pairingCopy["scanner.hint"];
-  return (
-    <>
-      {macCopy.endedScanBefore}
-      <Text className="font-sans-medium text-on-scrim">{ended.deviceName}</Text>
-      {macCopy.endedScanAfter}
-    </>
-  );
+function scannerHint(
+  mac: string | undefined,
+  ended: EndedNotice | null,
+): ScannerHint {
+  if (mac) {
+    const label = macCopy.pairAgainHint(mac);
+    return { label, content: label };
+  }
+  if (!ended) {
+    const label = pairingCopy["scanner.hint"];
+    return { label, content: label };
+  }
+  const { endedScanBefore, endedScanAfter } = macCopy;
+  return {
+    label: `${endedScanBefore}${ended.deviceName}${endedScanAfter}`,
+    content: (
+      <>
+        {endedScanBefore}
+        <Text className="font-sans-medium text-on-scrim">
+          {ended.deviceName}
+        </Text>
+        {endedScanAfter}
+      </>
+    ),
+  };
 }
 
 export function PairScreen() {
@@ -46,16 +64,14 @@ export function PairScreen() {
   const camera = useCameraGate(resumed === "1");
   const ended = useEndedNotice().notice;
   const [torchOn, setTorchOn] = useState(false);
-  const { state, claim } = useClaimMac(leaveAfterPairing);
+  const scanner = usePairScanner(leaveAfterPairing);
   const zoom = useScannerZoom();
-  const cameraLive = state.kind === "scanning" || state.kind === "failed";
 
   if (camera.gate.screen !== "granted") {
     return (
       <PermissionGateView kind="camera" gate={camera.gate} onClose={close} />
     );
   }
-  const hint = scannerHint(mac, ended);
   const notice = camera.turnedOn ? (
     <TurnedOnPill kind="camera" look="scanner" onHidden={camera.hideTurnedOn} />
   ) : null;
@@ -66,18 +82,23 @@ export function PairScreen() {
         torchOn={torchOn}
         cameraZoom={zoom.cameraZoom}
         pinch={zoom.pinch}
-        onScan={(code) => void claim(code)}
+        onScan={scanner.scan}
         onCameraFailed={camera.gate.fail}
       />
-      <ScannerViewfinder hint={hint} />
-      <ScannerZoom zoom={zoom} visible={cameraLive} />
+      <ScannerViewfinder dimmed={!scanner.scanning} />
+      <ScannerZoom zoom={zoom} visible={scanner.scanning} />
       <ScannerTopBar
         torchOn={torchOn}
         notice={notice}
         onClose={close}
         onToggleTorch={() => setTorchOn((on) => !on)}
       />
-      <ScannerStatus state={state} />
+      <ScannerMessageSlot
+        state={scanner.state}
+        hint={scannerHint(mac, ended)}
+        signingIn={scanner.signingIn}
+        onAction={scanner.act}
+      />
     </View>
   );
 }

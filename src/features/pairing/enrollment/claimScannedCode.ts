@@ -1,37 +1,19 @@
 import { decodeBytes, encodeBytes, pairingProof } from "@getahoy/crypto";
-import { requestErrorMessage } from "@getahoy/lib";
-import { type PairingQr, pairingQrSchema } from "@getahoy/protocol";
+import type { PairingQr } from "@getahoy/protocol";
+import { logger } from "@/features/logging/logger";
 import { claimPairing } from "../client/pairingApi";
-import { pairingCopy } from "../copy/pairingCopy";
 import { phoneDescription } from "../device/phoneDescription";
 import { loadDeviceKeys } from "../storage/deviceKeys";
 import type { PairedMac } from "../storage/pairedMacs";
+import {
+  type ClaimFailure,
+  claimFailure,
+  claimFailureCode,
+} from "./claimFailure";
 
-const MS_PER_SECOND = 1000;
-
-type Failed = { kind: "failed"; message: string };
-
-export type ClaimOutcome = { kind: "claimed"; mac: PairedMac } | Failed;
-
-type ScannedCode = { kind: "read"; qr: PairingQr } | Failed;
-
-function readQr(scanned: string): PairingQr | null {
-  try {
-    const parsed = pairingQrSchema.safeParse(JSON.parse(scanned));
-    return parsed.success ? parsed.data : null;
-  } catch {
-    return null;
-  }
-}
-
-export function readScannedCode(scanned: string): ScannedCode {
-  const qr = readQr(scanned);
-  if (!qr) return { kind: "failed", message: pairingCopy["scan.notAhoy"] };
-  if (qr.exp * MS_PER_SECOND <= Date.now()) {
-    return { kind: "failed", message: pairingCopy["scan.expired"] };
-  }
-  return { kind: "read", qr };
-}
+export type ClaimOutcome =
+  | { kind: "claimed"; mac: PairedMac }
+  | { kind: "failed"; failure: ClaimFailure };
 
 export async function claimScannedCode(qr: PairingQr): Promise<ClaimOutcome> {
   const keys = await loadDeviceKeys();
@@ -47,7 +29,8 @@ export async function claimScannedCode(qr: PairingQr): Promise<ClaimOutcome> {
     device: phoneDescription(keys),
   });
   if (claimed.code === "error") {
-    return { kind: "failed", message: requestErrorMessage(claimed.error) };
+    if (__DEV__) logger.info("pairing.claim", claimFailureCode(claimed.error));
+    return { kind: "failed", failure: claimFailure(claimed.error) };
   }
   const mac: PairedMac = {
     publicKey: qr.pk,

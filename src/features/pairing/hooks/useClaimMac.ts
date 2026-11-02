@@ -1,75 +1,66 @@
-import { errorMessages } from "@getahoy/lib";
-import { useEffect, useRef, useState } from "react";
-import { pairingCopy } from "../copy/pairingCopy";
+import type { PairingQr } from "@getahoy/protocol";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   type ClaimOutcome,
   claimScannedCode,
-  readScannedCode,
 } from "../enrollment/claimScannedCode";
 import { finishPairing } from "../enrollment/finishPairing";
+import {
+  nextScannerState,
+  SCAN_NOTICE_MS,
+  SCANNING,
+  type ScannerEvent,
+  type ScannerState,
+} from "../scannerFlow";
 import { usePairedMacsChanges } from "./usePairedMacsChanges";
 
-const PAIRED_CONFIRMATION_MS = 1000;
-// The rejected code is usually still in view; this paces retries of it.
-const SAME_CODE_RETRY_MS = 3000;
+const UNEXPECTED_FAILURE: ClaimOutcome = { kind: "failed", failure: "refused" };
 
-const UNEXPECTED_FAILURE: ClaimOutcome = {
-  kind: "failed",
-  message: errorMessages.internal,
-};
-
-export type ClaimState =
-  | { kind: "scanning" }
-  | { kind: "claiming" }
-  | { kind: "finishing" }
-  | { kind: "paired"; macName: string }
-  | { kind: "failed"; message: string };
-
-type Rejection = { code: string; at: number };
-
-export function useClaimMac(onPaired: () => void) {
-  const [state, setState] = useState<ClaimState>({ kind: "scanning" });
-  const busy = useRef(false);
-  const rejected = useRef<Rejection | null>(null);
-  const pairedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+export function useClaimMac() {
+  const [state, setState] = useState<ScannerState>(SCANNING);
+  const current = useRef(state);
   const changes = usePairedMacsChanges();
 
-  useEffect(
-    () => () => {
-      if (pairedTimer.current) clearTimeout(pairedTimer.current);
-    },
-    [],
-  );
+  const dispatch = useCallback((event: ScannerEvent) => {
+    const next = nextScannerState(current.current, event);
+    if (next === current.current) return null;
+    current.current = next;
+    setState(next);
+    return next;
+  }, []);
 
-  const recentlyRejected = (code: string) => {
-    const last = rejected.current;
-    if (!last || last.code !== code) return false;
-    return Date.now() - last.at < SAME_CODE_RETRY_MS;
-  };
+  useEffect(() => {
+    if (state.kind !== "scanning" || state.notice === null) return;
+    const timedOut = () => dispatch({ kind: "noticeTimedOut" });
+    const timer = setTimeout(timedOut, SCAN_NOTICE_MS);
+    return () => clearTimeout(timer);
+  }, [state, dispatch]);
 
-  const reject = (code: string, message: string) => {
-    rejected.current = { code, at: Date.now() };
-    busy.current = false;
-    setState({ kind: "failed", message });
-  };
-
-  const claim = async (scanned: string) => {
-    if (busy.current || recentlyRejected(scanned)) return;
-    const read = readScannedCode(scanned);
-    if (read.kind === "failed") return reject(scanned, read.message);
-    busy.current = true;
-    setState({ kind: "claiming" });
-    const outcome = await claimScannedCode(read.qr).catch(
-      () => UNEXPECTED_FAILURE,
-    );
-    if (outcome.kind === "failed") return reject(scanned, outcome.message);
-    setState({ kind: "finishing" });
+  const pair = async (qr: PairingQr) => {
+    const outcome = await claimScannedCode(qr).catch(() => UNEXPECTED_FAILURE);
+    if (outcome.kind === "failed") {
+      dispatch({ kind: "claimFailed", failure: outcome.failure });
+      return;
+    }
+    dispatch({ kind: "claimed" });
     const finished = await finishPairing(outcome.mac).catch(() => false);
-    if (!finished) return reject(scanned, pairingCopy["pair.notFinished"]);
-    setState({ kind: "paired", macName: outcome.mac.displayName });
+    if (!finished) {
+      dispatch({ kind: "notFinished" });
+      return;
+    }
+    dispatch({ kind: "finished", macName: outcome.mac.displayName });
     changes.announce();
-    pairedTimer.current = setTimeout(onPaired, PAIRED_CONFIRMATION_MS);
   };
 
-  return { state, claim };
+  const start = (event: ScannerEvent) => {
+    const next = dispatch(event);
+    if (next?.kind === "claiming") void pair(next.qr);
+  };
+
+  return {
+    state,
+    scan: (code: string) => start({ kind: "scanned", code, now: Date.now() }),
+    retry: () => start({ kind: "retried", now: Date.now() }),
+    scanAgain: () => dispatch({ kind: "scanAgain", now: Date.now() }),
+  };
 }

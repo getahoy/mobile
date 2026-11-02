@@ -1,8 +1,7 @@
-import type { ReactNode } from "react";
 import { View } from "react-native";
-import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/cn";
 
-type ScannerViewfinderProps = { hint: ReactNode };
+type ScannerViewfinderProps = { dimmed: boolean };
 
 const brackets = [
   "top-0 left-0 rounded-tl-viewfinder-bracket border-t-4 border-l-4",
@@ -11,7 +10,7 @@ const brackets = [
   "right-0 bottom-0 rounded-br-viewfinder-bracket border-r-4 border-b-4",
 ];
 
-export function ScannerViewfinder({ hint }: ScannerViewfinderProps) {
+export function ScannerViewfinder({ dimmed }: ScannerViewfinderProps) {
   return (
     <View
       className="absolute inset-0 items-center justify-center"
@@ -20,7 +19,7 @@ export function ScannerViewfinder({ hint }: ScannerViewfinderProps) {
       <View className="absolute rounded-viewfinder-scrim border-(length:--spacing-viewfinder-reach) border-scrim">
         <View className="size-viewfinder" />
       </View>
-      <View className="p-viewfinder-gap">
+      <View className={cn("p-viewfinder-gap", dimmed && "opacity-50")}>
         <View className="size-viewfinder" />
         {brackets.map((placement) => (
           <View
@@ -28,13 +27,6 @@ export function ScannerViewfinder({ hint }: ScannerViewfinderProps) {
             className={`absolute size-10 border-on-scrim ${placement}`}
           />
         ))}
-      </View>
-      <View className="absolute inset-x-0 bottom-0 px-6 pb-safe-offset-10">
-        <View className="self-center rounded-card bg-night px-4 py-2.5">
-          <Text variant="bodySmall" className="text-center text-on-scrim">
-            {hint}
-          </Text>
-        </View>
       </View>
     </View>
   );
