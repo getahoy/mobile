@@ -11,6 +11,16 @@ export const pairingCopy = {
   "pair.finishing": "Finishing pairing on your Mac…",
   "pair.notFinished":
     "Your Mac didn’t finish pairing. Check it’s online and try again.",
+  "pair.unreachable": "Couldn’t reach Ahoy. Check your connection.",
+  "pair.alreadyUsed":
+    "That code was already used. On your Mac, choose Pair a new phone to show a fresh one.",
+  "pair.rateLimited": "Too many tries. Wait a minute, then scan again.",
+  "pair.signIn": "Sign in again to pair this phone.",
+  "pair.updateApp": "Update Ahoy on this phone to pair with your Mac.",
+  "pair.refused": "Couldn’t pair with that code. Scan again.",
+  "pair.tryAgain": "Try again",
+  "pair.scanAgain": "Scan again",
+  "pair.signInAction": "Sign in",
   "camera.label": "Camera view for scanning the pairing code",
   "scan.notAhoy":
     "That is not an Ahoy pairing code. Scan the code on your Mac.",
