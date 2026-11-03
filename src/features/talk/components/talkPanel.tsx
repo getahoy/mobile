@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
@@ -26,6 +26,7 @@ type TalkPanelProps = {
 };
 
 export function TalkPanel({ target, notice }: TalkPanelProps) {
+  const [pressed, setPressed] = useState(false);
   const talk = useTalk(target.block ? null : target.mac);
   const { thread } = useThread(talk.state);
   const mac = target.mac.displayName;
@@ -37,11 +38,21 @@ export function TalkPanel({ target, notice }: TalkPanelProps) {
     durationMs: talk.durationMs,
   });
   const hold = {
-    onStart: () => void talk.flow.press(),
-    onStop: talk.flow.release,
-    onInterrupted: () => talk.flow.interrupt(),
+    onStart: () => {
+      setPressed(true);
+      void talk.flow.press();
+    },
+    onStop: () => {
+      setPressed(false);
+      talk.flow.release();
+    },
+    onInterrupted: () => {
+      setPressed(false);
+      talk.flow.interrupt();
+    },
   };
   const activity = voiceActivity(talk.state, talk.speech, talk.level);
+  const idle = !(heard || reply || thread || activity.orb || bar.disabled);
   const answering = activity.tone === "listen" && activity.orb !== null;
   const answer = {
     ...hold,
@@ -53,15 +64,15 @@ export function TalkPanel({ target, notice }: TalkPanelProps) {
     <>
       <View className="flex-1 justify-center gap-5 px-6">
         {notice}
+        {idle ? (
+          <TryHints paused={pressed || talk.state.kind !== "ready"} />
+        ) : null}
         {heard ? <HeardLine text={heard} /> : null}
         {reply ? (
           <ReplyCard reply={reply} onRetry={talk.flow.tryAgain} />
         ) : null}
       </View>
       <Animated.View entering={rise} className="gap-3.5 px-5 pb-safe-offset-2">
-        {heard || reply || thread || activity.orb || bar.disabled ? null : (
-          <TryHints />
-        )}
         {bar.reason ? <TalkReason reason={bar.reason} /> : null}
         <TalkBar macName={mac} {...bar} activity={activity} {...hold} />
       </Animated.View>

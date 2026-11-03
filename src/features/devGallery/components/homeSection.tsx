@@ -157,7 +157,7 @@ export function HomeSection() {
       <HeardLine text={galleryCopy.heardSample} />
       <ReplyCard reply={done} onRetry={noop} />
       <ReplyCard reply={failed} onRetry={noop} />
-      <TryHints />
+      <TryHints paused={false} />
       {barSamples.map((sample) => (
         <TalkBar
           key={sample.id}
