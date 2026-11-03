@@ -9,5 +9,5 @@ export type CarouselItemProps = {
 };
 
 export function CarouselItem({ className, children }: CarouselItemProps) {
-  return <View className={cn("flex-1", className)}>{children}</View>;
+  return <View className={cn("h-full w-full", className)}>{children}</View>;
 }

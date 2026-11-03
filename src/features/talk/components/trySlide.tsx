@@ -7,7 +7,7 @@ type TrySlideProps = { example: string };
 
 export function TrySlide({ example }: TrySlideProps) {
   return (
-    <View className="flex-1 items-center justify-center">
+    <View className="h-full w-full items-center justify-center">
       <Text
         maxFontSizeMultiplier={NO_FONT_SCALING}
         textBreakStrategy="balanced"

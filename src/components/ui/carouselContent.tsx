@@ -1,4 +1,4 @@
-import { type ReactElement, useCallback, useEffect } from "react";
+import { type ReactElement, useEffect } from "react";
 import {
   type AccessibilityActionEvent,
   type LayoutChangeEvent,
@@ -11,8 +11,8 @@ import { cn } from "@/lib/cn";
 import { useCarousel } from "./carouselContext";
 import { CarouselEdges } from "./carouselEdges";
 import type { CarouselItemProps } from "./carouselItem";
-import { slideStyle } from "./carouselMotion";
 import { useCarouselDrag } from "./useCarouselDrag";
+import { useSlideStyle } from "./useSlideStyle";
 
 const ADJUST_ACTIONS = [{ name: "increment" }, { name: "decrement" }];
 
@@ -28,24 +28,13 @@ export function CarouselContent({
   children,
 }: CarouselContentProps) {
   const carousel = useCarousel();
-  const { setCount, pageWidth, dragging, motion } = carousel;
+  const { setCount, pageWidth } = carousel;
   const trackStyle = useResolveClassNames(cn("w-full", className));
   const drag = useCarouselDrag(carousel, spacing);
+  const animateSlide = useSlideStyle(carousel, spacing);
 
   useEffect(() => setCount(children.length), [children.length, setCount]);
 
-  const animateSlide = useCallback(
-    (distance: number) => {
-      "worklet";
-      return slideStyle({
-        distance,
-        spacing,
-        motion,
-        dragging: dragging.value,
-      });
-    },
-    [spacing, motion, dragging],
-  );
   const measure = (event: LayoutChangeEvent) => {
     pageWidth.value = event.nativeEvent.layout.width;
   };
