@@ -58,9 +58,6 @@
   --text-display: 52px;
   --text-display--line-height: 52px;
   --text-display--letter-spacing: -1.56px;
-  --text-wordmark: 52px;
-  --text-wordmark--line-height: 64px;
-  --text-wordmark--letter-spacing: -1.04px;
   --text-welcome: 64px;
   --text-welcome--line-height: 64px;
   --text-welcome--letter-spacing: -1.92px;
@@ -84,6 +81,8 @@
   --spacing-orb: 240px;
   --spacing-welcome-orb: 300px;
   --spacing-signing-orb: 120px;
+  --spacing-splash-mark-x: 120px;
+  --spacing-splash-mark-y: 65.0847px;
   --spacing-guide: 232px;
   --spacing-finger: 30px;
   --spacing-edge-fade: 24%;

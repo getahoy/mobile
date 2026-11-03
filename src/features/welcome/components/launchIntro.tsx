@@ -1,32 +1,34 @@
 import { useEffect } from "react";
-import { View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withTiming,
 } from "react-native-reanimated";
 import { easing, REDUCED_FADE_MS, useReducedMotion } from "@/lib/motion";
+import { holdLeftMs, LAUNCH_LIFT, LAUNCH_REVEAL_MS } from "../launchTiming";
 import { Wordmark } from "./wordmark";
-
-const INTRO_MS = 900;
-const LIFT_BY = 24;
 
 type LaunchIntroProps = { onDone: () => void };
 
+// The Stack is already mounted underneath, so anything settled during the hold
+// (a server answer, a revoked Mac) is in place before the reveal.
 export function LaunchIntro({ onDone }: LaunchIntroProps) {
   const reducedMotion = useReducedMotion();
   const gone = useSharedValue(0);
 
   useEffect(() => {
-    const duration = reducedMotion ? REDUCED_FADE_MS : INTRO_MS;
-    gone.value = withTiming(1, { duration, easing: easing.out });
-    const timer = setTimeout(onDone, duration);
+    const holdMs = holdLeftMs(Date.now());
+    const duration = reducedMotion ? REDUCED_FADE_MS : LAUNCH_REVEAL_MS;
+    const reveal = withTiming(1, { duration, easing: easing.inOut });
+    gone.value = withDelay(holdMs, reveal);
+    const timer = setTimeout(onDone, holdMs + duration);
     return () => clearTimeout(timer);
   }, [gone, onDone, reducedMotion]);
 
   const fade = useAnimatedStyle(() => ({ opacity: 1 - gone.value }));
   const lift = useAnimatedStyle(() => ({
-    transform: [{ translateY: reducedMotion ? 0 : -LIFT_BY * gone.value }],
+    transform: [{ translateY: reducedMotion ? 0 : -LAUNCH_LIFT * gone.value }],
   }));
 
   return (
@@ -36,11 +38,7 @@ export function LaunchIntro({ onDone }: LaunchIntroProps) {
       aria-hidden
       className="absolute inset-0 bg-sailcloth"
     >
-      <View className="absolute inset-x-0 top-1/2 -mt-8 h-16 items-center justify-center">
-        <Animated.View style={lift}>
-          <Wordmark />
-        </Animated.View>
-      </View>
+      <Wordmark style={lift} />
     </Animated.View>
   );
 }

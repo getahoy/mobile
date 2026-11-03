@@ -1,3 +1,4 @@
+import "@/features/welcome/launchTiming";
 import "@/features/pairing/crypto/randomValues";
 import "@/global.css";
 

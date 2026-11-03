@@ -1,7 +1,4 @@
-import Animated, {
-  type SharedValue,
-  useAnimatedStyle,
-} from "react-native-reanimated";
+import { type SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { timelinePhase } from "@/lib/motion";
 import { welcomeTimeline } from "../welcomeTimeline";
 import { Wordmark } from "./wordmark";
@@ -18,14 +15,5 @@ export function WelcomeWordmark({ time }: WelcomeWordmarkProps) {
       transform: [{ translateY: -riseBy * gone }],
     };
   });
-  return (
-    <Animated.View
-      style={leave}
-      aria-hidden
-      pointerEvents="none"
-      className="absolute inset-x-0 top-1/2 -mt-8 h-16 items-center justify-center"
-    >
-      <Wordmark />
-    </Animated.View>
-  );
+  return <Wordmark style={leave} />;
 }

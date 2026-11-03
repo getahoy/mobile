@@ -1,5 +1,4 @@
 export const welcomeCopy = {
-  wordmark: "ahoy",
   headline: [
     { words: ["Your", "Mac,"], italic: false },
     { words: ["on", "a", "word."], italic: true },

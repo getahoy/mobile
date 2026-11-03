@@ -16,12 +16,7 @@ export function SigningIn({ slow, onCancel }: SigningInProps) {
       aria-busy
       className="absolute inset-0 bg-sailcloth"
     >
-      <View
-        aria-hidden
-        className="absolute inset-x-0 top-1/2 -mt-8 h-16 items-center justify-center"
-      >
-        <Wordmark />
-      </View>
+      <Wordmark />
       <View className="absolute inset-x-0 top-1/2 mt-13 items-center">
         <Orb motion="breathe" className="size-signing-orb opacity-90" />
       </View>
