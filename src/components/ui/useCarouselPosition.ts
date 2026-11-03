@@ -2,15 +2,20 @@ import { useCallback, useState } from "react";
 import {
   useAnimatedReaction,
   useSharedValue,
+  withSequence,
   withTiming,
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
+import { duration, easing } from "@/lib/motion";
 import {
   type CarouselMotion,
   clampPage,
   glideTiming,
   nearestIndex,
 } from "./carouselMotion";
+
+const PEEK_OUT = { duration: duration.base, easing: easing.out };
+const PEEK_BACK = { duration: duration.slow, easing: easing.spring };
 
 type PositionOptions = {
   loop: boolean;
@@ -47,5 +52,17 @@ export function useCarouselPosition(options: PositionOptions) {
     [loop, count, motion, offset, pageWidth],
   );
 
-  return { offset, pageWidth, dragging, index, step };
+  const peek = useCallback(
+    (pages: number) => {
+      const width = pageWidth.value;
+      const rest = -Math.round(-offset.value / Math.max(width, 1)) * width;
+      offset.value = withSequence(
+        withTiming(rest - pages * width, PEEK_OUT),
+        withTiming(rest, PEEK_BACK),
+      );
+    },
+    [offset, pageWidth],
+  );
+
+  return { offset, pageWidth, dragging, index, step, peek };
 }

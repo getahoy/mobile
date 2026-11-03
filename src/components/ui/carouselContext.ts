@@ -15,6 +15,7 @@ export type CarouselState = {
   touchStarted: () => void;
   touchEnded: () => void;
   step: (delta: 1 | -1) => void;
+  peek: (pages: number) => void;
 };
 
 export const CarouselContext = createContext<CarouselState | null>(null);
