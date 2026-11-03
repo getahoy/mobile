@@ -1,31 +1,17 @@
 import { usePanGesture } from "react-native-gesture-handler";
-import {
-  cancelAnimation,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import { cancelAnimation, useSharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import type { CarouselState } from "./carouselContext";
-import { clampPage, glideTiming, releasePage } from "./carouselMotion";
+import { pageAt, releasePage } from "./carouselMotion";
 
 // A swipe must win clearly over a vertical drag, so the screen and the talk button keep theirs.
 const SWIPE_START_PX = 10;
 
 export function useCarouselDrag(carousel: CarouselState, spacing: number) {
-  const { offset, pageWidth, dragging, motion, loop, count } = carousel;
+  const { offset, pageWidth, dragging, glideTo } = carousel;
   const { touchStarted, touchEnded } = carousel;
   const startOffset = useSharedValue(0);
   const released = useSharedValue(false);
-
-  const glideTo = (page: number) => {
-    "worklet";
-    const target = loop ? page : clampPage(page, count);
-    offset.value = withTiming(-target * pageWidth.value, glideTiming(motion));
-  };
-  const pageOf = (value: number) => {
-    "worklet";
-    return pageWidth.value > 0 ? -value / pageWidth.value : 0;
-  };
 
   return usePanGesture({
     activeOffsetX: [-SWIPE_START_PX, SWIPE_START_PX],
@@ -47,15 +33,17 @@ export function useCarouselDrag(carousel: CarouselState, spacing: number) {
       released.value = true;
       glideTo(
         releasePage({
-          startPage: pageOf(startOffset.value),
-          currentPage: pageOf(offset.value),
+          startPage: pageAt(startOffset.value, pageWidth.value),
+          currentPage: pageAt(offset.value, pageWidth.value),
           translation: event.translationX,
           velocity: event.velocityX,
         }),
       );
     },
     onFinalize: () => {
-      if (!released.value) glideTo(Math.round(pageOf(offset.value)));
+      if (!released.value) {
+        glideTo(Math.round(pageAt(offset.value, pageWidth.value)));
+      }
       dragging.value = false;
       scheduleOnRN(touchEnded);
     },

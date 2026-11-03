@@ -14,6 +14,7 @@ export type CarouselState = {
   setCount: (count: number) => void;
   touchStarted: () => void;
   touchEnded: () => void;
+  glideTo: (page: number) => void;
   step: (delta: 1 | -1) => void;
   peek: (pages: number) => void;
 };

@@ -12,25 +12,25 @@ const FLICK_PX_PER_S = 400;
 
 type SlideLook = {
   distance: number;
-  travel: number;
+  page: number;
   spacing: number;
   motion: CarouselMotion;
   dragging: boolean;
 };
 
-export function travelFromRest(page: number) {
+export function pageAt(offset: number, pageWidth: number) {
   "worklet";
-  return Math.abs(page - Math.round(page));
+  return -offset / Math.max(pageWidth, 1);
 }
 
-// Neighbours stay invisible at rest and only appear while the strip is moving.
 export function slideStyle(look: SlideLook) {
   "worklet";
-  const { distance, travel, spacing, motion, dragging } = look;
+  const { distance, page, spacing, motion, dragging } = look;
   const near = Math.min(1, Math.abs(distance));
   const beyond = Math.max(0, Math.abs(distance) - 1);
   const settledOnly = motion === "reduced" && !dragging;
   const placed = settledOnly ? Math.round(distance) : distance;
+  const travel = Math.abs(page - Math.round(page));
   const reveal = Math.min(travel * REVEAL_GAIN, 1);
   const neighbourOpacity = NEIGHBOUR_PEAK_OPACITY * reveal;
   return {

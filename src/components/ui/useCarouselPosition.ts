@@ -12,6 +12,7 @@ import {
   clampPage,
   glideTiming,
   nearestIndex,
+  pageAt,
 } from "./carouselMotion";
 
 const PEEK_OUT = { duration: duration.base, easing: easing.out };
@@ -36,26 +37,31 @@ export function useCarouselPosition(options: PositionOptions) {
     onIndexChange?.(next);
   };
   useAnimatedReaction(
-    () => nearestIndex(-offset.value / Math.max(pageWidth.value, 1), count),
+    () => nearestIndex(pageAt(offset.value, pageWidth.value), count),
     (now, before) => {
       if (before !== null && now !== before) scheduleOnRN(settle, now);
     },
   );
 
-  const step = useCallback(
-    (delta: 1 | -1) => {
-      const width = pageWidth.value;
-      const page = Math.round(-offset.value / Math.max(width, 1)) + delta;
+  const glideTo = useCallback(
+    (page: number) => {
+      "worklet";
       const target = loop ? page : clampPage(page, count);
-      offset.value = withTiming(-target * width, glideTiming(motion));
+      offset.value = withTiming(-target * pageWidth.value, glideTiming(motion));
     },
     [loop, count, motion, offset, pageWidth],
+  );
+
+  const step = useCallback(
+    (delta: 1 | -1) =>
+      glideTo(Math.round(pageAt(offset.value, pageWidth.value)) + delta),
+    [glideTo, offset, pageWidth],
   );
 
   const peek = useCallback(
     (pages: number) => {
       const width = pageWidth.value;
-      const rest = -Math.round(-offset.value / Math.max(width, 1)) * width;
+      const rest = -Math.round(pageAt(offset.value, width)) * width;
       offset.value = withSequence(
         withTiming(rest - pages * width, PEEK_OUT),
         withTiming(rest, PEEK_BACK),
@@ -64,5 +70,5 @@ export function useCarouselPosition(options: PositionOptions) {
     [offset, pageWidth],
   );
 
-  return { offset, pageWidth, dragging, index, step, peek };
+  return { offset, pageWidth, dragging, index, glideTo, step, peek };
 }
