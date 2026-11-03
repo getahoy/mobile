@@ -1,37 +1,26 @@
-import { createContext, type RefObject, useContext } from "react";
-import type { CarouselRef } from "react-native-reanimated-carousel";
+import { createContext, useContext } from "react";
+import type { SharedValue } from "react-native-reanimated";
+import type { CarouselMotion } from "./carouselMotion";
 
-export type CarouselCause = "user" | "auto";
-
-export type CarouselApi = {
+export type CarouselState = {
   index: number;
   count: number;
-  cause: CarouselCause;
-  autoAdvance: boolean;
-  jumpTo: (index: number) => void;
-};
-
-export type CarouselInternals = CarouselApi & {
-  ref: RefObject<CarouselRef | null>;
-  loop: boolean;
-  autoPlayInterval: number | null;
   label: string;
+  loop: boolean;
+  motion: CarouselMotion;
+  offset: SharedValue<number>;
+  pageWidth: SharedValue<number>;
+  dragging: SharedValue<boolean>;
   setCount: (count: number) => void;
   touchStarted: () => void;
   touchEnded: () => void;
-  movingStarted: () => void;
-  settled: (index: number) => void;
-  stepByUser: (step: 1 | -1) => void;
+  step: (delta: 1 | -1) => void;
 };
 
-export const CarouselContext = createContext<CarouselInternals | null>(null);
+export const CarouselContext = createContext<CarouselState | null>(null);
 
-export function useCarouselInternals(): CarouselInternals {
+export function useCarousel(): CarouselState {
   const carousel = useContext(CarouselContext);
   if (!carousel) throw new Error("Carousel parts must sit inside <Carousel>");
   return carousel;
-}
-
-export function useCarousel(): CarouselApi {
-  return useCarouselInternals();
 }

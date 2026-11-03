@@ -11,8 +11,8 @@ export const galleryCopy = {
     "It loops around",
     "It plays on its own",
   ],
-  carouselStatus: (slide: number, count: number, cause: string) =>
-    `Slide ${slide} of ${count}, moved by ${cause}`,
+  carouselStatus: (slide: number, count: number) =>
+    `Slide ${slide} of ${count}`,
   heardSample: "close the grok tab",
   secondMacName: "Office Mac",
   openTwoMacs: "Open More options with 2 Macs",
