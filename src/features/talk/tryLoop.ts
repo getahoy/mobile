@@ -15,9 +15,12 @@ export function firstTryFrame(): TryFrame {
   return { index: 0, shown: 0, delayMs: FIRST_WORD_DELAY_MS };
 }
 
-export function stillTryFrame(examples: readonly string[]): TryFrame {
-  const first = examples[0] ?? "";
-  return { index: 0, shown: tryWords(first).length, delayMs: 0 };
+export function wholeTryFrame(
+  index: number,
+  examples: readonly string[],
+): TryFrame {
+  const example = examples[index] ?? "";
+  return { index, shown: tryWords(example).length, delayMs: 0 };
 }
 
 export function nextTryFrame(

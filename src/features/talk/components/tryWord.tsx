@@ -24,9 +24,15 @@ export function TryWord({ word, phase }: TryWordProps) {
   const rise = useSharedValue(targets[phase].rise);
 
   useEffect(() => {
+    const target = targets[phase];
+    if (phase === "hidden") {
+      opacity.value = target.opacity;
+      rise.value = target.rise;
+      return;
+    }
     const timing = { duration: duration.slow, easing: easing.out };
-    opacity.value = withTiming(targets[phase].opacity, timing);
-    rise.value = withTiming(targets[phase].rise, timing);
+    opacity.value = withTiming(target.opacity, timing);
+    rise.value = withTiming(target.rise, timing);
   }, [phase, opacity, rise]);
 
   const style = useAnimatedStyle(() => ({

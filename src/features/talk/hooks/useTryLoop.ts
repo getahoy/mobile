@@ -1,41 +1,39 @@
-import { useEffect, useState } from "react";
-import { AppState } from "react-native";
+import { useCallback, useEffect, useState } from "react";
 import { useReducedMotion } from "@/lib/motion";
 import {
   firstTryFrame,
   nextTryFrame,
-  stillTryFrame,
   type TryFrame,
+  wholeTryFrame,
 } from "../tryLoop";
 
-function useAppActive(): boolean {
-  const [active, setActive] = useState(AppState.currentState === "active");
-  useEffect(() => {
-    const subscription = AppState.addEventListener("change", (appState) =>
-      setActive(appState === "active"),
-    );
-    return () => subscription.remove();
-  }, []);
-  return active;
-}
+type TryLoopOptions = {
+  examples: readonly string[];
+  running: boolean;
+  onAdvance: (index: number) => void;
+};
 
-export function useTryLoop(
-  examples: readonly string[],
-  paused: boolean,
-): TryFrame {
+export function useTryLoop({ examples, running, onAdvance }: TryLoopOptions) {
   const reduced = useReducedMotion();
-  const active = useAppActive();
   const [frame, setFrame] = useState(firstTryFrame);
-  const running = active && !paused && !reduced;
 
   useEffect(() => {
     if (!running) return;
-    const timer = setTimeout(
-      () => setFrame((current) => nextTryFrame(current, examples)),
-      frame.delayMs,
-    );
+    const timer = setTimeout(() => {
+      const next = nextTryFrame(frame, examples);
+      if (next.index !== frame.index) onAdvance(next.index);
+      setFrame(next);
+    }, frame.delayMs);
     return () => clearTimeout(timer);
-  }, [running, frame, examples]);
+  }, [running, frame, examples, onAdvance]);
 
-  return reduced ? stillTryFrame(examples) : frame;
+  const showWhole = useCallback(
+    (index: number) => setFrame(wholeTryFrame(index, examples)),
+    [examples],
+  );
+
+  const shown: TryFrame = reduced
+    ? wholeTryFrame(frame.index, examples)
+    : frame;
+  return { frame: shown, showWhole };
 }

@@ -47,7 +47,6 @@ export const talkCopy = {
   noneOfThese: "None of these",
   holdToAnswer: "Hold to answer",
   trySaying: "Try saying",
-  trySayingLabel: (example: string) => `Try saying, for example: ${example}`,
   examples: [
     "What’s the weather today?",
     "Search today’s top headlines",
