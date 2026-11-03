@@ -10,6 +10,7 @@ import { haptics } from "@/lib/haptics";
 import { AuthSection } from "../components/authSection";
 import { BuildStamp } from "../components/buildStamp";
 import { ButtonsSection } from "../components/buttonsSection";
+import { CarouselSection } from "../components/carouselSection";
 import { ChoiceTagsSection } from "../components/choiceTagsSection";
 import { type GallerySheet, GallerySheets } from "../components/gallerySheets";
 import { HomeSection } from "../components/homeSection";
@@ -65,6 +66,7 @@ export function GalleryScreen() {
         <InputsSection />
         <StatusSection />
         <ChoiceTagsSection />
+        <CarouselSection />
         <ListSection />
         <SheetsSection onOpen={openSheet} />
         <OrbSection />

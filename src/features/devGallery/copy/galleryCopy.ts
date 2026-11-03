@@ -5,6 +5,14 @@ export const galleryCopy = {
   screenTitle: "Components",
   auth: "Sign in",
   home: "Home and talk",
+  carousel: "Carousel",
+  carouselSlides: [
+    "Swipe either way",
+    "It loops around",
+    "It plays on its own",
+  ],
+  carouselStatus: (slide: number, count: number, cause: string) =>
+    `Slide ${slide} of ${count}, moved by ${cause}`,
   heardSample: "close the grok tab",
   secondMacName: "Office Mac",
   openTwoMacs: "Open More options with 2 Macs",
