@@ -1,5 +1,6 @@
 import type { KeyPair } from "@getahoy/crypto";
 import type { PairedMac } from "../storage/pairedMacs";
+import type { MarkStage } from "./connectTiming";
 import type { Transport } from "./frameStream";
 import { lanTransport } from "./lanTransport";
 import { type HandshakeOutcome, shakeHands } from "./macHandshake";
@@ -26,15 +27,17 @@ function wait(ms: number): Promise<void> {
 export async function connectToMac(
   mac: PairedMac,
   keys: KeyPair,
+  mark: MarkStage,
 ): Promise<MacLink> {
   for (const transport of transports) {
     const stream = await transport.open(mac);
     if (!stream) continue;
-    const shaken = await shakeHands(stream, keys, mac);
+    mark("socketOpen");
+    const shaken = await shakeHands({ stream, keys, mac, mark });
     if (shaken.outcome === "unreachable") continue;
     if (macStillFinishing(mac, shaken)) {
       await wait(JUST_PAIRED_RETRY_MS);
-      return connectToMac(mac, keys);
+      return connectToMac(mac, keys, mark);
     }
     if (shaken.outcome !== "connected") return shaken;
     return {

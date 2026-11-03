@@ -14,6 +14,7 @@ import {
 } from "@getahoy/protocol";
 import { phoneHello } from "../device/phoneDescription";
 import type { PairedMac } from "../storage/pairedMacs";
+import type { MarkStage } from "./connectTiming";
 import type { FrameStream } from "./frameStream";
 import { decodeJson, encodeJson } from "./jsonBytes";
 
@@ -65,11 +66,19 @@ function readReply(
   }
 }
 
-export function shakeHands(
-  stream: FrameStream,
-  keys: KeyPair,
-  mac: PairedMac,
-): Promise<HandshakeOutcome> {
+type Handshake = {
+  stream: FrameStream;
+  keys: KeyPair;
+  mac: PairedMac;
+  mark: MarkStage;
+};
+
+export function shakeHands({
+  stream,
+  keys,
+  mac,
+  mark,
+}: Handshake): Promise<HandshakeOutcome> {
   return new Promise((resolve) => {
     const handshake = startInitiator(keys, decodeBytes(mac.publicKey));
     let answered = false;
@@ -83,8 +92,14 @@ export function shakeHands(
     const timer = setTimeout(() => answer(UNREACHABLE), REPLY_TIMEOUT_MS);
     stream.onClose(() => answer(UNREACHABLE));
     stream.onFrame((message) => {
-      if (!answered) answer(readReply(handshake, stream, message));
+      if (answered) return;
+      mark("replyReceived");
+      const outcome = readReply(handshake, stream, message);
+      mark("replyRead");
+      answer(outcome);
     });
-    stream.send(handshake.firstMessage(encodeJson(phoneHello())));
+    const firstMessage = handshake.firstMessage(encodeJson(phoneHello()));
+    mark("firstMessageBuilt");
+    stream.send(firstMessage);
   });
 }

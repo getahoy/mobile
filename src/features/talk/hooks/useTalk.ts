@@ -43,7 +43,8 @@ export function useTalk(mac: PairedMac | null) {
     return new TalkFlow({
       recorder: () => latest.current.recorder,
       onMicRefused: openMicrophoneGate,
-      session,
+      canTalk: () => latest.current.macKey !== null,
+      link: { current: session, onChange: live.onChange },
       speakOn,
       onPress: (choosingFor) => {
         clearEndedNotice();

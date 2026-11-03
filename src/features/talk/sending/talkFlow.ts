@@ -17,13 +17,15 @@ import {
 import { askMac, choiceRequest, commandRequest } from "./askMac";
 import type { MacRequest } from "./sendCommand";
 import { uploadFailure } from "./uploadFailure";
+import type { SessionLink } from "./waitForSession";
 
 type TalkRecorder = Pick<FileRecorder, "start" | "stop" | "discard">;
 
 type TalkFlowOptions = {
   recorder: () => TalkRecorder;
   onMicRefused: (refusal: MicRefusal) => void;
-  session: () => MacSession | null;
+  canTalk: () => boolean;
+  link: SessionLink<MacSession>;
   speakOn: () => SpeakTarget;
   onPress: (choosingFor: string | null) => void;
   onState: (state: TalkState) => void;
@@ -54,7 +56,7 @@ export class TalkFlow {
   }
 
   readonly press = async (): Promise<void> => {
-    if (this.#phase !== "idle" || !this.#options.session()) return;
+    if (this.#phase !== "idle" || !this.#options.canTalk()) return;
     this.#phase = "starting";
     this.#releasedEarly = false;
     this.#sawRecording = false;
@@ -141,8 +143,8 @@ export class TalkFlow {
 
   async #ask(request: MacRequest, heard: string): Promise<void> {
     this.#retry = { kind: "request", request, heard };
-    const { session, onState } = this.#options;
-    const state = await askMac(session(), request, heard, onState);
+    const { link, onState } = this.#options;
+    const state = await askMac(link, request, heard, onState);
     const answered = state.kind === "answered";
     if (answered) this.#retry = null;
     const choosing = answered && state.choices.length > 0;

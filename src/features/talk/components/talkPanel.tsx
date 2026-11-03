@@ -5,9 +5,9 @@ import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
 import { easing } from "@/lib/motion";
 import { talkCopy } from "../copy/talkCopy";
 import { useTalk } from "../hooks/useTalk";
-import type { TalkTarget } from "../hooks/useTalkTarget";
 import { useThread } from "../hooks/useThread";
 import { talkBarView } from "../talkBarView";
+import type { TalkBlock } from "../talkState";
 import { talkView } from "../talkView";
 import { voiceActivity } from "../voiceActivity";
 import { ChoiceSheet } from "./choiceSheet";
@@ -21,19 +21,20 @@ const LAUNCH_RISE_MS = 900;
 const rise = FadeInDown.duration(LAUNCH_RISE_MS).easing(easing.out);
 
 type TalkPanelProps = {
-  target: TalkTarget & { mac: PairedMac };
+  mac: PairedMac;
+  block: TalkBlock | null;
   notice: ReactNode;
 };
 
-export function TalkPanel({ target, notice }: TalkPanelProps) {
+export function TalkPanel({ mac: target, block, notice }: TalkPanelProps) {
   const [pressed, setPressed] = useState(false);
-  const talk = useTalk(target.block ? null : target.mac);
+  const talk = useTalk(block ? null : target);
   const { thread } = useThread(talk.state);
-  const mac = target.mac.displayName;
+  const mac = target.displayName;
   const { heard, reply } = talkView(talk.state, thread, mac);
   const bar = talkBarView({
     state: talk.state,
-    block: target.block,
+    block,
     mac,
     durationMs: talk.durationMs,
   });

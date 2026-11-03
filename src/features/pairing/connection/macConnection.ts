@@ -5,26 +5,20 @@ import {
 } from "@getahoy/protocol";
 import { logger } from "@/features/logging/logger";
 import { markReachedOnLan } from "@/features/permissions/storage/localNetworkMemory";
-import { loadDeviceKeys } from "../storage/deviceKeys";
 import { type PairedMac, updatePairedMac } from "../storage/pairedMacs";
 import { endPairedMac } from "../sync/endedMacs";
-import { connectToMac, type MacLink } from "./connectToMac";
+import { createStageClock, type StageClock } from "./connectTiming";
+import type { MacLink } from "./connectToMac";
+import { dialMac } from "./dialMac";
+import { BACKGROUND_GRACE_MS, resumeLink, retryDelay } from "./linkTiming";
 import type { LiveMacLinks } from "./liveMacLinks";
 import {
+  goodbyeState,
   keepsRetrying,
   type MacLinkState,
   unreachableState,
 } from "./macLinkState";
 import type { MacEvent, MacSession } from "./macSession";
-
-const AUTO_RETRY_MS = 5000;
-const UNREACHABLE_LINK: MacLink = { outcome: "unreachable" };
-
-const goodbyeStates: Partial<Record<GoodbyeReason, MacLinkState>> = {
-  turned_off: { kind: "macOff" },
-  quitting: { kind: "macQuit" },
-  sleeping: { kind: "macAsleep" },
-};
 
 type MacConnectionOptions = {
   mac: PairedMac;
@@ -37,15 +31,15 @@ export class MacConnection {
   #state: MacLinkState;
   #session: MacSession | null = null;
   #attempt = 0;
+  #misses = 0;
   #lastReason: MacLinkState | null = null;
   #retryTimer: ReturnType<typeof setTimeout> | null = null;
+  #graceTimer: ReturnType<typeof setTimeout> | null = null;
   #foreground = true;
 
   constructor(options: MacConnectionOptions) {
     this.#options = options;
-    this.#state = options.mac.paused
-      ? { kind: "paused" }
-      : { kind: "connecting" };
+    this.#state = { kind: options.mac.paused ? "paused" : "connecting" };
   }
 
   state(): MacLinkState {
@@ -59,13 +53,13 @@ export class MacConnection {
 
   stop(): void {
     this.#attempt += 1;
-    if (this.#retryTimer) clearTimeout(this.#retryTimer);
+    this.#clearTimers();
     this.#dropSession()?.close();
   }
 
-  connect(): void {
+  connect(clock: StageClock = createStageClock(Date.now)): void {
     this.#setState({ kind: "connecting" });
-    void this.#establish();
+    void this.#establish(clock);
   }
 
   pause(): void {
@@ -87,20 +81,25 @@ export class MacConnection {
 
   foreground(): void {
     this.#foreground = true;
-    if (!this.#session && this.#state.kind !== "paused") this.connect();
+    this.#misses = 0;
+    this.#clearTimers();
+    if (this.#state.kind === "paused") return;
+    const clock = createStageClock(Date.now);
+    clock.mark("foreground");
+    void resumeLink(this.#session, () => this.connect(clock));
   }
 
+  // A quick app switch keeps the session, so coming back costs no reconnect.
   background(): void {
     this.#foreground = false;
-    this.stop();
+    this.#clearTimers();
+    this.#graceTimer = setTimeout(() => this.stop(), BACKGROUND_GRACE_MS);
   }
 
-  async #establish(): Promise<void> {
+  async #establish(clock: StageClock): Promise<void> {
     this.#dropSession()?.close();
     const attempt = ++this.#attempt;
-    const link = await loadDeviceKeys()
-      .then((keys) => connectToMac(this.#options.mac, keys))
-      .catch(() => UNREACHABLE_LINK);
+    const link = await dialMac(this.#options.mac, clock);
     if (attempt === this.#attempt) return this.#apply(link, attempt);
     if (link.outcome === "connected") link.session.close();
   }
@@ -108,22 +107,18 @@ export class MacConnection {
   async #apply(link: MacLink, attempt: number): Promise<void> {
     switch (link.outcome) {
       case "connected":
-        this.#adopt(link.session, attempt);
-        return;
+        return this.#adopt(link.session, attempt);
       case "ended":
-        await this.#end(link.reason);
-        return;
+        return this.#end(link.reason);
       case "unreachable":
-        await this.#settleUnreachable(attempt);
-        return;
+        return this.#settleUnreachable(attempt);
       case "unrecognised":
       case "macTooOld":
       case "macTooNew":
-        this.#setState({ kind: link.outcome });
-        return;
+        return this.#setState({ kind: link.outcome });
       default: {
         const unhandled: never = link;
-        throw new Error(`Unhandled link ${JSON.stringify(unhandled)}`);
+        return unhandled;
       }
     }
   }
@@ -131,6 +126,7 @@ export class MacConnection {
   #adopt(session: MacSession, attempt: number): void {
     this.#session = session;
     this.#lastReason = null;
+    this.#misses = 0;
     this.#options.live.register(this.#options.mac.publicKey, session);
     markReachedOnLan(this.#options.mac.publicKey);
     session.onEvent((event) => void this.#handle(event, attempt));
@@ -164,11 +160,8 @@ export class MacConnection {
 
   async #goodbye(reason: GoodbyeReason): Promise<void> {
     const ending = endReasonSchema.safeParse(reason);
-    if (ending.success) {
-      await this.#end(ending.data);
-      return;
-    }
-    const state = goodbyeStates[reason];
+    if (ending.success) return this.#end(ending.data);
+    const state = goodbyeState(reason);
     if (!state) return;
     this.#lastReason = state;
     this.#dropSession();
@@ -195,6 +188,13 @@ export class MacConnection {
     this.#options.live.reportState(this.#options.mac.publicKey, state);
     if (this.#retryTimer) clearTimeout(this.#retryTimer);
     if (!this.#foreground || !keepsRetrying(state)) return;
-    this.#retryTimer = setTimeout(() => void this.#establish(), AUTO_RETRY_MS);
+    const delay = retryDelay(state.kind, this.#misses++);
+    const retry = () => void this.#establish(createStageClock(Date.now));
+    this.#retryTimer = setTimeout(retry, delay);
+  }
+
+  #clearTimers(): void {
+    if (this.#retryTimer) clearTimeout(this.#retryTimer);
+    if (this.#graceTimer) clearTimeout(this.#graceTimer);
   }
 }

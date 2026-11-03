@@ -25,11 +25,23 @@ function parseStored(text: string | null) {
   }
 }
 
+// Every reconnect needs the keys; reading SecureStore each time slows the dial.
+let loaded: Promise<KeyPair> | null = null;
+
 export async function clearDeviceKeys(): Promise<void> {
+  loaded = null;
   await SecureStore.deleteItemAsync(DEVICE_KEYS_ENTRY);
 }
 
-export async function loadDeviceKeys(): Promise<KeyPair> {
+export function loadDeviceKeys(): Promise<KeyPair> {
+  loaded ??= readOrCreateKeys().catch((error: unknown) => {
+    loaded = null;
+    throw error;
+  });
+  return loaded;
+}
+
+async function readOrCreateKeys(): Promise<KeyPair> {
   const stored = parseStored(await SecureStore.getItemAsync(DEVICE_KEYS_ENTRY));
   if (stored) {
     return {

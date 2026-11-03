@@ -7,6 +7,8 @@ import { useSteadyLinkState } from "./useSteadyLinkState";
 
 const CONNECTING: MacLinkState = { kind: "connecting" };
 
+export type MacLinkView = ReturnType<typeof useMacLink>;
+
 export function useMacLink(mac: PairedMac) {
   const live = useLiveMacLinks();
   const connections = useMacConnections();

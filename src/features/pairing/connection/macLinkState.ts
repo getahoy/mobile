@@ -1,3 +1,4 @@
+import type { GoodbyeReason } from "@getahoy/protocol";
 import { getNetworkStateAsync, NetworkStateType } from "expo-network";
 
 export type MacLinkState =
@@ -20,6 +21,16 @@ const RETRYING_KINDS: readonly MacLinkKind[] = [
   "macQuit",
   "macAsleep",
 ];
+
+const goodbyeStates: Partial<Record<GoodbyeReason, MacLinkState>> = {
+  turned_off: { kind: "macOff" },
+  quitting: { kind: "macQuit" },
+  sleeping: { kind: "macAsleep" },
+};
+
+export function goodbyeState(reason: GoodbyeReason): MacLinkState | null {
+  return goodbyeStates[reason] ?? null;
+}
 
 export function keepsRetrying(state: MacLinkState): boolean {
   return RETRYING_KINDS.includes(state.kind);

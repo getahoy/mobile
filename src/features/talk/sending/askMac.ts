@@ -2,7 +2,13 @@ import type { SpeakTarget } from "@getahoy/protocol";
 import { randomUUID } from "expo-crypto";
 import type { MacSession } from "@/features/pairing/connection/macSession";
 import type { TalkState } from "../talkState";
-import { type MacRequest, sendCommand } from "./sendCommand";
+import {
+  type MacRequest,
+  RECEIVED_TIMEOUT_MS,
+  SLOW_COMMAND_MS,
+  sendCommand,
+} from "./sendCommand";
+import { type SessionLink, waitForSession } from "./waitForSession";
 
 export function commandRequest(text: string, speakOn: SpeakTarget): MacRequest {
   return { type: "command", commandId: randomUUID(), text, speakOn };
@@ -26,8 +32,9 @@ export function signalPress(
   }
 }
 
+// A link still reconnecting after unlock is waited for with the same limits as the Mac's receipt.
 export async function askMac(
-  session: MacSession | null,
+  link: SessionLink<MacSession>,
   request: MacRequest,
   heard: string,
   onState: (state: TalkState) => void,
@@ -35,6 +42,9 @@ export async function askMac(
   onState({ kind: "sending", heard, slow: false });
   const onSlow = () => onState({ kind: "sending", heard, slow: true });
   const sentAt = Date.now();
+  const slowLink = setTimeout(onSlow, SLOW_COMMAND_MS);
+  const session = await waitForSession(link, RECEIVED_TIMEOUT_MS);
+  clearTimeout(slowLink);
   const answer = session
     ? await sendCommand(session, request, onSlow).catch(() => null)
     : null;

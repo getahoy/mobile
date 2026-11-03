@@ -1,10 +1,10 @@
 import type { CommandChoice, CommandStatus, Frame } from "@getahoy/protocol";
 import type { MacSession } from "@/features/pairing/connection/macSession";
 
-const RECEIVED_TIMEOUT_MS = 5000;
+export const RECEIVED_TIMEOUT_MS = 5000;
 // Covers the Mac asking the interpreter (7 s) and then running an action (5 s).
 const RESULT_TIMEOUT_MS = 15_000;
-const SLOW_COMMAND_MS = 3000;
+export const SLOW_COMMAND_MS = 3000;
 
 export type CommandAnswer =
   | {

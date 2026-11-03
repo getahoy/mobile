@@ -4,7 +4,7 @@ import { ConfirmSheet } from "@/components/ui/confirmSheet";
 import { permissionCopy } from "@/features/permissions/copy/permissionCopy";
 import { useLocalNetworkCheck } from "@/features/permissions/hooks/useLocalNetworkCheck";
 import { useMacCardActions } from "../hooks/useMacCardActions";
-import { useMacLink } from "../hooks/useMacLink";
+import type { MacLinkView } from "../hooks/useMacLink";
 import { macStatus, statusLine } from "../macStatus";
 import type { PairedMac } from "../storage/pairedMacs";
 import { useSelectedMac } from "../storage/selectedMac";
@@ -16,13 +16,14 @@ import { MoreOptionsSheet } from "./moreOptionsSheet";
 type HomeMacProps = {
   mac: PairedMac;
   macs: readonly PairedMac[];
+  link: MacLinkView;
   onChanged: () => void;
 };
 
-export function HomeMac({ mac, macs, onChanged }: HomeMacProps) {
+export function HomeMac({ mac, macs, link: macLink, onChanged }: HomeMacProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { select } = useSelectedMac();
-  const { state, connection } = useMacLink(mac);
+  const { state, connection } = macLink;
   const status = macStatus(state, mac.displayName);
   const { actions, link, removal } = useMacCardActions({
     mac,

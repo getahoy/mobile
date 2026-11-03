@@ -26,6 +26,7 @@ export class MacSession {
   readonly #stream: FrameStream;
   readonly #channel: SecureChannel;
   readonly #listeners = new Set<(event: MacEvent) => void>();
+  readonly #pongWaiters = new Set<() => void>();
   readonly #heartbeat: ReturnType<typeof setInterval>;
   #pongTimer: ReturnType<typeof setTimeout> | null = null;
   #closed = false;
@@ -50,6 +51,21 @@ export class MacSession {
   send(frame: Frame): void {
     if (this.#closed) return;
     this.#stream.send(this.#channel.seal(encodeJson(frame)));
+  }
+
+  probe(timeoutMs: number): Promise<boolean> {
+    if (this.#closed) return Promise.resolve(false);
+    return new Promise((resolve) => {
+      const answer = (alive: boolean) => {
+        clearTimeout(timer);
+        this.#pongWaiters.delete(onPong);
+        resolve(alive);
+      };
+      const onPong = () => answer(true);
+      const timer = setTimeout(() => answer(false), timeoutMs);
+      this.#pongWaiters.add(onPong);
+      this.send({ type: "ping" });
+    });
   }
 
   goodbye(reason: GoodbyeReason): void {
@@ -85,6 +101,7 @@ export class MacSession {
       case "pong":
         if (this.#pongTimer) clearTimeout(this.#pongTimer);
         this.#pongTimer = null;
+        for (const waiter of this.#pongWaiters) waiter();
         return;
       case "ping":
         this.send({ type: "pong" });
