@@ -6,13 +6,15 @@ import { duration } from "@/lib/motion";
 import { talkCopy } from "../copy/talkCopy";
 import { TrySlides } from "./trySlides";
 
+const AUTO_ADVANCE_MS = 3400;
+
 type TryHintsProps = { paused: boolean };
 
 export function TryHints({ paused }: TryHintsProps) {
   return (
     <Animated.View
       entering={FadeIn.duration(duration.base)}
-      className="items-center gap-4.5 pb-6"
+      className="-mx-6 items-center gap-4.5 pb-6"
     >
       <Text
         variant="eyebrow"
@@ -23,8 +25,9 @@ export function TryHints({ paused }: TryHintsProps) {
       </Text>
       <Carousel
         loop
+        autoPlayInterval={AUTO_ADVANCE_MS}
         paused={paused}
-        accessibilityLabel={talkCopy.trySaying}
+        accessibilityLabel={talkCopy.trySayingLabel}
         className="gap-4.5"
       >
         <TrySlides />

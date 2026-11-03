@@ -47,7 +47,8 @@ export const talkCopy = {
   noneOfThese: "None of these",
   holdToAnswer: "Hold to answer",
   trySaying: "Try saying",
-  examples: [
+  trySayingLabel: "Things to try saying",
+  tryExamples: [
     "What’s the weather today?",
     "Search today’s top headlines",
     "Open a new page in Notion",

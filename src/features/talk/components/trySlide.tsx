@@ -1,20 +1,20 @@
 import { View } from "react-native";
-import { type TryFrame, tryWords, wordPhase } from "../tryLoop";
-import { TryWord } from "./tryWord";
+import { Text } from "@/components/ui/text";
 
-type TrySlideProps = { example: string; frame: TryFrame | null };
+const NO_FONT_SCALING = 1;
 
-export function TrySlide({ example, frame }: TrySlideProps) {
-  const words = tryWords(example);
+type TrySlideProps = { example: string };
+
+export function TrySlide({ example }: TrySlideProps) {
   return (
-    <View className="flex-1 flex-row flex-wrap content-center justify-center gap-x-2.75 px-1">
-      {words.map((word, wordIndex) => (
-        <TryWord
-          key={word}
-          word={word}
-          phase={frame ? wordPhase(frame, wordIndex, words.length) : "shown"}
-        />
-      ))}
+    <View className="flex-1 items-center justify-center">
+      <Text
+        maxFontSizeMultiplier={NO_FONT_SCALING}
+        textBreakStrategy="balanced"
+        className="w-68 text-center font-fraunces-light-italic text-example text-ink"
+      >
+        {example}
+      </Text>
     </View>
   );
 }
