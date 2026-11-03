@@ -41,10 +41,10 @@ export async function askMac(
 ): Promise<TalkState> {
   onState({ kind: "sending", heard, slow: false });
   const onSlow = () => onState({ kind: "sending", heard, slow: true });
-  const sentAt = Date.now();
   const slowLink = setTimeout(onSlow, SLOW_COMMAND_MS);
   const session = await waitForSession(link, RECEIVED_TIMEOUT_MS);
   clearTimeout(slowLink);
+  const sentAt = Date.now();
   const answer = session
     ? await sendCommand(session, request, onSlow).catch(() => null)
     : null;

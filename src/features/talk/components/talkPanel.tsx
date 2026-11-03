@@ -53,7 +53,7 @@ export function TalkPanel({ mac: target, block, notice }: TalkPanelProps) {
     },
   };
   const activity = voiceActivity(talk.state, talk.speech, talk.level);
-  const idle = !(heard || reply || thread || activity.orb || bar.disabled);
+  const idle = !(heard || reply || thread || activity.orb);
   const answering = activity.tone === "listen" && activity.orb !== null;
   const answer = {
     ...hold,
