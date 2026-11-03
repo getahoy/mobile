@@ -26,8 +26,11 @@ type StoredMac = z.infer<typeof storedMacSchema>;
 
 const storedMacListSchema = z.array(storedMacSchema);
 
+// A restored Android backup cannot be decrypted and the read throws; that reads as no Macs.
 export async function readStoredMacs(): Promise<StoredMac[]> {
-  const text = await SecureStore.getItemAsync(PAIRED_MACS_ENTRY);
+  const text = await SecureStore.getItemAsync(PAIRED_MACS_ENTRY).catch(
+    () => null,
+  );
   if (text === null) return [];
   try {
     const parsed = storedMacListSchema.safeParse(JSON.parse(text));

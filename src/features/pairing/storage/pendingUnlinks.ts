@@ -9,7 +9,9 @@ const pendingListSchema = z.array(pairingUnlinkRequestSchema);
 export type PendingUnlink = z.infer<typeof pairingUnlinkRequestSchema>;
 
 export async function readPendingUnlinks(): Promise<PendingUnlink[]> {
-  const text = await SecureStore.getItemAsync(PENDING_UNLINKS_ENTRY);
+  const text = await SecureStore.getItemAsync(PENDING_UNLINKS_ENTRY).catch(
+    () => null,
+  );
   if (text === null) return [];
   try {
     const parsed = pendingListSchema.safeParse(JSON.parse(text));

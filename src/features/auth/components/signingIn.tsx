@@ -18,17 +18,17 @@ export function SigningIn({ slow, onCancel }: SigningInProps) {
     >
       <View
         aria-hidden
-        className="absolute inset-x-0 top-21/50 -mt-8 h-16 items-center justify-center"
+        className="absolute inset-x-0 top-1/2 -mt-8 h-16 items-center justify-center"
       >
         <Wordmark />
       </View>
-      <View className="absolute inset-x-0 top-21/50 mt-13 items-center">
+      <View className="absolute inset-x-0 top-1/2 mt-13 items-center">
         <Orb motion="breathe" className="size-signing-orb opacity-90" />
       </View>
       <Animated.View
         key={slow ? "slow" : "main"}
         entering={FadeIn.duration(duration.base)}
-        className="absolute inset-x-6 top-21/50 mt-49"
+        className="absolute inset-x-6 top-1/2 mt-49"
       >
         <Text
           variant="bodySmall"

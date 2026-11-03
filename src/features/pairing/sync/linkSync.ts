@@ -32,6 +32,11 @@ export async function flushPendingUnlinks(): Promise<void> {
   }
 }
 
+export async function syncLinks(): Promise<void> {
+  await flushPendingUnlinks().catch(() => undefined);
+  await endRevokedMacs().catch(() => undefined);
+}
+
 export async function queueUnlink(macKey: string, reason: UnlinkReason) {
   const keys = await loadDeviceKeys();
   const devicePublicKey = encodeBytes(keys.publicKey);

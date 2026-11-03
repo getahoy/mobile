@@ -1,18 +1,12 @@
 import { useEffect } from "react";
 import { AppState } from "react-native";
-import { endRevokedMacs, flushPendingUnlinks } from "../sync/linkSync";
-
-async function syncLinks(onSynced: () => void): Promise<void> {
-  await flushPendingUnlinks().catch(() => undefined);
-  await endRevokedMacs().catch(() => undefined);
-  onSynced();
-}
+import { syncLinks } from "../sync/linkSync";
 
 export function useLinkSync(onSynced: () => void): void {
   useEffect(() => {
-    void syncLinks(onSynced);
+    void syncLinks().then(onSynced);
     const subscription = AppState.addEventListener("change", (appState) => {
-      if (appState === "active") void syncLinks(onSynced);
+      if (appState === "active") void syncLinks().then(onSynced);
     });
     return () => subscription.remove();
   }, [onSynced]);

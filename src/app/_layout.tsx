@@ -1,23 +1,9 @@
 import "@/features/pairing/crypto/randomValues";
 import "@/global.css";
 
-import { PortalHost } from "@rn-primitives/portal";
-import { Stack } from "expo-router";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "expo-router/react-navigation";
-import { StatusBar } from "expo-status-bar";
-import { SafeAreaListener } from "react-native-safe-area-context";
-import { Uniwind, useUniwind } from "uniwind";
-import { GestureRoot } from "@/components/gestureRoot";
-import { SigningIn } from "@/features/auth/components/signingIn";
-import { useSessionGate } from "@/features/auth/hooks/useSessionGate";
+import { SessionRoot } from "@/features/auth/components/sessionRoot";
+import { useInstallWipe } from "@/features/auth/hooks/useInstallWipe";
 import type * as GalleryMenu from "@/features/devGallery/hooks/useGalleryMenuItem";
-import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
-import { LaunchIntro } from "@/features/welcome/components/launchIntro";
-import { useLaunchIntro } from "@/features/welcome/hooks/useLaunchIntro";
 
 export { ErrorFallback as ErrorBoundary } from "@/features/errors/components/errorFallback";
 
@@ -27,55 +13,10 @@ const devMenu: typeof GalleryMenu | null = __DEV__
   : null;
 const useGalleryMenuItem = devMenu?.useGalleryMenuItem ?? (() => undefined);
 
+// The session must not load before a reinstall wipe settles, or the stale
+// Keychain session would open Home; the splash stays up meanwhile.
 export default function RootLayout() {
-  const { theme } = useUniwind();
-  const { gate, signedIn } = useSessionGate();
-  const intro = useLaunchIntro(gate === "ready", signedIn);
+  const installChecked = useInstallWipe();
   useGalleryMenuItem();
-
-  return (
-    <SafeAreaListener onChange={({ insets }) => Uniwind.updateInsets(insets)}>
-      <GestureRoot className="flex-1">
-        <LiveMacLinksProvider>
-          <ThemeProvider value={theme === "dark" ? DarkTheme : DefaultTheme}>
-            <StatusBar style={theme === "dark" ? "light" : "dark"} />
-            {gate === "signingIn" ? <SigningIn slow={false} /> : null}
-            {gate === "ready" ? (
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Protected guard={signedIn} redirectTo="/welcome">
-                  <Stack.Screen name="index" />
-                  <Stack.Screen
-                    name="pair"
-                    options={{ presentation: "fullScreenModal" }}
-                  />
-                  <Stack.Screen name="account" />
-                  <Stack.Screen
-                    name="microphone"
-                    options={{ presentation: "fullScreenModal" }}
-                  />
-                  <Stack.Screen
-                    name="local-network"
-                    options={{ presentation: "fullScreenModal" }}
-                  />
-                </Stack.Protected>
-                <Stack.Protected guard={!signedIn}>
-                  <Stack.Screen
-                    name="welcome"
-                    options={{ animation: "none" }}
-                  />
-                  <Stack.Screen name="sign-in" />
-                  <Stack.Screen name="sign-up" />
-                </Stack.Protected>
-                <Stack.Protected guard={__DEV__}>
-                  <Stack.Screen name="dev/components" />
-                </Stack.Protected>
-              </Stack>
-            ) : null}
-            {intro.playing ? <LaunchIntro onDone={intro.finish} /> : null}
-            <PortalHost />
-          </ThemeProvider>
-        </LiveMacLinksProvider>
-      </GestureRoot>
-    </SafeAreaListener>
-  );
+  return installChecked ? <SessionRoot /> : null;
 }

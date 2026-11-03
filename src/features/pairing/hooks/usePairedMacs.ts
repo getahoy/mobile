@@ -2,8 +2,8 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { authClient } from "@/features/auth/client/authClient";
 import { type PairedMac, readPairedMacs } from "../storage/pairedMacs";
-import { claimPairingsFor } from "../storage/pairingOwner";
 import { settleStoredEndedMacs } from "../sync/endedMacs";
+import { preparePairingsFor } from "../sync/preparePairings";
 import { usePairedMacsChanges } from "./usePairedMacsChanges";
 
 export function usePairedMacs() {
@@ -12,7 +12,8 @@ export function usePairedMacs() {
   const userId = authClient.useSession().data?.user.id ?? null;
   const reload = useCallback(() => {
     if (!userId) return;
-    void claimPairingsFor(userId)
+    void preparePairingsFor(userId)
+      .catch(() => undefined)
       .then(settleStoredEndedMacs)
       .then(readPairedMacs)
       .then(setMacs);
