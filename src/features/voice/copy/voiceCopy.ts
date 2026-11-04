@@ -32,12 +32,15 @@ export const voiceCopy = {
     off: "Text only, with soft sounds",
   },
   voiceHelp: {
-    default:
-      Platform.OS === "ios"
-        ? "The voice set on this iPhone"
-        : "The voice set on this phone",
+    default: "A natural English voice",
     india: "English with an Indian accent",
   },
+  previewLine:
+    "Hey there! Your Mac’s all set. So, what are we working on today?",
+  playSample: "Play sample",
+  pauseSample: "Pause",
+  playSampleLabel: (voice: string) => `Play a sample of the ${voice} voice`,
+  pauseSampleLabel: (voice: string) => `Pause the ${voice} sample`,
   footer:
     "Ahoy talks back when it needs you. Successes get a soft sound instead.",
   silentMode: "Speak in silent mode",

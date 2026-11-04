@@ -1,5 +1,6 @@
 import { ImpactFeedbackStyle, impactAsync } from "expo-haptics";
-import { useEffect, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, AppState } from "react-native";
 import type { TalkState } from "@/features/talk/talkState";
 import { useScreenReader } from "@/lib/useScreenReader";
@@ -39,6 +40,8 @@ export function useVoiceReplies(state: TalkState, recording: boolean) {
     });
     return () => subscription.remove();
   }, [voice]);
+
+  useFocusEffect(useCallback(() => () => voice.stop(), [voice]));
 
   useEffect(() => {
     if (state.kind !== "answered") return;

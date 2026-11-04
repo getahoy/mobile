@@ -20,7 +20,7 @@ export async function preparePlayback(playsInSilentMode: boolean) {
   });
 }
 
-async function fadeOut(player: AudioPlayer): Promise<void> {
+export async function fadeOut(player: AudioPlayer): Promise<void> {
   const start = player.volume;
   for (let step = FADE_STEPS - 1; step >= 0; step -= 1) {
     player.volume = (start * step) / FADE_STEPS;
