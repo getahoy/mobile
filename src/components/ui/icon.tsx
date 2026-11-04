@@ -22,11 +22,13 @@ const symbols = {
   chevronDown: { ios: "chevron.down", android: "expand_more" },
   mac: { ios: "laptopcomputer", android: "laptop_mac" },
   account: { ios: "person.crop.circle", android: "account_circle" },
+  play: { ios: "play.fill", android: "play_arrow" },
+  pause: { ios: "pause.fill", android: "pause" },
 } as const satisfies Record<string, { ios: SFSymbol; android: AndroidSymbol }>;
 
 export type IconName = keyof typeof symbols;
 
-const ICON_SIZE = { sm: 16, md: 20, lg: 24, xl: 32 } as const;
+const ICON_SIZE = { xs: 12, sm: 16, md: 20, lg: 24, xl: 32 } as const;
 
 const StyledSymbol = withUniwind(SymbolView);
 
