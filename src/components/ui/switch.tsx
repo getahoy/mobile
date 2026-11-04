@@ -6,6 +6,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { cn } from "@/lib/cn";
+import { haptic } from "@/lib/haptics";
 import { duration, easing } from "@/lib/motion";
 
 const THUMB_TRAVEL = 20;
@@ -17,6 +18,7 @@ export function Switch({
   className,
   checked,
   disabled,
+  onCheckedChange,
   ...props
 }: SwitchProps) {
   const offset = useSharedValue(checked ? THUMB_TRAVEL : 0);
@@ -35,6 +37,10 @@ export function Switch({
   return (
     <SwitchPrimitives.Root
       checked={checked}
+      onCheckedChange={(next) => {
+        haptic("switchToggled");
+        onCheckedChange(next);
+      }}
       {...(disabled === undefined ? {} : { disabled })}
       hitSlop={TAP_TARGET_PADDING}
       className={cn(

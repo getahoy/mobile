@@ -1,4 +1,6 @@
 import type { EndReason } from "@getahoy/protocol";
+import { haptic } from "@/lib/haptics";
+import { type EndSource, endedHaptic } from "../endedHaptic";
 import { endPairing, settleEndedMacs } from "../endedPairing";
 import { saveEndedNotice } from "../storage/endedNotice";
 import {
@@ -12,9 +14,12 @@ import {
 const LAUNCH_WINDOW_MS = 15_000;
 const launchedAt = Date.now();
 
+export type { EndSource };
+
 export async function endPairedMac(
   publicKey: string,
   reason: EndReason,
+  source: EndSource,
 ): Promise<void> {
   const at = Date.now();
   const whileClosed = at - launchedAt < LAUNCH_WINDOW_MS;
@@ -23,6 +28,8 @@ export async function endPairedMac(
   if (!ended) return;
   await writePairedMacs(ended.macs);
   saveEndedNotice(ended.notice);
+  const event = endedHaptic(source, whileClosed);
+  if (event) haptic(event);
 }
 
 export async function settleStoredEndedMacs(): Promise<void> {

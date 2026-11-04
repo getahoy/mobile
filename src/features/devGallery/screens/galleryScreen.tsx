@@ -6,7 +6,6 @@ import { ListGroup } from "@/components/ui/listGroup";
 import { ListRow } from "@/components/ui/listRow";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
-import { haptics } from "@/lib/haptics";
 import { AuthSection } from "../components/authSection";
 import { BuildStamp } from "../components/buildStamp";
 import { ButtonsSection } from "../components/buttonsSection";
@@ -27,10 +26,6 @@ import { useGalleryTheme } from "../hooks/useGalleryTheme";
 export function GalleryScreen() {
   const { dark, setDark } = useGalleryTheme();
   const [sheet, setSheet] = useState<GallerySheet | null>(null);
-  const openSheet = (next: GallerySheet) => {
-    if (next === "danger") haptics.confirmOpen();
-    setSheet(next);
-  };
   return (
     <View className="flex-1 bg-sailcloth">
       <ScrollView
@@ -68,7 +63,7 @@ export function GalleryScreen() {
         <ChoiceTagsSection />
         <CarouselSection />
         <ListSection />
-        <SheetsSection onOpen={openSheet} />
+        <SheetsSection onOpen={setSheet} />
         <OrbSection />
         <IconsSection />
         <AuthSection />

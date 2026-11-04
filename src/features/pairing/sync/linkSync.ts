@@ -54,7 +54,7 @@ export async function endRevokedMacs(): Promise<void> {
       (l) => l.peerPublicKey === mac.publicKey,
     );
     if (!link || link.active) continue;
-    await endPairedMac(mac.publicKey, link.reason ?? "removed");
+    await endPairedMac(mac.publicKey, link.reason ?? "removed", "sync");
   }
 }
 

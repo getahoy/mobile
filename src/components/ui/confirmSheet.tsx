@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import { haptics } from "@/lib/haptics";
 import { Button } from "./button";
 import { Sheet } from "./sheet";
 import { Text } from "./text";
@@ -16,13 +14,9 @@ export type ConfirmRequest = {
 type ConfirmSheetProps = { request: ConfirmRequest | null };
 
 export function ConfirmSheet({ request }: ConfirmSheetProps) {
-  const open = request !== null;
-  useEffect(() => {
-    if (open) haptics.confirmOpen();
-  }, [open]);
   return (
     <Sheet
-      open={open}
+      open={request !== null}
       onClose={() => request?.onCancel()}
       tone="danger"
       title={request?.title ?? ""}

@@ -1,6 +1,6 @@
 import type { SpeakTarget } from "@getahoy/protocol";
 import type { MacSession } from "@/features/pairing/connection/macSession";
-import { haptics } from "@/lib/haptics";
+import { haptic } from "@/lib/haptics";
 import { transcribeRecording } from "../client/transcribeApi";
 import {
   deleteRecording,
@@ -36,6 +36,7 @@ type Retry =
   | { kind: "request"; request: MacRequest; heard: string };
 
 type Phase = "idle" | "starting" | "listening" | "working";
+type FinishReason = "released" | "limitReached";
 
 const READY: TalkState = { kind: "ready" };
 const TOO_SHORT: TalkState = { kind: "tooShort" };
@@ -70,16 +71,19 @@ export class TalkFlow {
     if (started !== "recording") return this.#refuse(started);
     if (this.#releasedEarly) return this.#discard(TOO_SHORT);
     this.#phase = "listening";
-    haptics.talkStart();
+    haptic("talkStart");
     this.#options.onState({ kind: "listening" });
-    this.#maxTimer = setTimeout(() => void this.#finish(), MAX_RECORDING_MS);
+    const limitReached = () => void this.#finish("limitReached");
+    this.#maxTimer = setTimeout(limitReached, MAX_RECORDING_MS);
   };
 
   readonly release = (): void => {
     if (this.#phase === "starting") this.#releasedEarly = true;
     if (this.#phase !== "listening") return;
     const held = Date.now() - this.#pressedAt;
-    void (held < MIN_HOLD_MS ? this.#discard(TOO_SHORT) : this.#finish());
+    void (held < MIN_HOLD_MS
+      ? this.#discard(TOO_SHORT)
+      : this.#finish("released"));
   };
 
   readonly tryAgain = (): void => {
@@ -116,13 +120,13 @@ export class TalkFlow {
     else if (this.#sawRecording) void this.#discard(READY);
   }
 
-  async #finish(): Promise<void> {
+  async #finish(reason: FinishReason): Promise<void> {
     if (this.#phase !== "listening") return;
     this.#phase = "working";
     this.#clearMaxTimer();
+    haptic(reason === "released" ? "talkStop" : "recordingLimit");
     const recorder = this.#options.recorder();
     const uri = await recorder.stop().catch(() => null);
-    haptics.talkEnd();
     if (!uri) return this.#settle(READY);
     await this.#upload(uri);
   }
@@ -159,6 +163,8 @@ export class TalkFlow {
 
   async #discard(next: TalkState): Promise<void> {
     this.#clearMaxTimer();
+    if (next.kind === "tooShort") haptic("tooShort");
+    else if (this.#phase === "listening") haptic("talkCancel");
     this.#settle(next);
     await this.#stopOrphan();
   }

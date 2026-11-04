@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, View } from "react-native";
 import { ChoiceTag } from "@/components/ui/choiceTag";
 import { Text } from "@/components/ui/text";
-import { haptics } from "@/lib/haptics";
+import { haptic } from "@/lib/haptics";
 import { galleryCopy } from "../copy/galleryCopy";
 import { GallerySection } from "./gallerySection";
 
@@ -11,7 +11,7 @@ const NUMBERS = [1, 2, 3, 9] as const;
 export function ChoiceTagsSection() {
   const [selected, setSelected] = useState<number | null>(null);
   const pick = (number: number) => {
-    haptics.choicePicked();
+    haptic("choicePicked");
     setSelected((current) => (current === number ? null : number));
   };
   return (

@@ -12,6 +12,7 @@ import { type MicRefusal, useFileRecorder } from "../recorder/useFileRecorder";
 import { signalPress } from "../sending/askMac";
 import { TalkFlow } from "../sending/talkFlow";
 import type { TalkState } from "../talkState";
+import { useReplyHaptic } from "./useReplyHaptic";
 
 function openMicrophoneGate(refusal: MicRefusal): void {
   const params = refusal === "failed" ? { failed: "1" } : {};
@@ -29,6 +30,7 @@ export function useTalk(mac: PairedMac | null) {
   const recorder = useFileRecorder();
   const [state, setState] = useState<TalkState>({ kind: "ready" });
   const voice = useVoiceReplies(state, recorder.isRecording);
+  useReplyHaptic(state);
   const macKey = mac?.publicKey ?? null;
   const latest = useRef({ recorder, macKey, stopVoice: voice.stop });
   const [flow] = useState(() => {

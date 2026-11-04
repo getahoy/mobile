@@ -1,4 +1,3 @@
-import { ImpactFeedbackStyle, impactAsync } from "expo-haptics";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, AppState } from "react-native";
@@ -20,7 +19,6 @@ export type Speech = { speaking: boolean; level: number | null };
 const SILENT: Speech = { speaking: false, level: null };
 
 async function chime(signal: AbortSignal): Promise<void> {
-  void impactAsync(ImpactFeedbackStyle.Light).catch(() => undefined);
   await playSource(DONE_SOUND, signal);
 }
 

@@ -1,5 +1,6 @@
 import { type AuthRequestState, authCopy } from "@getahoy/lib";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { haptic } from "@/lib/haptics";
 import { useElapsedOver } from "@/lib/useElapsedOver";
 import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
 
@@ -19,6 +20,10 @@ export function useSigningInOverlay(authRequest: AuthRequestState) {
   const errorMessage = cancelled
     ? authCopy["error.social"]
     : authRequest.errorMessage;
+  const failed = cancelled ? null : authRequest.errorMessage;
+  useEffect(() => {
+    if (failed !== null) haptic("signInFailed");
+  }, [failed]);
 
   const track = (next: AuthSource) => {
     setSource(next);

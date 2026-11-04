@@ -6,7 +6,7 @@ import {
 import { logger } from "@/features/logging/logger";
 import { markReachedOnLan } from "@/features/permissions/storage/localNetworkMemory";
 import { type PairedMac, updatePairedMac } from "../storage/pairedMacs";
-import { endPairedMac } from "../sync/endedMacs";
+import { type EndSource, endPairedMac } from "../sync/endedMacs";
 import { createStageClock, type StageClock } from "./connectTiming";
 import type { MacLink } from "./connectToMac";
 import { dialMac } from "./dialMac";
@@ -109,7 +109,7 @@ export class MacConnection {
       case "connected":
         return this.#adopt(link.session, attempt);
       case "ended":
-        return this.#end(link.reason);
+        return this.#end(link.reason, "handshake");
       case "unreachable":
         return this.#settleUnreachable(attempt);
       case "unrecognised":
@@ -160,7 +160,7 @@ export class MacConnection {
 
   async #goodbye(reason: GoodbyeReason): Promise<void> {
     const ending = endReasonSchema.safeParse(reason);
-    if (ending.success) return this.#end(ending.data);
+    if (ending.success) return this.#end(ending.data, "liveGoodbye");
     const state = goodbyeState(reason);
     if (!state) return;
     this.#lastReason = state;
@@ -168,9 +168,9 @@ export class MacConnection {
     this.#setState(state);
   }
 
-  async #end(reason: EndReason): Promise<void> {
+  async #end(reason: EndReason, source: EndSource): Promise<void> {
     this.stop();
-    await endPairedMac(this.#options.mac.publicKey, reason);
+    await endPairedMac(this.#options.mac.publicKey, reason, source);
     this.#options.onEnded();
   }
 

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { usePermissionGate } from "@/features/permissions/hooks/usePermissionGate";
-import { haptics } from "@/lib/haptics";
 
 export function useCameraGate(resumed: boolean) {
   const [turnedOn, setTurnedOn] = useState(false);
@@ -8,9 +7,7 @@ export function useCameraGate(resumed: boolean) {
     returnTo: "resumePairing",
     resumed,
     onGranted: (via) => {
-      if (via !== "settings") return;
-      haptics.success();
-      setTurnedOn(true);
+      if (via === "settings") setTurnedOn(true);
     },
   });
   return { gate, turnedOn, hideTurnedOn: () => setTurnedOn(false) };

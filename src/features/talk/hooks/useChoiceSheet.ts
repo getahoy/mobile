@@ -1,6 +1,6 @@
 import type { CommandChoice } from "@getahoy/protocol";
 import { useEffect, useRef, useState } from "react";
-import { haptics } from "@/lib/haptics";
+import { haptic } from "@/lib/haptics";
 import { choiceSheetStep } from "../choiceSheetStep";
 import type { TalkState } from "../talkState";
 
@@ -32,7 +32,7 @@ export function useChoiceSheet(
       setPicked(null);
       leaving.current = false;
       open.current = true;
-      if (confirm) haptics.confirmOpen();
+      haptic("macAsks");
       return;
     }
     if (!open.current || step === "keep") return;
@@ -43,7 +43,7 @@ export function useChoiceSheet(
 
   const choose = (number: number) => {
     if (expired) return;
-    haptics.choicePicked();
+    haptic("choicePicked");
     setPicked(number);
     leaving.current = true;
     onChoose(number);

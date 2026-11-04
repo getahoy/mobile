@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Platform } from "react-native";
 import {
   useAnimatedReaction,
@@ -6,8 +6,9 @@ import {
   withTiming,
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
-import { haptics } from "@/lib/haptics";
+import { haptic } from "@/lib/haptics";
 import { duration, easing, useReducedMotion } from "@/lib/motion";
+import { FIRST_MARK, zoomMarkStep } from "../zoomMarks";
 import {
   type CameraZoomCurve,
   MIN_ZOOM_LEVEL,
@@ -29,6 +30,7 @@ export type ScannerZoomState = ReturnType<typeof useScannerZoom>;
 export function useScannerZoom() {
   const reducedMotion = useReducedMotion();
   const [level, setLevel] = useState(MIN_ZOOM_LEVEL);
+  const lastMark = useRef<number | null>(FIRST_MARK);
   const liveLevel = useSharedValue(MIN_ZOOM_LEVEL);
   const targetLevel = useSharedValue(MIN_ZOOM_LEVEL);
   const gestures = useZoomGestures({
@@ -37,10 +39,19 @@ export function useScannerZoom() {
     curve: ZOOM_CURVE,
   });
 
+  const showLevel = useCallback((current: number, previous: number) => {
+    setLevel(current);
+    const mark = zoomMarkStep(lastMark.current, previous, current);
+    lastMark.current = mark.lastMark;
+    if (mark.crossed) haptic("zoomStep");
+  }, []);
+
   useAnimatedReaction(
     () => liveLevel.value,
     (current, previous) => {
-      if (current !== previous) scheduleOnRN(setLevel, current);
+      if (previous !== null && current !== previous) {
+        scheduleOnRN(showLevel, current, previous);
+      }
     },
   );
 
@@ -53,12 +64,7 @@ export function useScannerZoom() {
       reducedMotion || motion === "jump"
         ? target
         : withTiming(target, { duration: duration.base, easing: easing.out });
-    if (zoomLimitReached(target, direction)) {
-      haptics.zoomLimit();
-      return false;
-    }
-    haptics.zoomStep();
-    return true;
+    return !zoomLimitReached(target, direction);
   };
 
   return {
