@@ -2,6 +2,7 @@ import { ImpactFeedbackStyle, impactAsync } from "expo-haptics";
 import { useEffect, useRef, useState } from "react";
 import { AccessibilityInfo, AppState } from "react-native";
 import type { TalkState } from "@/features/talk/talkState";
+import { useScreenReader } from "@/lib/useScreenReader";
 import { refreshVoiceIds } from "../client/voicesApi";
 import { playSource, preparePlayback } from "../engine/audioPlayback";
 import { createFallbackVoice } from "../engine/fallbackVoice";
@@ -16,19 +17,6 @@ type Answered = Extract<TalkState, { kind: "answered" }>;
 export type Speech = { speaking: boolean; level: number | null };
 
 const SILENT: Speech = { speaking: false, level: null };
-
-function useScreenReader(): boolean {
-  const [enabled, setEnabled] = useState(false);
-  useEffect(() => {
-    void AccessibilityInfo.isScreenReaderEnabled().then(setEnabled);
-    const subscription = AccessibilityInfo.addEventListener(
-      "screenReaderChanged",
-      setEnabled,
-    );
-    return () => subscription.remove();
-  }, []);
-  return enabled;
-}
 
 async function chime(signal: AbortSignal): Promise<void> {
   void impactAsync(ImpactFeedbackStyle.Light).catch(() => undefined);
