@@ -9,6 +9,7 @@ import { touchCache } from "./cacheOrder";
 const ORDER_KEY = "voice.cacheOrder";
 const AUDIO_EXTENSION = ".mp3";
 const UNKNOWN_VOICE_ID = "unknown";
+const SPEECH_PACE = "speed0.9-pause0.3";
 
 const orderSchema = z.array(z.string());
 
@@ -42,10 +43,11 @@ function remember(key: string): void {
   voiceStorage.set(ORDER_KEY, JSON.stringify(order));
 }
 
-// The server voice id is part of the key, so changing a voice on the server never replays old audio.
+// The server voice id and pace are part of the key, so changing either on the server never
+// replays old audio. The server does not report its pace: change SPEECH_PACE with speechVoices.ts.
 export function speechKey(text: string, voice: SpeakVoice): Promise<string> {
   const voiceId = readVoiceId(voice) ?? UNKNOWN_VOICE_ID;
-  const material = `${voice}\n${voiceId}\n${text}`;
+  const material = `${voice}\n${voiceId}\n${SPEECH_PACE}\n${text}`;
   return digestStringAsync(CryptoDigestAlgorithm.SHA256, material);
 }
 
