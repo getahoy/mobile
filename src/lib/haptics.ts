@@ -9,11 +9,11 @@ import {
 } from "expo-haptics";
 import { AppState, Platform } from "react-native";
 import {
-  createStackGate,
   HAPTIC_EVENTS,
   type HapticEvent,
   type HapticFeel,
 } from "./hapticEvents";
+import { IDLE_QUEUE, offerHaptic, playDue } from "./hapticQueue";
 
 const IOS_FEEL: Record<HapticFeel, () => Promise<void>> = {
   selection: () => selectionAsync(),
@@ -42,10 +42,32 @@ function play(feel: HapticFeel): Promise<void> {
   return IOS_FEEL[feel]();
 }
 
-const stackGate = createStackGate();
+let queue = IDLE_QUEUE;
+let timer: ReturnType<typeof setTimeout> | null = null;
+
+function schedule(): void {
+  if (timer || !queue.pending) return;
+  const delay = Math.max(0, queue.playAt - performance.now());
+  timer = setTimeout(flush, delay);
+}
+
+function flush(): void {
+  timer = null;
+  const due = playDue(queue, performance.now());
+  queue = due.queue;
+  if (due.play) void play(HAPTIC_EVENTS[due.play]).catch(() => undefined);
+  schedule();
+}
+
+AppState.addEventListener("change", (appState) => {
+  if (appState === "active") return;
+  if (timer) clearTimeout(timer);
+  timer = null;
+  queue = { ...queue, pending: null };
+});
 
 export function haptic(event: HapticEvent): void {
   if (AppState.currentState !== "active") return;
-  if (!stackGate(performance.now())) return;
-  void play(HAPTIC_EVENTS[event]).catch(() => undefined);
+  queue = offerHaptic(queue, event, performance.now());
+  schedule();
 }
