@@ -1,17 +1,15 @@
 import { pairingUnlinkRequestSchema } from "@getahoy/protocol";
-import * as SecureStore from "expo-secure-store";
 import { z } from "zod";
-
-const PENDING_UNLINKS_ENTRY = "ahoy.pending.unlinks";
+import { pairingEntry, pairingKeychain } from "./pairingKeychain";
 
 const pendingListSchema = z.array(pairingUnlinkRequestSchema);
 
 export type PendingUnlink = z.infer<typeof pairingUnlinkRequestSchema>;
 
 export async function readPendingUnlinks(): Promise<PendingUnlink[]> {
-  const text = await SecureStore.getItemAsync(PENDING_UNLINKS_ENTRY).catch(
-    () => null,
-  );
+  const text = await pairingKeychain
+    .read(pairingEntry.pendingUnlinks)
+    .catch(() => null);
   if (text === null) return [];
   try {
     const parsed = pendingListSchema.safeParse(JSON.parse(text));
@@ -22,7 +20,10 @@ export async function readPendingUnlinks(): Promise<PendingUnlink[]> {
 }
 
 async function writePendingUnlinks(list: PendingUnlink[]): Promise<void> {
-  await SecureStore.setItemAsync(PENDING_UNLINKS_ENTRY, JSON.stringify(list));
+  await pairingKeychain.write(
+    pairingEntry.pendingUnlinks,
+    JSON.stringify(list),
+  );
 }
 
 export async function queuePendingUnlink(unlink: PendingUnlink): Promise<void> {
@@ -42,5 +43,5 @@ export async function settlePendingUnlink(
 }
 
 export async function clearPendingUnlinks(): Promise<void> {
-  await SecureStore.deleteItemAsync(PENDING_UNLINKS_ENTRY);
+  await pairingKeychain.remove(pairingEntry.pendingUnlinks);
 }

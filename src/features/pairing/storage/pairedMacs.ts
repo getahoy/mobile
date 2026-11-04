@@ -1,8 +1,6 @@
 import { bytes32Schema, endReasonSchema } from "@getahoy/protocol";
-import * as SecureStore from "expo-secure-store";
 import { z } from "zod";
-
-const PAIRED_MACS_ENTRY = "ahoy.paired.macs";
+import { pairingEntry, pairingKeychain } from "./pairingKeychain";
 
 const pairedMacSchema = z.object({
   publicKey: bytes32Schema,
@@ -28,9 +26,9 @@ const storedMacListSchema = z.array(storedMacSchema);
 
 // A restored Android backup cannot be decrypted and the read throws; that reads as no Macs.
 export async function readStoredMacs(): Promise<StoredMac[]> {
-  const text = await SecureStore.getItemAsync(PAIRED_MACS_ENTRY).catch(
-    () => null,
-  );
+  const text = await pairingKeychain
+    .read(pairingEntry.pairedMacs)
+    .catch(() => null);
   if (text === null) return [];
   try {
     const parsed = storedMacListSchema.safeParse(JSON.parse(text));
@@ -45,7 +43,7 @@ export async function readPairedMacs(): Promise<PairedMac[]> {
 }
 
 export async function writePairedMacs(list: PairedMac[]): Promise<void> {
-  await SecureStore.setItemAsync(PAIRED_MACS_ENTRY, JSON.stringify(list));
+  await pairingKeychain.write(pairingEntry.pairedMacs, JSON.stringify(list));
 }
 
 async function macsWithout(publicKey: string): Promise<PairedMac[]> {
@@ -73,5 +71,5 @@ export async function removePairedMac(publicKey: string): Promise<void> {
 }
 
 export async function clearPairedMacs(): Promise<void> {
-  await SecureStore.deleteItemAsync(PAIRED_MACS_ENTRY);
+  await pairingKeychain.remove(pairingEntry.pairedMacs);
 }
