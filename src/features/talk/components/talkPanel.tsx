@@ -1,10 +1,11 @@
-import { type ReactNode, useState } from "react";
+import type { ReactNode } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
 import { easing } from "@/lib/motion";
 import { talkCopy } from "../copy/talkCopy";
 import { useTalk } from "../hooks/useTalk";
+import { useTalkHold } from "../hooks/useTalkHold";
 import { useThread } from "../hooks/useThread";
 import { talkBarView } from "../talkBarView";
 import type { TalkBlock } from "../talkState";
@@ -27,8 +28,8 @@ type TalkPanelProps = {
 };
 
 export function TalkPanel({ mac: target, block, notice }: TalkPanelProps) {
-  const [pressed, setPressed] = useState(false);
   const talk = useTalk(block ? null : target);
+  const { pressed, hold } = useTalkHold(talk.flow);
   const { thread } = useThread(talk.state);
   const mac = target.displayName;
   const { heard, reply } = talkView(talk.state, thread, mac);
@@ -38,20 +39,6 @@ export function TalkPanel({ mac: target, block, notice }: TalkPanelProps) {
     mac,
     durationMs: talk.durationMs,
   });
-  const hold = {
-    onStart: () => {
-      setPressed(true);
-      void talk.flow.press();
-    },
-    onStop: () => {
-      setPressed(false);
-      talk.flow.release();
-    },
-    onInterrupted: () => {
-      setPressed(false);
-      talk.flow.interrupt();
-    },
-  };
   const activity = voiceActivity(talk.state, talk.speech, talk.level);
   const idle = !(heard || reply || thread || activity.orb);
   const answering = activity.tone === "listen" && activity.orb !== null;
