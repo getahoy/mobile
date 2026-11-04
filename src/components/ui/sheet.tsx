@@ -3,6 +3,7 @@ import { Portal } from "@rn-primitives/portal";
 import { type ReactNode, useEffect, useId, useRef } from "react";
 import { View } from "react-native";
 import { cn } from "@/lib/cn";
+import { useBackToClose } from "@/lib/useBackToClose";
 import { DrainBar } from "./drainBar";
 import { SheetBackdrop } from "./sheetBackdrop";
 import { SheetBackground } from "./sheetBackground";
@@ -35,6 +36,7 @@ export function Sheet({
   const portalName = useId();
   const sheet = useRef<BottomSheet>(null);
   const openNow = useRef(open);
+  useBackToClose(open, () => sheet.current?.close());
 
   useEffect(() => {
     openNow.current = open;
