@@ -26,7 +26,7 @@ export const macCopy = {
   cellular: (mac: string) =>
     `You are on mobile data. Join the same Wi-Fi as ${mac}.`,
   notFound: (mac: string) =>
-    `Cannot reach ${mac}. Check it is awake, Ahoy is running, and you are on the same Wi-Fi.`,
+    `Cannot reach ${mac}. Check it is awake, Ahoy is running and turned on, and you are on the same Wi-Fi.`,
   macTooOld: "Update the Ahoy app on your Mac to connect.",
   macTooNew: "Update this app to connect to your Mac.",
   unrecognised: (mac: string) =>
