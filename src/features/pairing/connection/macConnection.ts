@@ -12,12 +12,8 @@ import type { MacLink } from "./connectToMac";
 import { dialMac } from "./dialMac";
 import { BACKGROUND_GRACE_MS, resumeLink, retryDelay } from "./linkTiming";
 import type { LiveMacLinks } from "./liveMacLinks";
-import {
-  goodbyeState,
-  keepsRetrying,
-  type MacLinkState,
-  unreachableState,
-} from "./macLinkState";
+import { MacLinkMemory } from "./macLinkMemory";
+import { isLinking, keepsRetrying, type MacLinkState } from "./macLinkState";
 import type { MacEvent, MacSession } from "./macSession";
 
 type MacConnectionOptions = {
@@ -32,14 +28,16 @@ export class MacConnection {
   #session: MacSession | null = null;
   #attempt = 0;
   #misses = 0;
-  #lastReason: MacLinkState | null = null;
+  readonly #memory: MacLinkMemory;
   #retryTimer: ReturnType<typeof setTimeout> | null = null;
   #graceTimer: ReturnType<typeof setTimeout> | null = null;
   #foreground = true;
 
   constructor(options: MacConnectionOptions) {
     this.#options = options;
-    this.#state = { kind: options.mac.paused ? "paused" : "connecting" };
+    this.#memory = new MacLinkMemory(options.mac.publicKey);
+    const paused = options.mac.paused;
+    this.#state = paused ? { kind: "paused" } : this.#memory.dialState();
   }
 
   state(): MacLinkState {
@@ -58,7 +56,7 @@ export class MacConnection {
   }
 
   connect(clock: StageClock = createStageClock(Date.now)): void {
-    this.#setState({ kind: "connecting" });
+    this.#setState(this.#memory.dialState());
     void this.#establish(clock);
   }
 
@@ -125,26 +123,27 @@ export class MacConnection {
 
   #adopt(session: MacSession, attempt: number): void {
     this.#session = session;
-    this.#lastReason = null;
     this.#misses = 0;
-    this.#options.live.register(this.#options.mac.publicKey, session);
     markReachedOnLan(this.#options.mac.publicKey);
     session.onEvent((event) => void this.#handle(event, attempt));
-    this.#setState({ kind: "connected", locked: false });
   }
 
   async #handle(event: MacEvent, attempt: number): Promise<void> {
     if (attempt !== this.#attempt) return;
     switch (event.kind) {
-      case "status":
+      case "status": {
+        const { live, mac } = this.#options;
+        if (this.#session) live.register(mac.publicKey, this.#session);
+        this.#memory.clear();
         return this.#setState({ kind: "connected", locked: event.locked });
+      }
       case "goodbye":
         return this.#goodbye(event.reason);
       case "commandReply":
         return;
       case "closed":
         this.#dropSession();
-        if (this.#state.kind !== "connected") return;
+        if (!isLinking(this.#state)) return;
         return this.#settleUnreachable(attempt);
       default: {
         const unhandled: never = event;
@@ -154,21 +153,21 @@ export class MacConnection {
   }
 
   async #settleUnreachable(attempt: number): Promise<void> {
-    const state = this.#lastReason ?? (await unreachableState());
+    const state = await this.#memory.missState();
     if (attempt === this.#attempt) this.#setState(state);
   }
 
   async #goodbye(reason: GoodbyeReason): Promise<void> {
     const ending = endReasonSchema.safeParse(reason);
     if (ending.success) return this.#end(ending.data, "liveGoodbye");
-    const state = goodbyeState(reason);
+    const state = this.#memory.goodbye(reason);
     if (!state) return;
-    this.#lastReason = state;
     this.#dropSession();
     this.#setState(state);
   }
 
   async #end(reason: EndReason, source: EndSource): Promise<void> {
+    this.#memory.clear();
     this.stop();
     await endPairedMac(this.#options.mac.publicKey, reason, source);
     this.#options.onEnded();
