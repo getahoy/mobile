@@ -29,10 +29,7 @@ export function timelinePhase(
 
 export const REDUCED_FADE_MS = duration.fast;
 
-export const spinnerTiming = {
-  showAfterMs: 300,
-  minimumVisibleMs: 500,
-} as const;
+export { spinnerTiming } from "./waitingTiming";
 
 export function useReducedMotion(): boolean {
   return useReanimatedReducedMotion();

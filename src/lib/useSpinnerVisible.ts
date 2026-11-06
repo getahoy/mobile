@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { spinnerTiming } from "./motion";
+import { hideAfterMs, spinnerTiming } from "./waitingTiming";
 
 export function useSpinnerVisible(busy: boolean): boolean {
   const [visible, setVisible] = useState(false);
@@ -15,8 +15,7 @@ export function useSpinnerVisible(busy: boolean): boolean {
       return () => clearTimeout(timer);
     }
     if (!busy && visible) {
-      const shownFor = Date.now() - shownAt.current;
-      const left = Math.max(0, spinnerTiming.minimumVisibleMs - shownFor);
+      const left = hideAfterMs(Date.now() - shownAt.current);
       const timer = setTimeout(() => setVisible(false), left);
       return () => clearTimeout(timer);
     }
