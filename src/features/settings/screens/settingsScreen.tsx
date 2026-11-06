@@ -4,6 +4,7 @@ import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
 import { AccountGroup } from "@/features/auth/components/accountGroup";
 import { SignOutRow } from "@/features/auth/components/signOutRow";
+import { HistorySettingsGroup } from "@/features/history/components/historySettingsGroup";
 import { VoiceSettingsSection } from "@/features/voice/components/voiceSettingsSection";
 import { MacsGroup } from "../components/macsGroup";
 import { settingsCopy } from "../copy/settingsCopy";
@@ -29,6 +30,7 @@ export function SettingsScreen({ name, email }: SettingsScreenProps) {
       <ScrollView contentContainerClassName="gap-6 px-5 pt-2 pb-safe-offset-6">
         <MacsGroup />
         <VoiceSettingsSection />
+        <HistorySettingsGroup />
         <AccountGroup name={name} email={email} />
         <SignOutRow />
       </ScrollView>

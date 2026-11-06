@@ -38,6 +38,7 @@ export function SessionRoot() {
                     options={{ presentation: "fullScreenModal" }}
                   />
                   <Stack.Screen name="account" />
+                  <Stack.Screen name="history" />
                   <Stack.Screen
                     name="microphone"
                     options={{ presentation: "fullScreenModal" }}
