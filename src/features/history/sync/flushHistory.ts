@@ -56,7 +56,9 @@ async function sendOneByOne(phoneKey: string, entries: HistoryWriteEntry[]) {
   return true;
 }
 
+// Loading the keys creates them on a fresh install, so nothing is loaded until there is work.
 async function drain(): Promise<void> {
+  if (pendingBatch(readOutbox()).length === 0) return;
   const keys = await loadDeviceKeys();
   const phoneKey = encodeBytes(keys.publicKey);
   for (;;) {
