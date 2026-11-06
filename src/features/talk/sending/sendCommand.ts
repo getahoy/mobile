@@ -1,5 +1,6 @@
 import type { CommandChoice, CommandStatus, Frame } from "@getahoy/protocol";
 import type { MacSession } from "@/features/pairing/connection/macSession";
+import type { ResultDetails } from "../talkState";
 
 export const RECEIVED_TIMEOUT_MS = 5000;
 // Covers the Mac asking the interpreter (7 s) and then running an action (5 s).
@@ -15,6 +16,7 @@ export type CommandAnswer =
       speech: string | null;
       choices: readonly CommandChoice[];
       confirm: boolean;
+      details: ResultDetails;
     }
   | { kind: "unreachable" }
   | { kind: "noAnswer" };
@@ -46,8 +48,10 @@ export function sendCommand(
       if (reply.type === "command.result") {
         const { threadId, status, message, choices, confirm } = reply;
         const speech = reply.speech ?? null;
+        const { app, via, onMacMs, reason } = reply;
+        const details = { app, via, onMacMs, reason };
         const result = { threadId, status, message, speech, choices, confirm };
-        settle({ kind: "result", ...result });
+        settle({ kind: "result", ...result, details });
         return;
       }
       if (received) return;

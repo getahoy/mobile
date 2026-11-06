@@ -39,8 +39,10 @@ export async function askMac(
   heard: string,
   onState: (state: TalkState) => void,
 ): Promise<TalkState> {
-  onState({ kind: "sending", heard, slow: false });
-  const onSlow = () => onState({ kind: "sending", heard, slow: true });
+  const { commandId } = request;
+  onState({ kind: "sending", heard, slow: false, commandId });
+  const onSlow = () =>
+    onState({ kind: "sending", heard, slow: true, commandId });
   const slowLink = setTimeout(onSlow, SLOW_COMMAND_MS);
   const session = await waitForSession(link, RECEIVED_TIMEOUT_MS);
   clearTimeout(slowLink);
@@ -50,7 +52,6 @@ export async function askMac(
     : null;
   if (answer?.kind === "result") {
     const { kind: _, ...result } = answer;
-    const { commandId } = request;
     const receivedAt = Date.now();
     return {
       kind: "answered",
@@ -62,5 +63,5 @@ export async function askMac(
     };
   }
   const failure = answer?.kind === "noAnswer" ? "noAnswer" : "macUnreachable";
-  return { kind: "failed", failure, heard };
+  return { kind: "failed", failure, heard, commandId };
 }

@@ -2,7 +2,16 @@ import {
   CHOICE_TTL_MS,
   type CommandChoice,
   type CommandStatus,
+  type FailureReason,
+  type UnderstoodBy,
 } from "@getahoy/protocol";
+
+export type ResultDetails = {
+  app?: string | undefined;
+  via?: UnderstoodBy | undefined;
+  onMacMs?: number | undefined;
+  reason?: FailureReason | undefined;
+};
 
 export type TalkFailure =
   | "offline"
@@ -18,7 +27,7 @@ export type TalkState =
   | { kind: "tooShort" }
   | { kind: "listening" }
   | { kind: "understanding" }
-  | { kind: "sending"; heard: string; slow: boolean }
+  | { kind: "sending"; heard: string; slow: boolean; commandId?: string }
   | {
       kind: "answered";
       commandId: string;
@@ -31,8 +40,14 @@ export type TalkState =
       confirm: boolean;
       sentAt: number;
       receivedAt: number;
+      details?: ResultDetails;
     }
-  | { kind: "failed"; failure: TalkFailure; heard: string | null };
+  | {
+      kind: "failed";
+      failure: TalkFailure;
+      heard: string | null;
+      commandId?: string;
+    };
 
 export type TalkBlock = "noMac" | "locked" | "paused";
 
