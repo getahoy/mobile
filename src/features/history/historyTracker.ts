@@ -9,13 +9,18 @@ import {
   startRecord,
 } from "./historyRecords.ts";
 
-type Sent = { commandId: string; heard: string; startedAt: number };
+type Sent = {
+  commandId: string;
+  heard: string;
+  startedAt: number;
+  hearingMs: number | null;
+  understandingMs: number | null;
+};
 
 export type TalkTracking = {
   startedAt: number | null;
   understandingAt: number | null;
   hearingMs: number | null;
-  understandingMs: number | null;
   sent: Sent | null;
   open: { id: string; askedAt: number } | null;
   lastAnswered: string | null;
@@ -25,7 +30,6 @@ export const freshTracking: TalkTracking = {
   startedAt: null,
   understandingAt: null,
   hearingMs: null,
-  understandingMs: null,
   sent: null,
   open: null,
   lastAnswered: null,
@@ -61,8 +65,9 @@ function onSending(step: TalkStep, commandId: string, heard: string) {
   const { hearingMs } = tracking;
   const understandingMs = since(tracking.understandingAt, now);
   const startedAt = tracking.startedAt ?? now;
-  const sent = { commandId, heard, startedAt };
-  const next = { ...tracking, sent, understandingMs, understandingAt: null };
+  const sent = { commandId, heard, startedAt, hearingMs, understandingMs };
+  const spent = { startedAt: null, understandingAt: null, hearingMs: null };
+  const next = { ...tracking, ...spent, sent };
   if (tracking.open) return only(next);
   const start = { mac, heard, startedAt, hearingMs, understandingMs };
   return { tracking: next, writes: [startRecord({ id: commandId, ...start })] };
@@ -71,9 +76,11 @@ function onSending(step: TalkStep, commandId: string, heard: string) {
 function baseFor({ tracking, outbox, mac }: TalkStep, state: Answered) {
   const stored = entryOf(outbox, state.threadId);
   if (stored || state.threadId !== state.commandId) return stored;
-  const { sent, hearingMs, understandingMs } = tracking;
+  const { sent } = tracking;
   const own = sent?.commandId === state.commandId ? sent : null;
   const startedAt = own?.startedAt ?? state.sentAt;
+  const hearingMs = own?.hearingMs ?? null;
+  const understandingMs = own?.understandingMs ?? null;
   const { commandId: id, heard } = state;
   return startRecord({ id, mac, heard, startedAt, hearingMs, understandingMs });
 }

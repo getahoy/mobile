@@ -1,12 +1,6 @@
-import type { SpeakTarget } from "@getahoy/protocol";
-import type { MacSession } from "@/features/pairing/connection/macSession";
 import { haptic } from "@/lib/haptics";
 import { transcribeRecording } from "../client/transcribeApi";
-import {
-  deleteRecording,
-  type FileRecorder,
-  type MicRefusal,
-} from "../recorder/useFileRecorder";
+import { deleteRecording, type MicRefusal } from "../recorder/useFileRecorder";
 import {
   MAX_RECORDING_MS,
   MIN_HOLD_MS,
@@ -16,27 +10,13 @@ import {
 } from "../talkState";
 import { askMac, choiceRequest, commandRequest } from "./askMac";
 import type { MacRequest } from "./sendCommand";
+import type {
+  FinishReason,
+  Phase,
+  Retry,
+  TalkFlowOptions,
+} from "./talkFlowTypes";
 import { uploadFailure } from "./uploadFailure";
-import type { SessionLink } from "./waitForSession";
-
-type TalkRecorder = Pick<FileRecorder, "start" | "stop" | "discard">;
-
-type TalkFlowOptions = {
-  recorder: () => TalkRecorder;
-  onMicRefused: (refusal: MicRefusal) => void;
-  canTalk: () => boolean;
-  link: SessionLink<MacSession>;
-  speakOn: () => SpeakTarget;
-  onPress: (choosingFor: string | null) => void;
-  onState: (state: TalkState) => void;
-};
-
-type Retry =
-  | { kind: "upload"; uri: string }
-  | { kind: "request"; request: MacRequest; heard: string };
-
-type Phase = "idle" | "starting" | "listening" | "working";
-type FinishReason = "released" | "limitReached";
 
 const READY: TalkState = { kind: "ready" };
 const TOO_SHORT: TalkState = { kind: "tooShort" };
@@ -92,6 +72,13 @@ export class TalkFlow {
     this.#phase = "working";
     if (again.kind === "upload") void this.#upload(again.uri);
     else void this.#ask(again.request, again.heard);
+  };
+
+  readonly runText = (text: string): void => {
+    if (this.#phase !== "idle" || !this.#options.canTalk()) return;
+    this.#phase = "working";
+    this.#forgetRetry();
+    void this.#ask(commandRequest(text, this.#options.speakOn()), text);
   };
 
   readonly choose = (number: number): void => {
