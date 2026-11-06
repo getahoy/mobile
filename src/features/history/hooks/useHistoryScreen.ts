@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { usePairedMacs } from "@/features/pairing/hooks/usePairedMacs";
 import { historyCopy } from "../copy/historyCopy";
-import { blankFor } from "../historyBlankState";
+import { blankFor, waitsForFirstLoad } from "../historyBlankState";
 import { listNotice, summaryLine } from "../historyView";
 import { useHistory } from "./historyContext";
+import { useFirstLoad } from "./useFirstLoad";
 
 export type OpenSheet = "picker" | "clear" | null;
 
@@ -15,14 +16,13 @@ export function useHistoryScreen() {
   const picking = macs.length > 1;
   const chosen = macs.find((mac) => mac.publicKey === macKey);
   const plain = filter === "all" && !search.trim();
-  const blank = blankFor({
-    phase: list.phase,
-    cleared: history.cleared,
-    count: entries.length,
-    filter,
-    search,
-  });
+  const count = entries.length;
+  const { phase } = list;
+  const { cleared } = history;
+  const blank = blankFor({ phase, cleared, count, filter, search });
+  const firstLoad = useFirstLoad(waitsForFirstLoad({ phase, count }));
   return {
+    firstLoad,
     history,
     macs,
     sheet,

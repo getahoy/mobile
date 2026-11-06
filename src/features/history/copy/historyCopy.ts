@@ -33,6 +33,9 @@ export const historyCopy = {
   emptyTitle: "Nothing here yet.",
   emptyBody:
     "Everything you say to Ahoy, and what it did on your Mac, will be kept here.",
+  loading: "Loading your history…",
+  loadingSlow: "Still loading your history…",
+  loadingSlowHint: "This can take a moment on a slow connection.",
   errorTitle: "Couldn’t load your history.",
   errorBody: "Your entries are safe. Check your connection and try again.",
   tryAgain: "Try again",

@@ -1,11 +1,13 @@
-import { ActivityIndicator, View } from "react-native";
-import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
+import { WaitingState } from "@/components/ui/waitingState";
+import { historyCopy } from "../copy/historyCopy";
 
-export function HistoryLoading() {
-  const visible = useSpinnerVisible(true);
+export function HistoryLoading({ busy }: { busy: boolean }) {
   return (
-    <View className="items-center pt-16">
-      {visible ? <ActivityIndicator colorClassName="accent-driftwood" /> : null}
-    </View>
+    <WaitingState
+      busy={busy}
+      message={historyCopy.loading}
+      slowMessage={historyCopy.loadingSlow}
+      slowHint={historyCopy.loadingSlowHint}
+    />
   );
 }

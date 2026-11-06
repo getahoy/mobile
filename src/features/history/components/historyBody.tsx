@@ -1,55 +1,19 @@
-import type { HistoryEntry } from "@getahoy/protocol";
-import { router } from "expo-router";
-import { entryMeta, sectionsByDay, timeLabel } from "../historyView";
+import Animated, { FadeIn } from "react-native-reanimated";
+import { duration } from "@/lib/motion";
 import type { HistoryScreenState } from "../hooks/useHistoryScreen";
-import { HistoryList } from "./historyList";
-import { HistoryListBlank } from "./historyListBlank";
-import { HistoryListFooter } from "./historyListFooter";
-import { HistoryListTop } from "./historyListTop";
-import { HistoryRow } from "./historyRow";
+import { HistoryFeed } from "./historyFeed";
+import { HistoryLoading } from "./historyLoading";
 
-const openEntry = (id: string) =>
-  router.push({ pathname: "/history/[id]", params: { id } });
+const listFade = FadeIn.duration(duration.base);
 
+// The header stays; until something can be shown, the waiting state takes the list's place.
 export function HistoryBody({ screen }: { screen: HistoryScreenState }) {
-  const { history, blank, showMac } = screen;
-  const { list, search, filter, unsynced } = history;
-  const row = (entry: HistoryEntry) => (
-    <HistoryRow
-      entry={entry}
-      time={timeLabel(new Date(entry.startedAt))}
-      meta={entryMeta({ entry, unsynced, showMac })}
-      onOpen={openEntry}
-    />
-  );
-  const retry = () => void list.reload();
+  const { firstLoad } = screen;
+  if (firstLoad.showLoader) return <HistoryLoading busy={firstLoad.busy} />;
+  const fade = firstLoad.fadeIn ? { entering: listFade } : {};
   return (
-    <HistoryList
-      sections={sectionsByDay(history.entries, new Date())}
-      top={
-        <HistoryListTop
-          notice={screen.notice}
-          summary={screen.summary}
-          search={search}
-          filter={filter}
-          onSearch={history.setSearch}
-          onFilter={history.setFilter}
-        />
-      }
-      blank={
-        blank ? (
-          <HistoryListBlank kind={blank} search={search} onRetry={retry} />
-        ) : null
-      }
-      footer={
-        <HistoryListFooter
-          loadingMore={list.loadingMore}
-          canClear={screen.canClear}
-          onClear={() => screen.setSheet("clear")}
-        />
-      }
-      renderEntry={row}
-      onEndReached={() => void list.loadMore()}
-    />
+    <Animated.View {...fade} className="flex-1">
+      <HistoryFeed screen={screen} />
+    </Animated.View>
   );
 }

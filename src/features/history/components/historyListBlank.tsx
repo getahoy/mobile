@@ -1,7 +1,6 @@
 import { historyCopy } from "../copy/historyCopy";
 import type { BlankKind } from "../historyBlankState";
 import { HistoryBlank } from "./historyBlank";
-import { HistoryLoading } from "./historyLoading";
 
 type HistoryListBlankProps = {
   kind: BlankKind;
@@ -38,7 +37,7 @@ export function HistoryListBlank({
   search,
   onRetry,
 }: HistoryListBlankProps) {
-  if (kind === "loading") return <HistoryLoading />;
+  if (kind === "loading") return null;
   const blank = copyFor(kind, search);
   const retry = { label: historyCopy.tryAgain, onPress: onRetry };
   return (
