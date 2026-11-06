@@ -36,7 +36,10 @@ export function EntryActions(props: EntryActionsProps) {
           {historyCopy.runAgainOff}
         </Text>
       ) : null}
-      <View className="flex-row flex-wrap gap-2">
+      <Button variant="outline" size="sm" onPress={props.onReport}>
+        <Text numberOfLines={1}>{historyCopy.report}</Text>
+      </Button>
+      <View className="flex-row gap-2">
         <Button
           variant="outline"
           size="sm"
@@ -44,14 +47,6 @@ export function EntryActions(props: EntryActionsProps) {
           className="flex-1"
         >
           <Text>{historyCopy.copy}</Text>
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onPress={props.onReport}
-          className="flex-2"
-        >
-          <Text>{historyCopy.report}</Text>
         </Button>
         <Button
           variant="outline"
