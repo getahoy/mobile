@@ -85,6 +85,12 @@ test("speaking writes a running entry with hearing and understanding times", () 
   assert.deepEqual(writes[0]?.timings, timings);
 });
 
+test("a command sent without speaking carries no stage times", () => {
+  const again = sending("open pages", ANSWER);
+  const { writes } = play([...spoken, [answered({}), 3500], [again, 9000]]);
+  assert.deepEqual(writes.at(-1)?.timings, {});
+});
+
 test("the result finishes the same entry", () => {
   const { outbox } = play([...spoken, [answered({}), 3500]]);
   assert.equal(outbox[ROOT]?.entry.status, "done");
