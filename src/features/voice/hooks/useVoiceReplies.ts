@@ -5,8 +5,8 @@ import type { TalkState } from "@/features/talk/talkState";
 import { useScreenReader } from "@/lib/useScreenReader";
 import { refreshVoiceIds } from "../client/voicesApi";
 import { playSource, preparePlayback } from "../engine/audioPlayback";
-import { createFallbackVoice } from "../engine/fallbackVoice";
-import type { VoiceEngine } from "../engine/voiceEngine";
+import { createFallbackVoice, type ReplyVoice } from "../engine/fallbackVoice";
+import { promptFor } from "../promptClips";
 import { replyAction } from "../replyAction";
 import { readVoiceSettings } from "../storage/voiceSettings";
 
@@ -29,8 +29,10 @@ export function useVoiceReplies(state: TalkState, recording: boolean) {
   const handled = useRef<string | null>(null);
 
   useEffect(() => {
-    void refreshVoiceIds().catch(() => undefined);
-  }, []);
+    void refreshVoiceIds()
+      .catch(() => undefined)
+      .then(() => voice.warmPrompts(readVoiceSettings().voice));
+  }, [voice]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (appState) => {
@@ -45,7 +47,7 @@ export function useVoiceReplies(state: TalkState, recording: boolean) {
     if (state.kind !== "answered") return;
     if (handled.current === state.commandId) return;
     handled.current = state.commandId;
-    const context = { recording, screenReader, speak: voice.speak };
+    const context = { recording, screenReader, voice };
     void reply(state, context, setSpeech).finally(() => setSpeech(SILENT));
   }, [state, recording, screenReader, voice]);
 
@@ -55,12 +57,12 @@ export function useVoiceReplies(state: TalkState, recording: boolean) {
 type Context = {
   recording: boolean;
   screenReader: boolean;
-  speak: VoiceEngine["speak"];
+  voice: ReplyVoice;
 };
 
 async function reply(
   answered: Answered,
-  { recording, screenReader, speak }: Context,
+  { recording, screenReader, voice }: Context,
   report: (speech: Speech) => void,
 ): Promise<void> {
   const settings = readVoiceSettings();
@@ -84,5 +86,9 @@ async function reply(
   if (action === "chime") return chime(signal);
   report({ speaking: true, level: null });
   const onLevel = (level: number) => report({ speaking: true, level });
-  await speak(line, { voice: settings.voice, signal, onLevel });
+  const options = { voice: settings.voice, signal, onLevel };
+  const choices = answered.choices.length;
+  const clip = promptFor({ choices, confirm: answered.confirm });
+  if (clip) return voice.speakPrompt(clip, options);
+  await voice.speak(line, options);
 }

@@ -1,7 +1,10 @@
 import { logger } from "@/features/logging/logger";
+import type { PromptClip } from "../promptClips";
 import { playSource } from "./audioPlayback";
 import { deviceVoice } from "./deviceVoice";
 import { type PreparedSpeech, prepareSpeech } from "./elevenLabsVoice";
+import { SpeechFetches } from "./previewAudio";
+import { speakPrompt, warmPrompts } from "./promptVoice";
 import type { SpeakOptions, VoiceEngine } from "./voiceEngine";
 
 // Past this the device voice speaks instead, so a slow network never leaves silence.
@@ -46,18 +49,31 @@ async function speakWithFallback(
   return deviceVoice.speak(text, { voice, signal });
 }
 
-export function createFallbackVoice(): VoiceEngine {
+export type ReplyVoice = VoiceEngine & {
+  speakPrompt: (clip: PromptClip, options: SpeakOptions) => Promise<void>;
+  warmPrompts: (voice: SpeakOptions["voice"]) => void;
+};
+
+export function createFallbackVoice(): ReplyVoice {
   let current: AbortController | null = null;
+  const fetches = new SpeechFetches();
+  const ownSignal = (signal: AbortSignal) => {
+    current?.abort();
+    const own = new AbortController();
+    current = own;
+    signal.addEventListener("abort", () => own.abort(), { once: true });
+    return own.signal;
+  };
   return {
     speak(text, options) {
-      current?.abort();
-      const own = new AbortController();
-      current = own;
-      options.signal.addEventListener("abort", () => own.abort(), {
-        once: true,
-      });
-      return speakWithFallback(text, { ...options, signal: own.signal });
+      const signal = ownSignal(options.signal);
+      return speakWithFallback(text, { ...options, signal });
     },
+    speakPrompt(clip, options) {
+      const signal = ownSignal(options.signal);
+      return speakPrompt(clip, { ...options, signal }, fetches);
+    },
+    warmPrompts: (voice) => warmPrompts(voice, fetches),
     stop() {
       current?.abort();
       current = null;

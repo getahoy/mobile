@@ -49,7 +49,7 @@ export async function locatePreview(
   const key = await speechKey(text, voice);
   const source = previewSource({
     cachedUri: cachedSpeech(key),
-    bundled: bundledSample(voice),
+    bundled: bundledSample(voice, text),
     voiceId: readVoiceId(voice),
     text,
     online: await isOnline(),
@@ -66,8 +66,10 @@ export async function choosePlayable(
   switch (source.kind) {
     case "cache":
       return { kind: "audio", source: { uri: source.uri } };
-    case "bundled":
-      return { kind: "audio", source: bundledAudio(voice) };
+    case "bundled": {
+      const audio = bundledAudio(voice, text);
+      return audio ? { kind: "audio", source: audio } : DEVICE;
+    }
     case "fetch": {
       const prepared = await fetches.fetch(key, text, voice);
       return prepared.kind === "ready"
