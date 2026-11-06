@@ -9,6 +9,13 @@ test("a colour and a custom text size both survive a merge", () => {
   );
 });
 
+test("history text sizes keep the colour beside them", () => {
+  assert.equal(
+    cn("font-sans text-body text-ink", "font-fraunces-italic text-entry"),
+    "text-ink font-fraunces-italic text-entry",
+  );
+});
+
 test("a later custom text size replaces an earlier one", () => {
   assert.equal(cn("text-body text-ink", "text-title"), "text-ink text-title");
 });
