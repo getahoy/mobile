@@ -47,7 +47,7 @@ export const historyCopy = {
   offBody: "Ahoy isn’t keeping what you say. Turn it on to start again.",
   keepHistory: "Keep history",
   keepHistoryFooter:
-    "Ahoy keeps what you said and what it did for 90 days. Turning this off deletes it.",
+    "Ahoy keeps a history of what you said and what it did in your account for 90 days. You can clear it or turn it off here. Speech audio is never stored.",
   clearHistory: "Clear history…",
   clearTitle: "Clear all history?",
   clearBody:
