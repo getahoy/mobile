@@ -3,7 +3,7 @@ import { createMMKV } from "react-native-mmkv";
 import { z } from "zod";
 import type { Outbox } from "../historyOutbox";
 
-const OUTBOX_KEY = "history.outbox";
+export const OUTBOX_KEY = "history.outbox";
 const CACHE_KEY = "history.cache";
 const KEEP_KEY = "history.keep";
 export const CACHED_ENTRIES = 50;
@@ -24,8 +24,7 @@ export type HistoryCache = z.infer<typeof cacheSchema>;
 
 const emptyCache: HistoryCache = { entries: [], summary: null };
 
-function readJson<T>(key: string, schema: z.ZodType<T>): T | null {
-  const text = historyStorage.getString(key);
+function parseJson<T>(text: string | undefined, schema: z.ZodType<T>) {
   if (text === undefined) return null;
   try {
     const parsed = schema.safeParse(JSON.parse(text));
@@ -35,8 +34,19 @@ function readJson<T>(key: string, schema: z.ZodType<T>): T | null {
   }
 }
 
+const readJson = <T>(key: string, schema: z.ZodType<T>) =>
+  parseJson(historyStorage.getString(key), schema);
+
+export function parseOutbox(text: string | undefined): Outbox {
+  return parseJson(text, outboxSchema) ?? {};
+}
+
 export function readOutbox(): Outbox {
-  return readJson(OUTBOX_KEY, outboxSchema) ?? {};
+  return parseOutbox(historyStorage.getString(OUTBOX_KEY));
+}
+
+export function removeFromOutbox(id: string): void {
+  updateOutbox(({ [id]: _, ...rest }) => rest);
 }
 
 export function updateOutbox(change: (outbox: Outbox) => Outbox): void {
@@ -62,4 +72,9 @@ export function rememberKeepHistory(keep: boolean): void {
 
 export function clearHistoryStorage(): void {
   historyStorage.clearAll();
+}
+
+export function clearHistoryEntries(): void {
+  historyStorage.remove(OUTBOX_KEY);
+  historyStorage.remove(CACHE_KEY);
 }
