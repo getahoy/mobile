@@ -66,7 +66,6 @@ export const historyCopy = {
     blocked: "Blocked",
     cancelled: "Cancelled",
   } satisfies Record<HistoryStatus, string>,
-  askedFirst: "Asked you first",
   ahoyAsked: "Ahoy asked",
   youSaid: (seconds: string | null) =>
     seconds ? `You said · after ${seconds}s` : "You said",
