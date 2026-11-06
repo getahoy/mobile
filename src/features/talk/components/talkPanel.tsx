@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { useHistoryWriter } from "@/features/history/hooks/useHistoryWriter";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
 import { easing } from "@/lib/motion";
 import { talkCopy } from "../copy/talkCopy";
@@ -31,6 +32,7 @@ export function TalkPanel({ mac: target, block, notice }: TalkPanelProps) {
   const talk = useTalk(block ? null : target);
   const { pressed, hold } = useTalkHold(talk.flow);
   const { thread } = useThread(talk.state);
+  useHistoryWriter(talk.state, target);
   const mac = target.displayName;
   const { heard, reply } = talkView(talk.state, thread, mac);
   const bar = talkBarView({

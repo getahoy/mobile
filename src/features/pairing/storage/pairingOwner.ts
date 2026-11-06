@@ -1,3 +1,4 @@
+import { clearHistoryStorage } from "@/features/history/storage/historyStore";
 import { clearDeviceKeys } from "./deviceKeys";
 import { clearPairedMacs } from "./pairedMacs";
 import { pairingEntry, pairingKeychain } from "./pairingKeychain";
@@ -8,6 +9,7 @@ export async function claimPairingsFor(userId: string): Promise<void> {
   const owner = await pairingKeychain.read(pairingEntry.owner);
   if (owner === userId) return;
   if (owner !== null) {
+    clearHistoryStorage();
     await Promise.all([clearPairedMacs(), clearPendingUnlinks()]);
     await clearDeviceKeys();
   }
