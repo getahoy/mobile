@@ -4,6 +4,7 @@ import { MAX_HISTORY_WRITES } from "@getahoy/protocol";
 import {
   cancelRunning,
   entryOf,
+  markRejected,
   markSent,
   type Outbox,
   pendingBatch,
@@ -88,6 +89,25 @@ test("one flush sends at most twenty entries, oldest first", () => {
   const batch = pendingBatch(outbox);
   assert.equal(batch.length, MAX_HISTORY_WRITES);
   assert.equal(batch[0]?.id, done(1).id);
+});
+
+test("a refused entry waits as not synced and no longer blocks the rest", () => {
+  const outbox = [done(1), done(2)].reduce(putEntry, empty);
+  const refused = markRejected(outbox, [{ id: done(1).id, rev: done(1).rev }]);
+  assert.deepEqual(
+    pendingBatch(refused).map((entry) => entry.id),
+    [done(2).id],
+  );
+  assert.equal(unsyncedIds(refused).has(done(1).id), true);
+});
+
+test("a newer revision of a refused entry is tried again", () => {
+  const refused = markRejected(putEntry(empty, recordAt(1)), [
+    { id: recordAt(1).id, rev: 1 },
+  ]);
+  assert.equal(pendingBatch(refused).length, 0);
+  const finished = putEntry(refused, done(1));
+  assert.equal(pendingBatch(finished)[0]?.status, "done");
 });
 
 test("on relaunch every running entry is finished as cancelled and sent again", () => {
