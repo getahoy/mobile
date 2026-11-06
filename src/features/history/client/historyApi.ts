@@ -45,6 +45,12 @@ export function restoreHistoryEntry(id: string) {
   return sessionRequest({ path, method: "POST", schema: historyChangedSchema });
 }
 
+export function reportHistoryProblem(id: string, note: string) {
+  const path = `${entryPath(id)}/report`;
+  const body = note.trim() ? { note: note.trim() } : {};
+  return sessionRequest({ path, body, schema: historyChangedSchema });
+}
+
 export function clearAllHistory() {
   const schema = historyChangedSchema;
   return sessionRequest({ path: HISTORY, method: "DELETE", schema });

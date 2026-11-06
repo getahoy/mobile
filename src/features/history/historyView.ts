@@ -53,6 +53,29 @@ export function sectionsByDay(
   return sections;
 }
 
+// History keeps the words, not the action, so the words decide what deserves a second look.
+const RISKY_WORDS = /\b(close|quit|exit|e-?mail|mail|draft)\b/i;
+
+export function needsRunConfirm(heard: string): boolean {
+  return RISKY_WORDS.test(heard);
+}
+
+export function reportLines(entry: HistoryEntry) {
+  const timings = timingSegments(entry.timings)
+    .map((segment) => `${segment.label} ${seconds(segment.ms)}s`)
+    .join(" · ");
+  const fields = historyCopy.reportFields;
+  const lines: [string, string | null][] = [
+    [fields.heard, entry.heard],
+    [fields.did, entry.did],
+    [fields.status, entry.status],
+    [fields.app, entry.app],
+    [fields.reason, entry.reason],
+    [fields.timings, timings || null],
+  ];
+  return lines.flatMap(([label, text]) => (text ? [{ label, text }] : []));
+}
+
 type NoticeInput = { offline: boolean; waiting: number; stale: boolean };
 
 export function listNotice({ offline, waiting, stale }: NoticeInput) {
