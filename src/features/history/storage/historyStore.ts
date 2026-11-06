@@ -6,7 +6,7 @@ import type { Outbox } from "../historyOutbox";
 export const OUTBOX_KEY = "history.outbox";
 const CACHE_KEY = "history.cache";
 const KEEP_KEY = "history.keep";
-export const CACHED_ENTRIES = 50;
+const CACHED_ENTRIES = 50;
 
 export const historyStorage = createMMKV({ id: "ahoy.history" });
 
@@ -21,7 +21,7 @@ const outboxSchema = z.record(
 
 const cacheSchema = historyPageSchema.pick({ entries: true, summary: true });
 
-export type HistoryCache = z.infer<typeof cacheSchema>;
+type HistoryCache = z.infer<typeof cacheSchema>;
 
 const emptyCache: HistoryCache = { entries: [], summary: null };
 

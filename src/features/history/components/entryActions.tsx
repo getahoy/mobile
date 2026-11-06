@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/cn";
 import { historyCopy } from "../copy/historyCopy";
 
-export type RunAgainAction = {
+type RunAgainAction = {
   label: string;
   ready: boolean;
   onPress: () => void;

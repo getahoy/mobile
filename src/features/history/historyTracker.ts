@@ -17,7 +17,7 @@ type Sent = {
   understandingMs: number | null;
 };
 
-export type TalkTracking = {
+type TalkTracking = {
   startedAt: number | null;
   understandingAt: number | null;
   hearingMs: number | null;
@@ -35,7 +35,7 @@ export const freshTracking: TalkTracking = {
   lastAnswered: null,
 };
 
-export type TalkStep = {
+type TalkStep = {
   tracking: TalkTracking;
   before: TalkState;
   state: TalkState;

@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import type { useHistoryState } from "./useHistoryState";
 
-export type HistoryState = ReturnType<typeof useHistoryState>;
+type HistoryState = ReturnType<typeof useHistoryState>;
 
 export const HistoryContext = createContext<HistoryState | null>(null);
 

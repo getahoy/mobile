@@ -8,7 +8,7 @@ import { useHistory } from "./historyContext";
 import { useReportProblem } from "./useReportProblem";
 import { useRunAgain } from "./useRunAgain";
 
-export type EntrySheet = "runAgain" | "report" | null;
+type EntrySheet = "runAgain" | "report" | null;
 
 export function useEntryActions(entry: HistoryEntry) {
   const history = useHistory();

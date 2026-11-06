@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 
-export type BlankAction = { label: string; onPress: () => void };
+type BlankAction = { label: string; onPress: () => void };
 
 type HistoryBlankProps = {
   eyebrow?: string;

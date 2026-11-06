@@ -20,7 +20,7 @@ type Start = {
   understandingMs: number | null;
 };
 
-export type MacAnswer = {
+type MacAnswer = {
   heard: string;
   status: CommandStatus;
   message: string;
@@ -60,7 +60,7 @@ export function startRecord(start: Start): HistoryWriteEntry {
   };
 }
 
-export function historyStatusOf(
+function historyStatusOf(
   status: CommandStatus,
   followedUp: boolean,
 ): HistoryStatus {

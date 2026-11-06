@@ -9,7 +9,7 @@ export type OutboxItem = {
 
 export type Outbox = Readonly<Record<string, OutboxItem>>;
 
-export type SentRevision = { id: string; rev: number };
+type SentRevision = { id: string; rev: number };
 
 // Settled entries stay a while: a retried command reuses its id and must write a newer revision.
 const KEPT_SETTLED = 50;
