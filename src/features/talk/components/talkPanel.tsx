@@ -5,6 +5,7 @@ import { useHistoryWriter } from "@/features/history/hooks/useHistoryWriter";
 import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
 import { easing } from "@/lib/motion";
 import { talkCopy } from "../copy/talkCopy";
+import { useRunAgainOnArrival } from "../hooks/useRunAgainOnArrival";
 import { useTalk } from "../hooks/useTalk";
 import { useTalkHold } from "../hooks/useTalkHold";
 import { useThread } from "../hooks/useThread";
@@ -26,13 +27,20 @@ type TalkPanelProps = {
   mac: PairedMac;
   block: TalkBlock | null;
   notice: ReactNode;
+  again: string | null;
 };
 
-export function TalkPanel({ mac: target, block, notice }: TalkPanelProps) {
+export function TalkPanel({
+  mac: target,
+  block,
+  notice,
+  again,
+}: TalkPanelProps) {
   const talk = useTalk(block ? null : target);
   const { pressed, hold } = useTalkHold(talk.flow);
   const { thread } = useThread(talk.state);
   useHistoryWriter(talk.state, target);
+  useRunAgainOnArrival(talk.flow, again, block !== null);
   const mac = target.displayName;
   const { heard, reply } = talkView(talk.state, thread, mac);
   const bar = talkBarView({

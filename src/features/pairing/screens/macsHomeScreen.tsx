@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
 import { useLocalNetworkIntro } from "@/features/permissions/hooks/useLocalNetworkIntro";
 import { useTurnedOnNotice } from "@/features/permissions/hooks/useTurnedOnNotice";
@@ -18,6 +19,7 @@ export function MacsHomeScreen() {
   const ended = useEndedNotice();
   const turnedOn = useTurnedOnNotice();
   const mac = useTalkTarget(macs ?? []);
+  const { again } = useLocalSearchParams<{ again?: string }>();
 
   if (macs?.length === 0) return <NoMacsYet ended={ended.notice} />;
 
@@ -29,6 +31,7 @@ export function MacsHomeScreen() {
           mac={mac}
           macs={macs ?? []}
           onChanged={reload}
+          again={again ?? null}
           notice={<HomeNotices macName={mac.displayName} turnedOn={turnedOn} />}
         />
       ) : (

@@ -10,15 +10,17 @@ type MacHomeProps = {
   macs: readonly PairedMac[];
   onChanged: () => void;
   notice: ReactNode;
+  again: string | null;
 };
 
 // The chip and the talk bar read one steady link state, so they never disagree.
-export function MacHome({ mac, macs, onChanged, notice }: MacHomeProps) {
+export function MacHome({ mac, macs, onChanged, notice, again }: MacHomeProps) {
   const link = useMacLink(mac);
+  const block = talkBlockOf(link.state);
   return (
     <>
       <HomeMac mac={mac} macs={macs} link={link} onChanged={onChanged} />
-      <TalkPanel mac={mac} block={talkBlockOf(link.state)} notice={notice} />
+      <TalkPanel mac={mac} block={block} notice={notice} again={again} />
     </>
   );
 }
