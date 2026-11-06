@@ -15,6 +15,7 @@ const outboxSchema = z.record(
   z.object({
     entry: historyWriteSchema.shape.entries.element,
     sentRev: z.int().min(0),
+    rejectedRev: z.int().min(0).default(0),
   }),
 );
 

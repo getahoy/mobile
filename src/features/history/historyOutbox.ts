@@ -1,7 +1,11 @@
 import { type HistoryWriteEntry, MAX_HISTORY_WRITES } from "@getahoy/protocol";
 import { cancelRecord } from "./historyRecords.ts";
 
-export type OutboxItem = { entry: HistoryWriteEntry; sentRev: number };
+export type OutboxItem = {
+  entry: HistoryWriteEntry;
+  sentRev: number;
+  rejectedRev: number;
+};
 
 export type Outbox = Readonly<Record<string, OutboxItem>>;
 
@@ -11,6 +15,10 @@ export type SentRevision = { id: string; rev: number };
 const KEPT_SETTLED = 50;
 
 const isPending = ({ entry, sentRev }: OutboxItem) => entry.rev > sentRev;
+
+// A refused revision waits as not synced; a newer revision of the entry is tried again.
+const isSendable = (item: OutboxItem) =>
+  isPending(item) && item.entry.rev > item.rejectedRev;
 
 const byStart = (first: OutboxItem, second: OutboxItem) =>
   first.entry.startedAt.localeCompare(second.entry.startedAt);
@@ -26,7 +34,21 @@ function pruned(items: Record<string, OutboxItem>): Outbox {
 
 export function putEntry(outbox: Outbox, entry: HistoryWriteEntry): Outbox {
   const sentRev = outbox[entry.id]?.sentRev ?? 0;
-  return { ...outbox, [entry.id]: { entry, sentRev } };
+  const rejectedRev = outbox[entry.id]?.rejectedRev ?? 0;
+  return { ...outbox, [entry.id]: { entry, sentRev, rejectedRev } };
+}
+
+export function markRejected(
+  outbox: Outbox,
+  refused: readonly SentRevision[],
+): Outbox {
+  const next: Record<string, OutboxItem> = { ...outbox };
+  for (const { id, rev } of refused) {
+    const item = next[id];
+    const rejectedRev = Math.max(item?.rejectedRev ?? 0, rev);
+    if (item) next[id] = { ...item, rejectedRev };
+  }
+  return next;
 }
 
 export function entryOf(outbox: Outbox, id: string) {
@@ -35,7 +57,7 @@ export function entryOf(outbox: Outbox, id: string) {
 
 export function pendingBatch(outbox: Outbox): HistoryWriteEntry[] {
   return Object.values(outbox)
-    .filter(isPending)
+    .filter(isSendable)
     .sort(byStart)
     .map(({ entry }) => entry)
     .slice(0, MAX_HISTORY_WRITES);
