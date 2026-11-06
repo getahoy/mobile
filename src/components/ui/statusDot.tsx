@@ -13,12 +13,13 @@ const PULSE_HALF_CYCLE_MS = 600;
 const PULSE_LOW_OPACITY = 0.4;
 const FOREVER = -1;
 
-export type DotTone = "kelp" | "signal" | "fog";
+export type DotTone = "kelp" | "signal" | "fog" | "ink";
 
 const tones = {
   kelp: "bg-kelp",
   signal: "bg-signal",
   fog: "bg-fog",
+  ink: "bg-ink",
 } as const satisfies Record<DotTone, string>;
 
 type StatusDotProps = { tone: DotTone; pulsing?: boolean };

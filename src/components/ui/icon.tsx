@@ -24,6 +24,10 @@ const symbols = {
   account: { ios: "person.crop.circle", android: "account_circle" },
   play: { ios: "play.fill", android: "play_arrow" },
   pause: { ios: "pause.fill", android: "pause" },
+  search: { ios: "magnifyingglass", android: "search" },
+  failedMark: { ios: "xmark.circle", android: "cancel" },
+  blockedMark: { ios: "nosign", android: "block" },
+  askedMark: { ios: "checkmark.bubble", android: "mark_chat_read" },
 } as const satisfies Record<string, { ios: SFSymbol; android: AndroidSymbol }>;
 
 export type IconName = keyof typeof symbols;
