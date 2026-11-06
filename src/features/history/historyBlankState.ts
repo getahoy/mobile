@@ -18,13 +18,6 @@ type BlankInput = {
   search: string;
 };
 
-type FirstLoadInput = Pick<BlankInput, "phase" | "count">;
-
-// Nothing cached and nothing waiting in the outbox: only then is there nothing to show yet.
-export function waitsForFirstLoad({ phase, count }: FirstLoadInput): boolean {
-  return phase === "loading" && count === 0;
-}
-
 export function blankFor(input: BlankInput): BlankKind | null {
   const { phase, cleared, count, filter, search } = input;
   if (count > 0) return null;

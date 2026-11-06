@@ -3,9 +3,10 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@/lib/motion";
 import { useElapsedOver } from "@/lib/useElapsedOver";
 import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
-import { SLOW_AFTER_MS } from "@/lib/waitingTiming";
 import { PennantSpinner } from "./pennantSpinner";
 import { Text } from "./text";
+
+const SLOW_AFTER_MS = 6000;
 
 type WaitingStateProps = {
   busy: boolean;
@@ -36,7 +37,7 @@ export function WaitingState({
       className="flex-1 items-center justify-center gap-4 px-8 pb-30"
     >
       <PennantSpinner />
-      <View className="max-w-65 items-center gap-1.5">
+      <View className="max-w-viewfinder items-center gap-1.5">
         <Text variant="bodySmall" className="text-center text-driftwood">
           {line}
         </Text>

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { usePairedMacs } from "@/features/pairing/hooks/usePairedMacs";
 import { historyCopy } from "../copy/historyCopy";
-import { blankFor, waitsForFirstLoad } from "../historyBlankState";
+import { blankFor } from "../historyBlankState";
 import { listNotice, summaryLine } from "../historyView";
 import { useHistory } from "./historyContext";
 import { useFirstLoad } from "./useFirstLoad";
 
-export type OpenSheet = "picker" | "clear" | null;
+type OpenSheet = "picker" | "clear" | null;
 
 export function useHistoryScreen() {
   const history = useHistory();
@@ -20,7 +20,7 @@ export function useHistoryScreen() {
   const { phase } = list;
   const { cleared } = history;
   const blank = blankFor({ phase, cleared, count, filter, search });
-  const firstLoad = useFirstLoad(waitsForFirstLoad({ phase, count }));
+  const firstLoad = useFirstLoad(blank === "loading");
   return {
     firstLoad,
     history,
