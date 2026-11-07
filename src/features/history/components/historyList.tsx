@@ -28,8 +28,9 @@ export function HistoryList({
       renderItem={({ item }) => renderEntry(item)}
       renderSectionHeader={({ section }) => (
         <Text
+          variant="eyebrow"
           role="heading"
-          className="bg-sailcloth px-3 pt-5 pb-1.5 font-fraunces text-entry"
+          className="bg-sailcloth px-3 pt-5.5 pb-1.5"
         >
           {section.title}
         </Text>

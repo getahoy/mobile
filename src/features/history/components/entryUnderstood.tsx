@@ -13,7 +13,9 @@ export function EntryUnderstood({ via }: { via: UnderstoodBy }) {
   return (
     <View className="gap-1.5">
       <Text variant="eyebrow">{historyCopy.understoodBy}</Text>
-      <Text className="font-sans-medium">{title}</Text>
+      <Text variant="bodySmall" className="font-sans-medium">
+        {title}
+      </Text>
       <Text variant="bodySmall" className="text-driftwood">
         {note}
       </Text>

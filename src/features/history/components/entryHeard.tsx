@@ -11,7 +11,7 @@ export function EntryHeard({ entry }: { entry: HistoryEntry }) {
   const day = dayLabel(startedAt, new Date());
   const eyebrow = [day, timeLabel(startedAt), entry.macName].join(" · ");
   const long = entry.heard.length > LONG_HEARD_CHARS;
-  const size = long ? "text-note" : "text-heard";
+  const size = long ? "text-entry-heard-long" : "text-entry-heard";
   return (
     <View className="gap-3">
       <Text variant="eyebrow">{eyebrow}</Text>

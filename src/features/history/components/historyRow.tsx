@@ -24,11 +24,11 @@ export function HistoryRow({ entry, time, meta, onOpen }: HistoryRowProps) {
       accessibilityLabel={meta ? `${label}. ${meta}` : label}
       disabled={running}
       onPress={() => onOpen(entry.id)}
-      className="gap-1.5 rounded-entry p-3 active:bg-linen"
+      className="gap-0.75 rounded-entry px-3 py-2.5 active:bg-linen"
     >
       <View className="flex-row items-baseline gap-3">
         <Text
-          numberOfLines={3}
+          numberOfLines={2}
           className="flex-1 font-fraunces-italic text-entry"
         >
           “{entry.heard}”
@@ -37,9 +37,7 @@ export function HistoryRow({ entry, time, meta, onOpen }: HistoryRowProps) {
       </View>
       <View className="flex-row items-start gap-2">
         <StatusMark status={entry.status} />
-        <Text variant="bodySmall" className="flex-1 text-driftwood">
-          {did}
-        </Text>
+        <Text className="flex-1 text-body-sm text-driftwood">{did}</Text>
       </View>
       {meta ? (
         <Text variant="eyebrow" className="pl-6.5">
