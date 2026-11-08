@@ -30,7 +30,11 @@ export function useEntryDeletion() {
       client.setQueriesData<HistoryPages>({ queryKey: HISTORY_KEY }, (pages) =>
         pages ? keepEntries(pages, (entry) => entry.id !== deleted.id) : pages,
       );
-      const undo = () => void restore(deleted).then(refresh);
+      const undo = async () => {
+        const restored = await restore(deleted);
+        if (!restored) toast(historyCopy.couldNotUndo);
+        await refresh();
+      };
       toast(historyCopy.deleted, { label: historyCopy.undo, onAction: undo });
     },
     onError: () => toast(historyCopy.couldNotDelete),
