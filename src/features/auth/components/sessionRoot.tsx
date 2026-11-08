@@ -65,8 +65,8 @@ export function SessionRoot() {
               </Stack>
             ) : null}
             {intro.playing ? <LaunchIntro onDone={intro.finish} /> : null}
-            <Toaster />
             <PortalHost />
+            <Toaster />
           </ThemeProvider>
         </LiveMacLinksProvider>
       </GestureRoot>
