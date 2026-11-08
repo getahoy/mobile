@@ -48,8 +48,10 @@ export function HistoryFeed({ screen }: { screen: HistoryScreenState }) {
           onClear={() => screen.setSheet("clear")}
         />
       }
+      refreshing={history.refreshing}
       renderEntry={row}
       onEndReached={() => void list.loadMore()}
+      onRefresh={() => void history.refresh()}
     />
   );
 }

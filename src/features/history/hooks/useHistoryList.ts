@@ -40,13 +40,14 @@ export function useHistoryList(view: HistoryView) {
     const request = ++latest.current;
     const viewKey = viewKeyOf(settled);
     const page = await fetchHistoryPage(queryOf(settled, null));
-    if (request !== latest.current) return;
+    if (request !== latest.current) return true;
     if (page.code === "error") {
       setState((shown) => failedState(shown, viewKey));
-      return;
+      return false;
     }
     if (isDefaultView(settled)) writeHistoryCache(page.data);
     setState(loadedState(page.data, viewKey));
+    return true;
   }, [settled]);
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import { useRestoreEntry } from "./useRestoreEntry";
 import type { Toast } from "./useToast";
 
 type DeletionOptions = {
-  reload: () => Promise<void>;
+  reload: () => Promise<unknown>;
   show: (toast: Toast) => void;
 };
 

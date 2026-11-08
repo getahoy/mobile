@@ -1,6 +1,6 @@
 import type { HistoryEntry } from "@getahoy/protocol";
 import type { ReactElement, ReactNode } from "react";
-import { SectionList } from "react-native";
+import { RefreshControl, SectionList } from "react-native";
 import { Text } from "@/components/ui/text";
 import type { HistorySection } from "../historyView";
 
@@ -9,8 +9,10 @@ type HistoryListProps = {
   top: ReactElement;
   blank: ReactElement | null;
   footer: ReactElement | null;
+  refreshing: boolean;
   renderEntry: (entry: HistoryEntry) => ReactNode;
   onEndReached: () => void;
+  onRefresh: () => void;
 };
 
 export function HistoryList({
@@ -18,12 +20,22 @@ export function HistoryList({
   top,
   blank,
   footer,
+  refreshing,
   renderEntry,
   onEndReached,
+  onRefresh,
 }: HistoryListProps) {
   return (
     <SectionList
       sections={sections}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColorClassName="accent-driftwood"
+          colorsClassName="accent-driftwood"
+        />
+      }
       keyExtractor={(entry) => entry.id}
       renderItem={({ item }) => renderEntry(item)}
       renderSectionHeader={({ section }) => (

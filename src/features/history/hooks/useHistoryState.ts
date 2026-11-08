@@ -9,6 +9,7 @@ import { useEntryDeletion } from "./useEntryDeletion";
 import { useHistoryList } from "./useHistoryList";
 import { useHistorySettings } from "./useHistorySettings";
 import { useOutbox } from "./useOutbox";
+import { useRefreshHistory } from "./useRefreshHistory";
 import { useToast } from "./useToast";
 
 function useHistoryView() {
@@ -29,6 +30,7 @@ export function useHistoryState() {
   const { reload } = list;
   const { show } = toasts;
   const { hidden, deleteEntry } = useEntryDeletion({ reload, show });
+  const refreshing = useRefreshHistory({ phase: list.phase, reload, show });
   const [cleared, setCleared] = useState(false);
 
   const entries = useMemo(() => {
@@ -47,5 +49,6 @@ export function useHistoryState() {
   }, [clear, reload, show]);
 
   const status = { entries, unsynced, offline, cleared, clearing };
-  return { ...view, ...status, list, settings, toasts, deleteEntry, clearAll };
+  const actions = { deleteEntry, clearAll, ...refreshing };
+  return { ...view, ...status, list, settings, toasts, ...actions };
 }
