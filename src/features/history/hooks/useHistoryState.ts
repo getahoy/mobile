@@ -1,6 +1,6 @@
 import type { HistoryFilter } from "@getahoy/protocol";
 import { useNetworkState } from "expo-network";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "@/components/ui/toast";
 import { historyCopy } from "../copy/historyCopy";
 import { unsyncedIds } from "../historyOutbox";
@@ -37,6 +37,10 @@ export function useHistoryState() {
     const merged = withLocalEntries(list.entries, outbox, settled, serverAt);
     return merged.filter((entry) => !deleting.has(entry.id));
   }, [list.entries, settled, outbox, serverAt, deleting]);
+  const hasEntries = entries.length > 0;
+  useEffect(() => {
+    if (hasEntries) setCleared(false);
+  }, [hasEntries]);
   const unsynced = useMemo(() => unsyncedIds(outbox), [outbox]);
   const offline =
     network.isConnected === false || network.isInternetReachable === false;
