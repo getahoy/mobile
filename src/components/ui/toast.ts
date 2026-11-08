@@ -3,9 +3,9 @@ import { AccessibilityInfo } from "react-native";
 
 const TOAST_MS = 3000;
 
-export type ToastAction = { label: string; onAction: () => void };
+type ToastAction = { label: string; onAction: () => void };
 
-export type ShownToast = {
+type ShownToast = {
   id: number;
   text: string;
   action: ToastAction | null;

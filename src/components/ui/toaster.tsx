@@ -29,8 +29,7 @@ const fadeOut = new Keyframe({
 export function Toaster() {
   const shown = useShownToast();
   const reducedMotion = useReducedMotion();
-  if (!shown) return null;
-  const { action } = shown;
+  const action = shown?.action ?? null;
   const act = () => {
     action?.onAction();
     dismissToast();
@@ -40,30 +39,32 @@ export function Toaster() {
       pointerEvents="box-none"
       className="absolute inset-x-0 bottom-safe-offset-6 items-center"
     >
-      <Animated.View
-        key={shown.id}
-        entering={reducedMotion ? fadeIn : riseIn}
-        exiting={fadeOut}
-        className="h-11 flex-row items-center gap-2.5 rounded-full bg-ink pr-1.5 pl-4.5"
-      >
-        <Text variant="bodySmall" className="font-sans-medium text-on-ink">
-          {shown.text}
-        </Text>
-        {action ? (
-          <Pressable
-            role="button"
-            onPress={act}
-            className="h-8 justify-center rounded-full px-3 active:opacity-80"
-          >
-            <Text
-              variant="bodySmall"
-              className="font-sans-medium text-on-ink underline"
+      {shown ? (
+        <Animated.View
+          key={shown.id}
+          entering={reducedMotion ? fadeIn : riseIn}
+          exiting={fadeOut}
+          className="h-11 flex-row items-center gap-2.5 rounded-full bg-ink pr-1.5 pl-4.5"
+        >
+          <Text variant="bodySmall" className="font-sans-medium text-on-ink">
+            {shown.text}
+          </Text>
+          {action ? (
+            <Pressable
+              role="button"
+              onPress={act}
+              className="h-8 justify-center rounded-full px-3 active:opacity-80"
             >
-              {action.label}
-            </Text>
-          </Pressable>
-        ) : null}
-      </Animated.View>
+              <Text
+                variant="bodySmall"
+                className="font-sans-medium text-on-ink underline"
+              >
+                {action.label}
+              </Text>
+            </Pressable>
+          ) : null}
+        </Animated.View>
+      ) : null}
     </View>
   );
 }
