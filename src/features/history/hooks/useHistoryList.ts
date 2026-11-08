@@ -1,3 +1,4 @@
+import type { HistoryPage } from "@getahoy/protocol";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDebounce } from "react-haiku";
 import { fetchHistoryPage } from "../client/historyApi";
@@ -15,6 +16,8 @@ import { readHistoryCache, writeHistoryCache } from "../storage/historyStore";
 import { useHistoryMore } from "./useHistoryMore";
 
 const SEARCH_DELAY_MS = 300;
+
+type Overall = { macKey: string | null; summary: HistoryPage["summary"] };
 
 function initialState(view: HistoryView): ListState {
   const cache = isDefaultView(view) ? readHistoryCache() : null;
@@ -34,6 +37,10 @@ export function useHistoryList(view: HistoryView) {
     [filter, macKey, search],
   );
   const [state, setState] = useState(() => initialState(settled));
+  const [overall, setOverall] = useState<Overall>(() => ({
+    macKey: null,
+    summary: readHistoryCache().summary,
+  }));
   const latest = useRef(0);
 
   const reload = useCallback(async () => {
@@ -46,6 +53,9 @@ export function useHistoryList(view: HistoryView) {
       return false;
     }
     if (isDefaultView(settled)) writeHistoryCache(page.data);
+    if (page.data.summary) {
+      setOverall({ macKey: settled.macKey, summary: page.data.summary });
+    }
     setState(loadedState(page.data, viewKey));
     return true;
   }, [settled]);
@@ -55,5 +65,6 @@ export function useHistoryList(view: HistoryView) {
   }, [reload]);
 
   const loadMore = useHistoryMore({ state, setState, settled, latest });
-  return { ...state, settled, reload, loadMore };
+  const summary = overall.macKey === macKey ? overall.summary : null;
+  return { ...state, summary, settled, reload, loadMore };
 }

@@ -25,9 +25,9 @@ export function HistoryListTop({
   return (
     <View className="gap-3 px-4 pb-2">
       <Banner message={notice} />
-      {summary ? (
-        <Text className="px-1 pt-1 font-fraunces text-summary">{summary}</Text>
-      ) : null}
+      <Text className="min-h-6 px-1 pt-1 font-fraunces text-summary">
+        {summary}
+      </Text>
       <HistorySearch value={search} onChange={onSearch} />
       <HistoryFilters filter={filter} onChange={onFilter} />
     </View>

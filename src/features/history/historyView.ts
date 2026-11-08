@@ -1,4 +1,9 @@
-import type { HistoryEntry, HistoryTimings } from "@getahoy/protocol";
+import type {
+  HistoryEntry,
+  HistoryFilter,
+  HistoryPage,
+  HistoryTimings,
+} from "@getahoy/protocol";
 import { historyCopy } from "./copy/historyCopy.ts";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -83,11 +88,11 @@ export function listNotice({ offline, waiting, stale }: NoticeInput) {
   return stale ? historyCopy.couldNotRefresh : null;
 }
 
-type Summary = { lastSevenDays: number; didntGoThrough: number };
-
-export function summaryLine(summary: Summary | null): string | null {
-  if (!summary) return null;
-  return historyCopy.summary(summary.lastSevenDays, summary.didntGoThrough);
+export function summaryLine(
+  filter: HistoryFilter,
+  summary: HistoryPage["summary"],
+): string | null {
+  return summary ? historyCopy.summary[filter](summary) : null;
 }
 
 type MetaInput = {

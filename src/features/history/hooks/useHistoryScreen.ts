@@ -31,7 +31,7 @@ export function useHistoryScreen() {
     chipLabel: chosen?.displayName || historyCopy.allMacs,
     showMac: picking && macKey === null,
     canClear: plain && entries.length > 0,
-    summary: plain ? summaryLine(list.summary) : null,
+    summary: summaryLine(filter, list.summary),
     notice: listNotice({
       offline: history.offline,
       waiting: unsynced.size,
