@@ -35,13 +35,16 @@ function matches(entry: HistoryEntry, view: HistoryView): boolean {
 }
 
 // The server only has what was sent; entries still waiting show from the outbox, newest first.
+// A sent entry keeps showing until the server list comes from a request made after the send.
 export function withLocalEntries(
   server: readonly HistoryEntry[],
   outbox: Outbox,
   view: HistoryView,
+  serverAt: number,
 ): HistoryEntry[] {
-  const waiting = ({ entry, sentRev }: OutboxItem) =>
-    entry.rev > sentRev || entry.status === "running";
+  const justSent = (sentAt: number) => sentAt > 0 && sentAt >= serverAt;
+  const waiting = ({ entry, sentRev, sentAt }: OutboxItem) =>
+    entry.rev > sentRev || entry.status === "running" || justSent(sentAt);
   const local = Object.values(outbox)
     .filter(waiting)
     .map(({ entry }) => toEntry(entry))

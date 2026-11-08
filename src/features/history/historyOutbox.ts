@@ -5,6 +5,7 @@ export type OutboxItem = {
   entry: HistoryWriteEntry;
   sentRev: number;
   rejectedRev: number;
+  sentAt: number;
 };
 
 export type Outbox = Readonly<Record<string, OutboxItem>>;
@@ -33,9 +34,8 @@ function pruned(items: Record<string, OutboxItem>): Outbox {
 }
 
 export function putEntry(outbox: Outbox, entry: HistoryWriteEntry): Outbox {
-  const sentRev = outbox[entry.id]?.sentRev ?? 0;
-  const rejectedRev = outbox[entry.id]?.rejectedRev ?? 0;
-  return { ...outbox, [entry.id]: { entry, sentRev, rejectedRev } };
+  const { sentRev = 0, rejectedRev = 0, sentAt = 0 } = outbox[entry.id] ?? {};
+  return { ...outbox, [entry.id]: { entry, sentRev, rejectedRev, sentAt } };
 }
 
 export function markRejected(
@@ -66,13 +66,19 @@ export function pendingBatch(outbox: Outbox): HistoryWriteEntry[] {
 export function markSent(
   outbox: Outbox,
   sent: readonly SentRevision[],
+  at: number,
 ): Outbox {
   const next: Record<string, OutboxItem> = { ...outbox };
   for (const { id, rev } of sent) {
     const item = next[id];
-    if (item) next[id] = { ...item, sentRev: Math.max(item.sentRev, rev) };
+    const sentRev = Math.max(item?.sentRev ?? 0, rev);
+    if (item) next[id] = { ...item, sentRev, sentAt: at };
   }
   return pruned(next);
+}
+
+export function lastSentAt(outbox: Outbox): number {
+  return Math.max(0, ...Object.values(outbox).map(({ sentAt }) => sentAt));
 }
 
 export function cancelRunning(outbox: Outbox, at: number): Outbox {

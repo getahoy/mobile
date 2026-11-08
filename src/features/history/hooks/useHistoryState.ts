@@ -9,6 +9,7 @@ import { useEntryDeletion } from "./useEntryDeletion";
 import { useHistoryList } from "./useHistoryList";
 import { useHistorySettings } from "./useHistorySettings";
 import { useOutbox } from "./useOutbox";
+import { useRefetchAfterSync } from "./useRefetchAfterSync";
 import { useRefreshHistory } from "./useRefreshHistory";
 import { useToast } from "./useToast";
 
@@ -29,14 +30,15 @@ export function useHistoryState() {
   const network = useNetworkState();
   const { show } = toasts;
   const { deleting, deleteEntry } = useEntryDeletion(show);
-  const { phase, settled } = list;
+  const { phase, settled, serverAt } = list;
   const refreshing = useRefreshHistory({ view: settled, phase, show });
+  useRefetchAfterSync(outbox, serverAt);
   const [cleared, setCleared] = useState(false);
 
   const entries = useMemo(() => {
-    const merged = withLocalEntries(list.entries, outbox, settled);
+    const merged = withLocalEntries(list.entries, outbox, settled, serverAt);
     return merged.filter((entry) => !deleting.has(entry.id));
-  }, [list.entries, settled, outbox, deleting]);
+  }, [list.entries, settled, outbox, serverAt, deleting]);
   const unsynced = useMemo(() => unsyncedIds(outbox), [outbox]);
   const offline =
     network.isConnected === false || network.isInternetReachable === false;

@@ -36,7 +36,7 @@ async function send(
 ): Promise<Sent> {
   const sent = await sendHistoryWrites({ phoneKey, entries });
   if (sent.code === "success") {
-    updateOutbox((outbox) => markSent(outbox, entries));
+    updateOutbox((outbox) => markSent(outbox, entries, Date.now()));
     return "sent";
   }
   const outcome = outcomeOf(sent.error);

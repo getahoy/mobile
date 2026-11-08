@@ -1,9 +1,11 @@
 import type { HistoryEntry, HistoryPage } from "@getahoy/protocol";
 import type { InfiniteData } from "@tanstack/react-query";
 
-export type HistoryPages = InfiniteData<HistoryPage, string | null>;
+export type ListedPage = HistoryPage & { fetchedAt: number };
 
-type SavedCopy = { entries: HistoryEntry[]; summary: HistoryPage["summary"] };
+export type HistoryPages = InfiniteData<ListedPage, string | null>;
+
+type SavedCopy = Pick<ListedPage, "entries" | "summary" | "fetchedAt">;
 
 export function keepEntries(
   pages: HistoryPages,
@@ -16,10 +18,8 @@ export function keepEntries(
   return { ...pages, pages: kept };
 }
 
-export function savedPages({
-  entries,
-  summary,
-}: SavedCopy): HistoryPages | undefined {
-  if (entries.length === 0) return undefined;
-  return { pages: [{ entries, summary, cursor: null }], pageParams: [null] };
+export function savedPages(saved: SavedCopy): HistoryPages | undefined {
+  if (saved.entries.length === 0) return undefined;
+  const page = { ...saved, cursor: null };
+  return { pages: [page], pageParams: [null] };
 }

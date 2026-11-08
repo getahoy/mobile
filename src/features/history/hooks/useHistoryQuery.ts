@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchHistoryPage } from "../client/historyApi";
-import { savedPages } from "../historyPages";
+import { type ListedPage, savedPages } from "../historyPages";
 import { isDefaultView, queryOf } from "../historyQuery";
 import type { HistoryView } from "../localEntries";
 import { readHistoryCache, writeHistoryCache } from "../storage/historyStore";
@@ -17,11 +17,16 @@ export const historyKey = ({ filter, search, macKey }: HistoryView) =>
 // The query library learns of a failure only from a throw.
 export class HistoryRequestError extends Error {}
 
-async function loadPage(view: HistoryView, cursor: string | null) {
+async function loadPage(
+  view: HistoryView,
+  cursor: string | null,
+): Promise<ListedPage> {
+  const fetchedAt = Date.now();
   const page = await fetchHistoryPage(queryOf(view, cursor));
   if (page.code === "error") throw new HistoryRequestError(page.error.kind);
-  if (!cursor && isDefaultView(view)) writeHistoryCache(page.data);
-  return page.data;
+  const listed = { ...page.data, fetchedAt };
+  if (!cursor && isDefaultView(view)) writeHistoryCache(listed);
+  return listed;
 }
 
 // The saved copy shows at once after a restart and is refetched straight away.

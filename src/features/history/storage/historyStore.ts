@@ -16,14 +16,17 @@ const outboxSchema = z.record(
     entry: historyWriteSchema.shape.entries.element,
     sentRev: z.int().min(0),
     rejectedRev: z.int().min(0).default(0),
+    sentAt: z.number().min(0).default(0),
   }),
 );
 
-const cacheSchema = historyPageSchema.pick({ entries: true, summary: true });
+const cacheSchema = historyPageSchema
+  .pick({ entries: true, summary: true })
+  .extend({ fetchedAt: z.number().min(0).default(0) });
 
 type HistoryCache = z.infer<typeof cacheSchema>;
 
-const emptyCache: HistoryCache = { entries: [], summary: null };
+const emptyCache: HistoryCache = { entries: [], summary: null, fetchedAt: 0 };
 
 function parseJson<T>(text: string | undefined, schema: z.ZodType<T>) {
   if (text === undefined) return null;
@@ -58,8 +61,13 @@ export function readHistoryCache(): HistoryCache {
   return readJson(CACHE_KEY, cacheSchema) ?? emptyCache;
 }
 
-export function writeHistoryCache({ entries, summary }: HistoryCache): void {
-  const kept = { entries: entries.slice(0, CACHED_ENTRIES), summary };
+export function writeHistoryCache(cache: HistoryCache): void {
+  const { entries, summary, fetchedAt } = cache;
+  const kept = {
+    entries: entries.slice(0, CACHED_ENTRIES),
+    summary,
+    fetchedAt,
+  };
   historyStorage.set(CACHE_KEY, JSON.stringify(kept));
 }
 
