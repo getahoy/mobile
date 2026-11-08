@@ -12,6 +12,7 @@ import { GestureRoot } from "@/components/gestureRoot";
 import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
 import { LaunchIntro } from "@/features/welcome/components/launchIntro";
 import { useLaunchIntro } from "@/features/welcome/hooks/useLaunchIntro";
+import { useClearCacheOnSignOut } from "../hooks/useClearCacheOnSignOut";
 import { useClearStaleSession } from "../hooks/useClearStaleSession";
 import { useSessionGate } from "../hooks/useSessionGate";
 import { SigningIn } from "./signingIn";
@@ -20,6 +21,7 @@ export function SessionRoot() {
   const { theme } = useUniwind();
   const { gate, signedIn, stale } = useSessionGate();
   useClearStaleSession(stale);
+  useClearCacheOnSignOut(signedIn);
   const intro = useLaunchIntro(gate === "ready", signedIn);
 
   return (

@@ -1,44 +1,47 @@
-import { useCallback, useState } from "react";
+import {
+  useMutation,
+  useMutationState,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { useMemo } from "react";
 import { historyCopy } from "../copy/historyCopy";
+import { type HistoryPages, keepEntries } from "../historyPages";
 import { useDeleteEntry } from "./useDeleteEntry";
+import { HISTORY_KEY, HistoryRequestError } from "./useHistoryQuery";
 import { useRestoreEntry } from "./useRestoreEntry";
 import type { Toast } from "./useToast";
 
-type DeletionOptions = {
-  reload: () => Promise<unknown>;
-  show: (toast: Toast) => void;
-};
+const DELETE_KEY = ["deleteHistoryEntry"] as const;
 
-function without(ids: ReadonlySet<string>, id: string) {
-  const next = new Set(ids);
-  next.delete(id);
-  return next;
-}
-
-// The row leaves at once; Undo puts it back for as long as the toast is up.
-export function useEntryDeletion({ reload, show }: DeletionOptions) {
+// The row leaves at once, even an unsent one still in the outbox; Undo puts it back.
+export function useEntryDeletion(show: (toast: Toast) => void) {
+  const client = useQueryClient();
   const remove = useDeleteEntry();
   const restore = useRestoreEntry();
-  const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());
-
-  const deleteEntry = useCallback(
-    async (id: string) => {
-      setHidden((ids) => new Set(ids).add(id));
+  const refresh = () => client.invalidateQueries({ queryKey: HISTORY_KEY });
+  const deletion = useMutation({
+    mutationKey: DELETE_KEY,
+    mutationFn: async (id: string) => {
       const deleted = await remove(id);
-      if (!deleted) {
-        setHidden((ids) => without(ids, id));
-        show({ text: historyCopy.couldNotDelete, undo: null });
-        return;
-      }
-      const undo = () =>
-        void restore(deleted).then(() => {
-          setHidden((ids) => without(ids, id));
-          void reload();
-        });
+      if (!deleted) throw new HistoryRequestError(id);
+      return deleted;
+    },
+    onSuccess: (deleted) => {
+      client.setQueriesData<HistoryPages>({ queryKey: HISTORY_KEY }, (pages) =>
+        pages ? keepEntries(pages, (entry) => entry.id !== deleted.id) : pages,
+      );
+      const undo = () => void restore(deleted).then(refresh);
       show({ text: historyCopy.deleted, undo });
     },
-    [remove, restore, reload, show],
+    onError: () => show({ text: historyCopy.couldNotDelete, undo: null }),
+  });
+  const pending = useMutationState({
+    filters: { mutationKey: DELETE_KEY, status: "pending" },
+    select: (mutation) => mutation.state.variables,
+  });
+  const deleting = useMemo(
+    () => new Set(pending.filter((id) => typeof id === "string")),
+    [pending],
   );
-
-  return { hidden, deleteEntry };
+  return { deleting, deleteEntry: deletion.mutate };
 }
