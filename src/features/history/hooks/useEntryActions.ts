@@ -2,6 +2,7 @@ import type { HistoryEntry } from "@getahoy/protocol";
 import { setStringAsync } from "expo-clipboard";
 import { router } from "expo-router";
 import { useState } from "react";
+import { toast } from "@/components/ui/toast";
 import { historyCopy } from "../copy/historyCopy";
 import { needsRunConfirm } from "../historyView";
 import { useHistory } from "./historyContext";
@@ -12,11 +13,9 @@ type EntrySheet = "runAgain" | "report" | null;
 
 export function useEntryActions(entry: HistoryEntry) {
   const history = useHistory();
-  const { show } = history.toasts;
   const again = useRunAgain(entry);
   const { report, sending } = useReportProblem();
   const [sheet, setSheet] = useState<EntrySheet>(null);
-  const toast = (text: string) => show({ text, undo: null });
 
   const copy = () => {
     const text = historyCopy.copiedText(entry.heard, entry.did);

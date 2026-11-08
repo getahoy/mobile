@@ -9,6 +9,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaListener } from "react-native-safe-area-context";
 import { Uniwind, useUniwind } from "uniwind";
 import { GestureRoot } from "@/components/gestureRoot";
+import { Toaster } from "@/components/ui/toaster";
 import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
 import { LaunchIntro } from "@/features/welcome/components/launchIntro";
 import { useLaunchIntro } from "@/features/welcome/hooks/useLaunchIntro";
@@ -64,6 +65,7 @@ export function SessionRoot() {
               </Stack>
             ) : null}
             {intro.playing ? <LaunchIntro onDone={intro.finish} /> : null}
+            <Toaster />
             <PortalHost />
           </ThemeProvider>
         </LiveMacLinksProvider>

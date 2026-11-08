@@ -4,17 +4,17 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { toast } from "@/components/ui/toast";
 import { historyCopy } from "../copy/historyCopy";
 import { type HistoryPages, keepEntries } from "../historyPages";
 import { useDeleteEntry } from "./useDeleteEntry";
 import { HISTORY_KEY, HistoryRequestError } from "./useHistoryQuery";
 import { useRestoreEntry } from "./useRestoreEntry";
-import type { Toast } from "./useToast";
 
 const DELETE_KEY = ["deleteHistoryEntry"] as const;
 
 // The row leaves at once, even an unsent one still in the outbox; Undo puts it back.
-export function useEntryDeletion(show: (toast: Toast) => void) {
+export function useEntryDeletion() {
   const client = useQueryClient();
   const remove = useDeleteEntry();
   const restore = useRestoreEntry();
@@ -31,9 +31,9 @@ export function useEntryDeletion(show: (toast: Toast) => void) {
         pages ? keepEntries(pages, (entry) => entry.id !== deleted.id) : pages,
       );
       const undo = () => void restore(deleted).then(refresh);
-      show({ text: historyCopy.deleted, undo });
+      toast(historyCopy.deleted, { label: historyCopy.undo, onAction: undo });
     },
-    onError: () => show({ text: historyCopy.couldNotDelete, undo: null }),
+    onError: () => toast(historyCopy.couldNotDelete),
   });
   const pending = useMutationState({
     filters: { mutationKey: DELETE_KEY, status: "pending" },
