@@ -42,7 +42,7 @@ export function withLocalEntries(
   view: HistoryView,
   serverAt: number,
 ): HistoryEntry[] {
-  const justSent = (sentAt: number) => sentAt > 0 && sentAt >= serverAt;
+  const justSent = (sentAt: number) => serverAt > 0 && sentAt >= serverAt;
   const waiting = ({ entry, sentRev, sentAt }: OutboxItem) =>
     entry.rev > sentRev || entry.status === "running" || justSent(sentAt);
   const local = Object.values(outbox)
