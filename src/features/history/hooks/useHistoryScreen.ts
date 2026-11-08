@@ -37,7 +37,7 @@ export function useHistoryScreen() {
     notice: listNotice({
       offline: history.offline,
       waiting: unsynced.size,
-      stale: list.stale,
+      stale: list.stale && list.errorAt !== history.failedAt,
     }),
     blank,
   };

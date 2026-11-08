@@ -34,6 +34,7 @@ export function useHistoryList(view: HistoryView) {
     entries,
     phase: phaseOf(data !== undefined, isError),
     stale: isError && data !== undefined,
+    errorAt: query.errorUpdatedAt,
     serverAt: data?.pages[0]?.fetchedAt ?? 0,
     summary: overall.data?.pages[0]?.summary ?? null,
     summaryPending: !overall.data && overall.fetchStatus === "fetching",

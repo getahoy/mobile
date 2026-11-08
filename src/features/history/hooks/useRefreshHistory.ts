@@ -7,12 +7,16 @@ import type { HistoryView } from "../localEntries";
 import { flushHistory } from "../sync/flushHistory";
 import { HISTORY_KEY, historyKey } from "./useHistoryQuery";
 
+const NO_FAILURE = -1;
+
 type RefreshOptions = { view: HistoryView; phase: ListPhase };
 
+// A failed manual refresh says so in a toast; failedAt lets the screen skip the stale line for it.
 export function useRefreshHistory({ view, phase }: RefreshOptions) {
   const client = useQueryClient();
   const running = useRef(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [failedAt, setFailedAt] = useState(NO_FAILURE);
   const refresh = async () => {
     if (running.current) return;
     running.current = true;
@@ -22,8 +26,10 @@ export function useRefreshHistory({ view, phase }: RefreshOptions) {
     await client.invalidateQueries({ queryKey: HISTORY_KEY });
     running.current = false;
     setRefreshing(false);
-    const failed = client.getQueryState(historyKey(view))?.status === "error";
-    if (failed && showing) toast(historyCopy.couldNotRefresh);
+    const state = client.getQueryState(historyKey(view));
+    if (state?.status !== "error") return;
+    setFailedAt(state.errorUpdatedAt);
+    if (showing) toast(historyCopy.couldNotRefresh);
   };
-  return { refreshing, refresh };
+  return { refreshing, refresh, failedAt };
 }
