@@ -1,10 +1,10 @@
-import type { HistoryPage } from "@getahoy/protocol";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDebounce } from "react-haiku";
 import { fetchHistoryPage } from "../client/historyApi";
 import {
   failedState,
   isDefaultView,
+  isOverallView,
   type ListPhase,
   type ListState,
   loadedState,
@@ -14,10 +14,9 @@ import {
 import type { HistoryView } from "../localEntries";
 import { readHistoryCache, writeHistoryCache } from "../storage/historyStore";
 import { useHistoryMore } from "./useHistoryMore";
+import { useOverallSummary } from "./useOverallSummary";
 
 const SEARCH_DELAY_MS = 300;
-
-type Overall = { macKey: string | null; summary: HistoryPage["summary"] };
 
 function initialState(view: HistoryView): ListState {
   const cache = isDefaultView(view) ? readHistoryCache() : null;
@@ -37,10 +36,8 @@ export function useHistoryList(view: HistoryView) {
     [filter, macKey, search],
   );
   const [state, setState] = useState(() => initialState(settled));
-  const [overall, setOverall] = useState<Overall>(() => ({
-    macKey: null,
-    summary: readHistoryCache().summary,
-  }));
+  const overall = useOverallSummary(settled);
+  const { settle } = overall;
   const latest = useRef(0);
 
   const reload = useCallback(async () => {
@@ -48,23 +45,22 @@ export function useHistoryList(view: HistoryView) {
     const viewKey = viewKeyOf(settled);
     const page = await fetchHistoryPage(queryOf(settled, null));
     if (request !== latest.current) return true;
+    const summary = page.code === "success" ? page.data.summary : null;
+    if (isOverallView(settled)) settle(settled.macKey, summary);
     if (page.code === "error") {
       setState((shown) => failedState(shown, viewKey));
       return false;
     }
     if (isDefaultView(settled)) writeHistoryCache(page.data);
-    if (page.data.summary) {
-      setOverall({ macKey: settled.macKey, summary: page.data.summary });
-    }
     setState(loadedState(page.data, viewKey));
     return true;
-  }, [settled]);
+  }, [settled, settle]);
 
   useEffect(() => {
     void reload();
   }, [reload]);
 
   const loadMore = useHistoryMore({ state, setState, settled, latest });
-  const summary = overall.macKey === macKey ? overall.summary : null;
-  return { ...state, summary, settled, reload, loadMore };
+  const { summary, summaryPending } = overall;
+  return { ...state, summary, summaryPending, settled, reload, loadMore };
 }

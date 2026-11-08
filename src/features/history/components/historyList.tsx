@@ -53,7 +53,7 @@ export function HistoryList({
       onEndReached={onEndReached}
       keyboardShouldPersistTaps="handled"
       keyboardDismissMode="on-drag"
-      contentContainerClassName="px-2 pb-safe-offset-8"
+      contentContainerClassName="grow px-2 pb-safe-offset-8"
     />
   );
 }

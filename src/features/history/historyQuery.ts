@@ -14,8 +14,11 @@ export type ListState = Omit<HistoryPage, "cursor"> & {
 export const viewKeyOf = ({ filter, search, macKey }: HistoryView) =>
   JSON.stringify([filter, search.trim(), macKey]);
 
+export const isOverallView = (view: HistoryView) =>
+  view.filter === "all" && !view.search.trim();
+
 export const isDefaultView = (view: HistoryView) =>
-  view.filter === "all" && !view.search.trim() && view.macKey === null;
+  isOverallView(view) && view.macKey === null;
 
 export function queryOf(
   view: HistoryView,

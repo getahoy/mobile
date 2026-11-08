@@ -21,6 +21,7 @@ export function useHistoryScreen() {
   const { cleared } = history;
   const blank = blankFor({ phase, cleared, count, filter, search });
   const firstLoad = useFirstLoad(blank === "loading");
+  const noHistory = blank === "empty" || blank === "cleared";
   return {
     firstLoad,
     history,
@@ -31,7 +32,8 @@ export function useHistoryScreen() {
     chipLabel: chosen?.displayName || historyCopy.allMacs,
     showMac: picking && macKey === null,
     canClear: plain && entries.length > 0,
-    summary: summaryLine(filter, list.summary),
+    summary: noHistory ? null : summaryLine(filter, list.summary),
+    summaryPending: !noHistory && list.summaryPending,
     notice: listNotice({
       offline: history.offline,
       waiting: unsynced.size,

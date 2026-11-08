@@ -1,13 +1,14 @@
 import type { HistoryFilter } from "@getahoy/protocol";
 import { View } from "react-native";
 import { Banner } from "@/components/ui/banner";
-import { Text } from "@/components/ui/text";
 import { HistoryFilters } from "./historyFilters";
 import { HistorySearch } from "./historySearch";
+import { HistorySummary } from "./historySummary";
 
 type HistoryListTopProps = {
   notice: string | null;
   summary: string | null;
+  summaryPending: boolean;
   search: string;
   filter: HistoryFilter;
   onSearch: (text: string) => void;
@@ -17,6 +18,7 @@ type HistoryListTopProps = {
 export function HistoryListTop({
   notice,
   summary,
+  summaryPending,
   search,
   filter,
   onSearch,
@@ -25,9 +27,7 @@ export function HistoryListTop({
   return (
     <View className="gap-3 px-4 pb-2">
       <Banner message={notice} />
-      <Text className="min-h-6 px-1 pt-1 font-fraunces text-summary">
-        {summary}
-      </Text>
+      <HistorySummary text={summary} pending={summaryPending} />
       <HistorySearch value={search} onChange={onSearch} />
       <HistoryFilters filter={filter} onChange={onFilter} />
     </View>

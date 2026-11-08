@@ -6,13 +6,23 @@ import { HistoryList } from "./historyList";
 import { HistoryListBlank } from "./historyListBlank";
 import { HistoryListFooter } from "./historyListFooter";
 import { HistoryListTop } from "./historyListTop";
+import { HistoryLoading } from "./historyLoading";
 import { HistoryRow } from "./historyRow";
 
 const openEntry = (id: string) =>
   router.push({ pathname: "/history/[id]", params: { id } });
 
+function listBlank({ firstLoad, blank, history }: HistoryScreenState) {
+  if (firstLoad.showLoader) return <HistoryLoading busy={firstLoad.busy} />;
+  if (!blank) return null;
+  const retry = () => void history.list.reload();
+  return (
+    <HistoryListBlank kind={blank} search={history.search} onRetry={retry} />
+  );
+}
+
 export function HistoryFeed({ screen }: { screen: HistoryScreenState }) {
-  const { history, blank, showMac } = screen;
+  const { history, showMac } = screen;
   const { list, search, filter, unsynced } = history;
   const row = (entry: HistoryEntry) => (
     <HistoryRow
@@ -22,7 +32,6 @@ export function HistoryFeed({ screen }: { screen: HistoryScreenState }) {
       onOpen={openEntry}
     />
   );
-  const retry = () => void list.reload();
   return (
     <HistoryList
       sections={sectionsByDay(history.entries, new Date())}
@@ -30,17 +39,14 @@ export function HistoryFeed({ screen }: { screen: HistoryScreenState }) {
         <HistoryListTop
           notice={screen.notice}
           summary={screen.summary}
+          summaryPending={screen.summaryPending}
           search={search}
           filter={filter}
           onSearch={history.setSearch}
           onFilter={history.setFilter}
         />
       }
-      blank={
-        blank ? (
-          <HistoryListBlank kind={blank} search={search} onRetry={retry} />
-        ) : null
-      }
+      blank={listBlank(screen)}
       footer={
         <HistoryListFooter
           loadingMore={list.loadingMore}

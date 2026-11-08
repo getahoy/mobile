@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { ClearHistorySheet } from "../components/clearHistorySheet";
-import { HistoryBody } from "../components/historyBody";
+import { HistoryFeed } from "../components/historyFeed";
 import { HistoryHeader } from "../components/historyHeader";
 import { HistoryOff } from "../components/historyOff";
 import { MacPickerChip } from "../components/macPickerChip";
@@ -21,7 +21,7 @@ export function HistoryScreen() {
     <View className="flex-1 bg-sailcloth pt-safe">
       <HistoryHeader trailing={settings.keepHistory ? chip : null} />
       {settings.keepHistory ? (
-        <HistoryBody screen={screen} />
+        <HistoryFeed screen={screen} />
       ) : (
         <HistoryOff changing={settings.changing} onTurnOn={turnOn} />
       )}
