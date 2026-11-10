@@ -1,6 +1,7 @@
 import "@/features/welcome/launchTiming";
 import "@/features/pairing/crypto/randomValues";
 import "@/global.css";
+import "@/features/appearance/applyStoredAppearance";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";

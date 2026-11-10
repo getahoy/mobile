@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Uniwind, useUniwind } from "uniwind";
+import { readAppearance } from "@/features/appearance/storage/appearanceStorage";
 
 export function useGalleryTheme() {
   const { theme } = useUniwind();
@@ -9,7 +10,7 @@ export function useGalleryTheme() {
     Uniwind.setTheme(dark ? "dark" : "light");
   }, [dark]);
 
-  useEffect(() => () => Uniwind.setTheme("system"), []);
+  useEffect(() => () => Uniwind.setTheme(readAppearance()), []);
 
   return { dark, setDark };
 }
