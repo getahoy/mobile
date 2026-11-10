@@ -86,6 +86,8 @@
   --radius-entry: 14px;
   --radius-card: 24px;
   --radius-sheet: 28px;
+  --radius-tile: 14px;
+  --radius-tile-ring: 18px;
   --radius-viewfinder-bracket: 36px;
   --radius-viewfinder-scrim: 1024px;
 
@@ -105,8 +107,11 @@
   --spacing-guide: 232px;
   --spacing-finger: 30px;
   --spacing-edge-fade: 24%;
+  --spacing-appearance-tile-x: 80px;
+  --spacing-appearance-tile-y: 112px;
 
   --color-night: #121110;
+  --color-day: #f4f2ed;
   --color-white: #ffffff;
   --color-scrim: rgba(0, 0, 0, 0.6);
   --color-on-scrim: #f4f2ed;

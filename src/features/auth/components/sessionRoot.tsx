@@ -10,6 +10,8 @@ import { SafeAreaListener } from "react-native-safe-area-context";
 import { Uniwind, useUniwind } from "uniwind";
 import { GestureRoot } from "@/components/gestureRoot";
 import { Toaster } from "@/components/ui/toaster";
+import { AppearanceFade } from "@/features/appearance/components/appearanceFade";
+import { LaunchVeil } from "@/features/appearance/components/launchVeil";
 import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
 import { LaunchIntro } from "@/features/welcome/components/launchIntro";
 import { useLaunchIntro } from "@/features/welcome/hooks/useLaunchIntro";
@@ -20,7 +22,7 @@ import { SigningIn } from "./signingIn";
 
 export function SessionRoot() {
   const { theme } = useUniwind();
-  const { gate, signedIn, stale } = useSessionGate();
+  const { gate, signedIn, stale, splashHidden } = useSessionGate();
   useClearStaleSession(stale);
   useClearCacheOnSignOut(signedIn);
   const intro = useLaunchIntro(gate === "ready", signedIn);
@@ -67,6 +69,8 @@ export function SessionRoot() {
             {intro.playing ? <LaunchIntro onDone={intro.finish} /> : null}
             <PortalHost />
             <Toaster />
+            <AppearanceFade />
+            <LaunchVeil splashHidden={splashHidden} />
           </ThemeProvider>
         </LiveMacLinksProvider>
       </GestureRoot>
