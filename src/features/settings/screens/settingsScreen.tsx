@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { Pressable, ScrollView, View } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
+import { AppearanceGroup } from "@/features/appearance/components/appearanceGroup";
 import { AccountGroup } from "@/features/auth/components/accountGroup";
 import { SignOutRow } from "@/features/auth/components/signOutRow";
 import { HistorySettingsGroup } from "@/features/history/components/historySettingsGroup";
@@ -30,6 +31,7 @@ export function SettingsScreen({ name, email }: SettingsScreenProps) {
       <ScrollView contentContainerClassName="gap-6 px-5 pt-2 pb-safe-offset-6">
         <MacsGroup />
         <VoiceSettingsSection />
+        <AppearanceGroup />
         <HistorySettingsGroup />
         <AccountGroup name={name} email={email} />
         <SignOutRow />
