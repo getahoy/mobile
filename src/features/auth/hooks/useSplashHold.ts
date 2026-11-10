@@ -1,5 +1,5 @@
 import { hide, preventAutoHideAsync, setOptions } from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export const SPLASH_LIMIT_MS = 3000;
 
@@ -8,22 +8,15 @@ setOptions({ fade: false });
 
 // The first JS frame draws the same image in the same place, so the splash is cut, not
 // faded, after one frame has painted; a crossfade would show both marks at once.
-const hideAfterPaint = (onHidden: () => void) =>
-  requestAnimationFrame(() => {
-    hide();
-    onHidden();
-  });
+const hideAfterPaint = () => requestAnimationFrame(() => hide());
 
-export function useSplashHold(ready: boolean): boolean {
-  const [hidden, setHidden] = useState(false);
+export function useSplashHold(ready: boolean): void {
   useEffect(() => {
-    const markHidden = () => setHidden(true);
     if (ready) {
-      hideAfterPaint(markHidden);
+      hideAfterPaint();
       return;
     }
-    const timer = setTimeout(() => hideAfterPaint(markHidden), SPLASH_LIMIT_MS);
+    const timer = setTimeout(hideAfterPaint, SPLASH_LIMIT_MS);
     return () => clearTimeout(timer);
   }, [ready]);
-  return hidden;
 }

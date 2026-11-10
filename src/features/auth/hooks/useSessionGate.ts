@@ -38,10 +38,9 @@ export function useSessionGate() {
   const slow = useElapsedOver(waiting, SIGNING_IN_DELAY_MS);
   const showSigningIn = useSpinnerVisible(slow);
   gate.current = nextSessionGate(gate.current, { ...input, showSigningIn });
-  const splashHidden = useSplashHold(!waiting);
+  useSplashHold(!waiting);
   return {
     gate: gate.current,
-    splashHidden,
     signedIn: launchSignedIn(input),
     stale: { failure: input.failure, orphaned: orphanedSession(input) },
   };

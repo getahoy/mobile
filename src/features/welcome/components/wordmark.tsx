@@ -2,21 +2,16 @@ import type { ComponentProps } from "react";
 import { Image } from "react-native";
 import Animated from "react-native-reanimated";
 import { useUniwind } from "uniwind";
-import type { ResolvedTheme } from "@/features/appearance/appearanceChoice";
 
 const lightMark = require("../../../../assets/images/splashWordmark.png");
 const darkMark = require("../../../../assets/images/splashWordmarkDark.png");
 
-type WordmarkProps = {
-  style?: ComponentProps<typeof Animated.View>["style"];
-  theme?: ResolvedTheme;
-};
+type WordmarkProps = { style?: ComponentProps<typeof Animated.View>["style"] };
 
 // The native splash image itself, at its imageWidth from app.config.ts and centred on
 // the full screen like the splash, so every launch screen shows the same Ahoy.
-export function Wordmark({ style, theme: shownTheme }: WordmarkProps) {
-  const { theme: appTheme } = useUniwind();
-  const theme = shownTheme ?? appTheme;
+export function Wordmark({ style }: WordmarkProps) {
+  const { theme } = useUniwind();
   return (
     <Animated.View
       style={style}

@@ -20,5 +20,5 @@ export function AppearanceFade() {
   }
   const finish = useCallback(() => setFade(null), []);
   if (!fade) return null;
-  return <ThemeVeil key={fade.id} theme={fade.from} fading onDone={finish} />;
+  return <ThemeVeil key={fade.id} theme={fade.from} onDone={finish} />;
 }

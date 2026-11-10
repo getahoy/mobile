@@ -11,7 +11,7 @@ import { Uniwind, useUniwind } from "uniwind";
 import { GestureRoot } from "@/components/gestureRoot";
 import { Toaster } from "@/components/ui/toaster";
 import { AppearanceFade } from "@/features/appearance/components/appearanceFade";
-import { LaunchVeil } from "@/features/appearance/components/launchVeil";
+import { useRootBackground } from "@/features/appearance/hooks/useRootBackground";
 import { LiveMacLinksProvider } from "@/features/pairing/components/liveMacLinksProvider";
 import { LaunchIntro } from "@/features/welcome/components/launchIntro";
 import { useLaunchIntro } from "@/features/welcome/hooks/useLaunchIntro";
@@ -22,7 +22,8 @@ import { SigningIn } from "./signingIn";
 
 export function SessionRoot() {
   const { theme } = useUniwind();
-  const { gate, signedIn, stale, splashHidden } = useSessionGate();
+  const { gate, signedIn, stale } = useSessionGate();
+  useRootBackground();
   useClearStaleSession(stale);
   useClearCacheOnSignOut(signedIn);
   const intro = useLaunchIntro(gate === "ready", signedIn);
@@ -70,7 +71,6 @@ export function SessionRoot() {
             <PortalHost />
             <Toaster />
             <AppearanceFade />
-            <LaunchVeil splashHidden={splashHidden} />
           </ThemeProvider>
         </LiveMacLinksProvider>
       </GestureRoot>

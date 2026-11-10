@@ -1,11 +1,11 @@
-import { type ReactNode, useEffect } from "react";
+import { useEffect } from "react";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { cn } from "@/lib/cn";
-import { duration, easing, useReducedMotion } from "@/lib/motion";
+import { duration, easing } from "@/lib/motion";
 import type { ResolvedTheme } from "../appearanceChoice";
 
 const canvas: Record<ResolvedTheme, string> = {
@@ -13,25 +13,20 @@ const canvas: Record<ResolvedTheme, string> = {
   dark: "bg-night",
 };
 
-type ThemeVeilProps = {
-  theme: ResolvedTheme;
-  fading: boolean;
-  onDone: () => void;
-  children?: ReactNode;
-};
+type ThemeVeilProps = { theme: ResolvedTheme; onDone: () => void };
 
 // The previous theme's canvas laid over the app, fading out to reveal the new one.
-export function ThemeVeil({ theme, fading, onDone, children }: ThemeVeilProps) {
-  const reducedMotion = useReducedMotion();
+export function ThemeVeil({ theme, onDone }: ThemeVeilProps) {
   const shown = useSharedValue(1);
 
   useEffect(() => {
-    if (!fading) return;
-    const fadeMs = reducedMotion ? 0 : duration.base;
-    shown.value = withTiming(0, { duration: fadeMs, easing: easing.inOut });
-    const timer = setTimeout(onDone, fadeMs);
+    shown.value = withTiming(0, {
+      duration: duration.base,
+      easing: easing.inOut,
+    });
+    const timer = setTimeout(onDone, duration.base);
     return () => clearTimeout(timer);
-  }, [fading, onDone, reducedMotion, shown]);
+  }, [onDone, shown]);
 
   const fade = useAnimatedStyle(() => ({ opacity: shown.value }));
 
@@ -41,8 +36,6 @@ export function ThemeVeil({ theme, fading, onDone, children }: ThemeVeilProps) {
       pointerEvents="none"
       aria-hidden
       className={cn("absolute inset-0", canvas[theme])}
-    >
-      {children}
-    </Animated.View>
+    />
   );
 }
