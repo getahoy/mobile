@@ -22,10 +22,9 @@ export const historyCopy = {
   emptyBody:
     "Everything you say to Ahoy, and what it did on your Mac, will be kept here.",
   offBody: "Ahoy isn’t keeping what you say. Turn it on to start again.",
-  keepHistoryFooter:
-    "Ahoy keeps a history of what you said and what it did in your account for 90 days. You can clear it or turn it off here. Speech audio is never stored.",
-  clearBody:
-    "This deletes every entry, on your iPhone and on your Macs. It can’t be undone.",
+  keepHistoryFooter: baseHistoryCopy.keepHistoryDisclosure(
+    "You can clear it or turn it off here.",
+  ),
   runAgain: (mac: string) => `Run again on ${mac}`,
   runAgainOff: "Run again needs a connection to your Mac.",
   viaRulesNote: "Matched one of Ahoy’s rules on your Mac. No AI was needed.",
