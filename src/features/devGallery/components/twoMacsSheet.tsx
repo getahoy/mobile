@@ -8,6 +8,7 @@ const sampleMac = (publicKey: string, displayName: string): PairedMac => ({
   publicKey,
   displayName,
   lastKnownAddresses: [],
+  localHost: null,
   lanPort: null,
   pairedAt: 0,
   paused: false,

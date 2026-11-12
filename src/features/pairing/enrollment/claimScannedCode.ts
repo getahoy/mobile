@@ -36,6 +36,7 @@ export async function claimScannedCode(qr: PairingQr): Promise<ClaimOutcome> {
     publicKey: qr.pk,
     displayName: qr.name,
     lastKnownAddresses: qr.lan?.hosts ?? [],
+    localHost: qr.lan?.local ?? null,
     lanPort: qr.lan?.port ?? null,
     pairedAt: Date.now(),
     paused: false,
