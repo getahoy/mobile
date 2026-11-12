@@ -1,6 +1,6 @@
-import type { PairingQr } from "@getahoy/protocol";
+import { type PairingQr, pairingQrExpired } from "@getahoy/protocol";
 import type { ClaimFailure } from "./enrollment/claimFailure.ts";
-import { qrExpired, readScannedCode } from "./enrollment/readScannedCode.ts";
+import { readScannedCode } from "./enrollment/readScannedCode.ts";
 
 export const SCAN_NOTICE_MS = 3000;
 
@@ -48,7 +48,7 @@ function scanned(state: Scanning, code: string, now: number): ScannerState {
 function retried(state: ScannerState, now: number): ScannerState {
   if (state.kind !== "failed" || state.failure !== "unreachable") return state;
   const { qr, code } = state;
-  if (!qrExpired(qr, now)) return { kind: "claiming", qr, code };
+  if (!pairingQrExpired(qr, now)) return { kind: "claiming", qr, code };
   return { kind: "scanning", notice: "expired", rejected: { code, at: now } };
 }
 
