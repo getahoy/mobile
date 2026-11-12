@@ -3,7 +3,6 @@ import type { LanEndpoint } from "@getahoy/protocol";
 import type { PairedMac } from "../storage/pairedMacs";
 import type { MarkStage } from "./connectTiming";
 import type { Dialed, Transport } from "./frameStream";
-import { type HandshakeMiss, handshakeVerdict } from "./handshakeVerdict";
 import { lanTransport } from "./lanTransport";
 import { type HandshakeOutcome, shakeHands } from "./macHandshake";
 import { MacSession } from "./macSession";
@@ -19,6 +18,7 @@ export type ConnectedLink = {
   lan: LanEndpoint | null;
 };
 
+type HandshakeMiss = Exclude<HandshakeOutcome, { outcome: "connected" }>;
 export type MacLink = ConnectedLink | HandshakeMiss;
 
 type Connected = Extract<HandshakeOutcome, { outcome: "connected" }>;
@@ -28,6 +28,19 @@ type Race =
   | { kind: "won"; winner: Winner }
   | { kind: "missed"; miss: HandshakeMiss };
 type Attempt = { transport: Transport; mac: PairedMac; keys: KeyPair };
+
+const UNREACHABLE: HandshakeMiss = { outcome: "unreachable" };
+// A stale address can belong to another device or another Mac running Ahoy,
+// so "unrecognised" wins only when no address gave a stronger answer.
+const MISS_STRENGTH = ["ended", "macTooOld", "macTooNew", "unrecognised"];
+
+function strongestMiss(misses: readonly HandshakeMiss[]): HandshakeMiss {
+  for (const kind of MISS_STRENGTH) {
+    const strongest = misses.find((miss) => miss.outcome === kind);
+    if (strongest) return strongest;
+  }
+  return UNREACHABLE;
+}
 
 function macStillFinishing(mac: PairedMac, miss: HandshakeMiss): boolean {
   const notPaired = miss.outcome === "ended" || miss.outcome === "unrecognised";
@@ -50,7 +63,7 @@ function firstConnected(attempts: Promise<Shaken | null>[]): Promise<Race> {
     let pending = attempts.length;
     let won = false;
     const missed = () =>
-      resolve({ kind: "missed", miss: handshakeVerdict(misses) });
+      resolve({ kind: "missed", miss: strongestMiss(misses) });
     if (pending === 0) missed();
     for (const attempt of attempts) {
       void attempt.then((shaken) => {
@@ -99,5 +112,5 @@ export async function connectToMac(
     session.send({ type: "ready" });
     return { outcome: "connected", session, ip, lan: handshake.lan };
   }
-  return { outcome: "unreachable" };
+  return UNREACHABLE;
 }

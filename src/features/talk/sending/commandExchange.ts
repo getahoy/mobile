@@ -1,9 +1,8 @@
-import type { Frame } from "@getahoy/protocol";
+import { COMMAND_LOOKUP_CAPABILITY, type Frame } from "@getahoy/protocol";
 import type {
   MacEvent,
   MacSession,
 } from "@/features/pairing/connection/macSession";
-import { afterLostLink, afterUnknown, failureFor } from "./lostLink";
 import {
   type CommandAnswer,
   type CommandSend,
@@ -14,6 +13,9 @@ import {
 } from "./sendCommand";
 
 type Result = Extract<Frame, { type: "command.result" }>;
+
+const failureFor = (received: boolean): CommandAnswer =>
+  received ? { kind: "noAnswer" } : { kind: "unreachable" };
 
 function resultAnswer(reply: Result): CommandAnswer {
   const { threadId, status, message, choices, confirm } = reply;
@@ -84,8 +86,10 @@ class CommandExchange {
     this.#arm();
   }
 
+  // A Mac that had received the command and now does not know it restarted,
+  // so sending it again could run it twice.
   #unknown(session: MacSession): void {
-    if (afterUnknown(this.#received) === "noAnswer") {
+    if (this.#received) {
       this.#settle({ kind: "noAnswer" });
       return;
     }
@@ -96,9 +100,9 @@ class CommandExchange {
   async #relink(): Promise<void> {
     this.#detach();
     const session = await openSession(this.#send.line);
-    if (!session) return this.#settle({ kind: failureFor(this.#received) });
-    const next = afterLostLink(session, this.#received);
-    if (next !== "lookup") return this.#settle({ kind: next });
+    if (!session?.can(COMMAND_LOOKUP_CAPABILITY)) {
+      return this.#settle(failureFor(this.#received));
+    }
     this.#attach(session);
     this.#awaitingReceipt = true;
     const { commandId } = this.#send.request;
@@ -110,7 +114,7 @@ class CommandExchange {
     this.#clearTimers();
     if (!this.#unsubscribe || !this.#send.line.activity.isActive()) return;
     if (this.#awaitingReceipt) {
-      const missed = () => this.#settle({ kind: failureFor(this.#received) });
+      const missed = () => this.#settle(failureFor(this.#received));
       this.#timers = [setTimeout(missed, RECEIVED_TIMEOUT_MS)];
       return;
     }

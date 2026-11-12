@@ -1,16 +1,33 @@
 import { parseStored } from "@getahoy/lib";
-import { z } from "zod";
 import {
-  type PairedMac,
-  type StoredMac,
-  storedMacSchema,
-} from "./pairedMacSchema";
+  bytes32Schema,
+  endReasonSchema,
+  localHostSchema,
+} from "@getahoy/protocol";
+import { z } from "zod";
 import { pairingEntry, pairingKeychain } from "./pairingKeychain";
 
-export type { PairedMac };
+const pairedMacSchema = z.object({
+  publicKey: bytes32Schema,
+  displayName: z.string(),
+  lastKnownAddresses: z.array(z.string()),
+  localHost: localHostSchema.nullable().default(null),
+  lanPort: z.int().nullable(),
+  pairedAt: z.int(),
+  paused: z.boolean().default(false),
+});
 
-type AddressChange = "lastKnownAddresses" | "localHost" | "lanPort";
-type MacChange = Partial<Pick<PairedMac, "paused" | AddressChange>>;
+// Older builds kept an ended Mac in the list; settleEndedMacs migrates it.
+const storedMacSchema = pairedMacSchema.extend({
+  ended: z
+    .object({ reason: endReasonSchema, at: z.int() })
+    .nullable()
+    .default(null),
+});
+
+export type PairedMac = z.infer<typeof pairedMacSchema>;
+type StoredMac = z.infer<typeof storedMacSchema>;
+type MacChange = Partial<Omit<PairedMac, "publicKey">>;
 
 const storedMacListSchema = z.array(storedMacSchema);
 

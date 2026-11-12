@@ -11,10 +11,10 @@ import type { ConnectedLink, MacLink } from "./connectToMac";
 import { dialMac } from "./dialMac";
 import { BACKGROUND_GRACE_MS, resumeLink, retryDelay } from "./linkTiming";
 import type { LiveMacLinks } from "./liveMacLinks";
+import { rememberLink } from "./macAddresses";
 import { MacLinkMemory } from "./macLinkMemory";
 import { isLinking, keepsRetrying, type MacLinkState } from "./macLinkState";
 import type { MacEvent, MacSession } from "./macSession";
-import { rememberLink } from "./rememberLink";
 
 type MacConnectionOptions = {
   mac: PairedMac;

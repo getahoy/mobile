@@ -1,15 +1,7 @@
-import { type LanEndpoint, MAX_LAN_HOSTS } from "@getahoy/protocol";
-import type { PairedMac } from "../storage/pairedMacSchema.ts";
-
-export function mergedAddresses(
-  workingIp: string | null,
-  current: readonly string[],
-  known: readonly string[],
-): string[] {
-  const first = workingIp === null ? [] : [workingIp];
-  const merged = new Set([...first, ...current, ...known]);
-  return [...merged].slice(0, MAX_LAN_HOSTS);
-}
+import { MAX_LAN_HOSTS } from "@getahoy/protocol";
+import { markReachedOnLan } from "@/features/permissions/storage/localNetworkMemory";
+import { type PairedMac, updatePairedMac } from "../storage/pairedMacs";
+import type { ConnectedLink } from "./connectToMac";
 
 function sameList(left: readonly string[], right: readonly string[]): boolean {
   return (
@@ -18,14 +10,14 @@ function sameList(left: readonly string[], right: readonly string[]): boolean {
   );
 }
 
-export function refreshedMac(
+function refreshedMac(
   mac: PairedMac,
-  workingIp: string | null,
-  lan: LanEndpoint | null,
+  { ip, lan }: ConnectedLink,
 ): PairedMac | null {
   const known = mac.lastKnownAddresses;
-  const current = lan?.hosts ?? [];
-  const lastKnownAddresses = mergedAddresses(workingIp, current, known);
+  const first = ip === null ? [] : [ip];
+  const merged = new Set([...first, ...(lan?.hosts ?? []), ...known]);
+  const lastKnownAddresses = [...merged].slice(0, MAX_LAN_HOSTS);
   const localHost = lan?.local ?? mac.localHost;
   const lanPort = lan?.port ?? mac.lanPort;
   const unchanged =
@@ -33,4 +25,14 @@ export function refreshedMac(
     localHost === mac.localHost &&
     lanPort === mac.lanPort;
   return unchanged ? null : { ...mac, lastKnownAddresses, localHost, lanPort };
+}
+
+export function rememberLink(mac: PairedMac, link: ConnectedLink): PairedMac {
+  markReachedOnLan(mac.publicKey);
+  const refreshed = refreshedMac(mac, link);
+  if (!refreshed) return mac;
+  const { lastKnownAddresses, localHost, lanPort } = refreshed;
+  const addresses = { lastKnownAddresses, localHost, lanPort };
+  void updatePairedMac(mac.publicKey, addresses);
+  return refreshed;
 }
