@@ -8,6 +8,7 @@ function mac(publicKey: string): PairedMac {
     publicKey,
     displayName: publicKey,
     lastKnownAddresses: [],
+    localHost: null,
     lanPort: null,
     pairedAt: 0,
     paused: false,
