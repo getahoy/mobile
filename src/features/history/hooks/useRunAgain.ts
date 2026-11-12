@@ -1,3 +1,4 @@
+import { canRunAgain } from "@getahoy/lib";
 import type { HistoryEntry } from "@getahoy/protocol";
 import { router } from "expo-router";
 import { useSyncExternalStore } from "react";
@@ -18,5 +19,5 @@ export function useRunAgain(entry: HistoryEntry) {
     select(macKey);
     router.dismissTo({ pathname: "/", params: { again: entry.heard } });
   };
-  return { shown: entry.status !== "blocked", ready, run };
+  return { shown: canRunAgain(entry), ready, run };
 }

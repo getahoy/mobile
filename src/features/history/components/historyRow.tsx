@@ -1,3 +1,4 @@
+import { rowDid } from "@getahoy/lib";
 import type { HistoryEntry } from "@getahoy/protocol";
 import { Pressable, View } from "react-native";
 import { Text } from "@/components/ui/text";
@@ -13,9 +14,7 @@ type HistoryRowProps = {
 
 export function HistoryRow({ entry, time, meta, onOpen }: HistoryRowProps) {
   const running = entry.status === "running";
-  const did = running
-    ? historyCopy.working(entry.macName)
-    : (entry.did ?? historyCopy.status[entry.status]);
+  const did = rowDid(entry, historyCopy.working(entry.macName));
   const status = historyCopy.status[entry.status];
   const label = historyCopy.entryLabel(entry.heard, `${status}. ${did}`, time);
   return (
