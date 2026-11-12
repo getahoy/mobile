@@ -1,7 +1,6 @@
-import { HISTORY_SEARCH_DELAY_MS } from "@getahoy/lib";
+import { HISTORY_SEARCH_DELAY_MS, type ListPhase } from "@getahoy/lib";
 import { useMemo } from "react";
 import { useDebounce } from "react-haiku";
-import type { ListPhase } from "../historyQuery";
 import type { HistoryView } from "../localEntries";
 import { useHistoryQuery } from "./useHistoryQuery";
 

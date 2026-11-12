@@ -1,9 +1,7 @@
-import { summaryLine } from "@getahoy/lib";
+import { blankFor, listView } from "@getahoy/lib";
 import { useState } from "react";
 import { usePairedMacs } from "@/features/pairing/hooks/usePairedMacs";
 import { historyCopy } from "../copy/historyCopy";
-import { blankFor } from "../historyBlankState";
-import { listNotice } from "../historyView";
 import { useHistory } from "./historyContext";
 import { useFirstLoad } from "./useFirstLoad";
 
@@ -16,13 +14,29 @@ export function useHistoryScreen() {
   const { list, filter, search, macKey, entries, unsynced } = history;
   const picking = macs.length > 1;
   const chosen = macs.find((mac) => mac.publicKey === macKey);
-  const plain = filter === "all" && !search.trim();
-  const count = entries.length;
-  const { phase } = list;
-  const { cleared } = history;
-  const blank = blankFor({ phase, cleared, count, filter, search });
+  const view = { filter, search, count: entries.length };
+  const blank = blankFor({
+    ...view,
+    phase: list.phase,
+    keepHistory: history.settings.keepHistory,
+    signedOut: false,
+    cleared: history.cleared,
+  });
   const firstLoad = useFirstLoad(blank === "loading");
-  const noHistory = blank === "empty" || blank === "cleared";
+  const shown = listView({
+    ...view,
+    blank,
+    summary: list.summary,
+    summaryPending: list.summaryPending,
+    offline: history.offline,
+    stale: list.stale,
+    manualFailure: list.errorAt === history.failedAt,
+  });
+  const notices = {
+    offline: historyCopy.offline(unsynced.size),
+    couldNotRefresh: historyCopy.couldNotRefresh,
+  };
+  const notice = shown.notice ? notices[shown.notice] : null;
   return {
     firstLoad,
     history,
@@ -32,14 +46,8 @@ export function useHistoryScreen() {
     picking,
     chipLabel: chosen?.displayName || historyCopy.allMacs,
     showMac: picking && macKey === null,
-    canClear: plain && entries.length > 0,
-    summary: noHistory ? null : summaryLine(filter, list.summary),
-    summaryPending: !noHistory && list.summaryPending,
-    notice: listNotice({
-      offline: history.offline,
-      waiting: unsynced.size,
-      stale: list.stale && list.errorAt !== history.failedAt,
-    }),
+    ...shown,
+    notice,
     blank,
   };
 }

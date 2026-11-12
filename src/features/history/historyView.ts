@@ -1,13 +1,6 @@
 import type { HistoryEntry } from "@getahoy/protocol";
 import { historyCopy } from "./copy/historyCopy.ts";
 
-type NoticeInput = { offline: boolean; waiting: number; stale: boolean };
-
-export function listNotice({ offline, waiting, stale }: NoticeInput) {
-  if (offline) return historyCopy.offline(waiting);
-  return stale ? historyCopy.couldNotRefresh : null;
-}
-
 type MetaInput = {
   entry: HistoryEntry;
   unsynced: ReadonlySet<string>;
