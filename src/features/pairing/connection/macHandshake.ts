@@ -22,7 +22,12 @@ import type { FrameStream } from "./frameStream";
 const REPLY_TIMEOUT_MS = 5000;
 
 export type HandshakeOutcome =
-  | { outcome: "connected"; channel: SecureChannel; lan: LanEndpoint | null }
+  | {
+      outcome: "connected";
+      channel: SecureChannel;
+      lan: LanEndpoint | null;
+      capabilities: readonly string[];
+    }
   | { outcome: "macTooOld" }
   | { outcome: "macTooNew" }
   | { outcome: "ended"; reason: EndReason }
@@ -47,8 +52,10 @@ function readReply(
   if (!reply.success) return UNREACHABLE;
   switch (reply.data.type) {
     case "welcome": {
+      const { channel } = opened;
       const lan = reply.data.lan ?? null;
-      return { outcome: "connected", channel: opened.channel, lan };
+      const { capabilities } = reply.data.hello;
+      return { outcome: "connected", channel, lan, capabilities };
     }
     case "version_mismatch":
       return reply.data.protocolVersion < PROTOCOL_VERSION

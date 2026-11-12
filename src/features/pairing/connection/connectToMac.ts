@@ -94,7 +94,8 @@ export async function connectToMac(
       return connectToMac(mac, keys, mark);
     }
     const { stream, ip, handshake } = race.winner;
-    const session = new MacSession(stream, handshake.channel);
+    const { channel, capabilities } = handshake;
+    const session = new MacSession(stream, channel, capabilities);
     session.send({ type: "ready" });
     return { outcome: "connected", session, ip, lan: handshake.lan };
   }

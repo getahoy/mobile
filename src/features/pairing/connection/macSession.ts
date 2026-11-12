@@ -14,7 +14,7 @@ const PONG_TIMEOUT_MS = 5000;
 
 type CommandReply = Extract<
   CommandFrame,
-  { type: "command.received" | "command.result" }
+  { type: "command.received" | "command.result" | "command.unknown" }
 >;
 
 export type MacEvent =
@@ -26,15 +26,21 @@ export type MacEvent =
 export class MacSession {
   readonly #stream: FrameStream;
   readonly #channel: SecureChannel;
+  readonly #capabilities: readonly string[];
   readonly #listeners = new Set<(event: MacEvent) => void>();
   readonly #pongWaiters = new Set<() => void>();
   readonly #heartbeat: ReturnType<typeof setInterval>;
   #pongTimer: ReturnType<typeof setTimeout> | null = null;
   #closed = false;
 
-  constructor(stream: FrameStream, channel: SecureChannel) {
+  constructor(
+    stream: FrameStream,
+    channel: SecureChannel,
+    capabilities: readonly string[],
+  ) {
     this.#stream = stream;
     this.#channel = channel;
+    this.#capabilities = capabilities;
     this.#heartbeat = setInterval(() => this.#ping(), PING_INTERVAL_MS);
     stream.onFrame((sealed) => this.#receive(sealed));
     stream.onClose(() => this.#finish());
@@ -42,6 +48,10 @@ export class MacSession {
 
   isOpen(): boolean {
     return !this.#closed;
+  }
+
+  can(capability: string): boolean {
+    return this.#capabilities.includes(capability);
   }
 
   onEvent(listener: (event: MacEvent) => void): () => void {
@@ -109,11 +119,13 @@ export class MacSession {
         return;
       case "command.received":
       case "command.result":
+      case "command.unknown":
         this.#emit({ kind: "commandReply", reply: frame.data });
         return;
       case "ready":
       case "command":
       case "command.choose":
+      case "command.lookup":
       case "speech.stop":
       case "choice.extend":
         return;
