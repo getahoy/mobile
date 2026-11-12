@@ -3,8 +3,9 @@ import {
   type CommandStatus,
   type FailureReason,
   type HistoryFollowUp,
-  type HistoryStatus,
   type HistoryWriteEntry,
+  historyReasonOf,
+  historyStatusOf,
   MAX_FOLLOW_UPS,
 } from "@getahoy/protocol";
 import type { ResultDetails, TalkFailure } from "../talk/talkState.ts";
@@ -60,26 +61,6 @@ export function startRecord(start: Start): HistoryWriteEntry {
   };
 }
 
-function historyStatusOf(
-  status: CommandStatus,
-  followedUp: boolean,
-): HistoryStatus {
-  switch (status) {
-    case "done":
-      return followedUp ? "choice" : "done";
-    case "needsChoice":
-      return "running";
-    case "refused":
-      return "blocked";
-    case "failed":
-      return "failed";
-    default: {
-      const unhandled: never = status;
-      return unhandled;
-    }
-  }
-}
-
 function answered(followUp: HistoryFollowUp, answer: MacAnswer) {
   const number = DIGITS.test(answer.heard) ? Number(answer.heard) : null;
   const known = followUp.options.some((option) => option.number === number);
@@ -116,7 +97,6 @@ export function applyAnswer(
   const followUps = followUpsAfter(entry, answer);
   const status = historyStatusOf(answer.status, followUps.length > 0);
   const { details } = answer;
-  const ended = status === "failed" || status === "blocked";
   const onMacMs = sum(entry.timings.onMacMs, details.onMacMs) ?? null;
   const waitedMs = sum(entry.timings.waitedMs, answer.waitedMs) ?? null;
   return {
@@ -126,7 +106,7 @@ export function applyAnswer(
     status,
     app: details.app ?? entry.app,
     via: details.via ?? entry.via,
-    reason: ended ? (details.reason ?? "other") : null,
+    reason: historyReasonOf(status, details.reason),
     timings: { ...entry.timings, ...measured({ onMacMs, waitedMs }) },
     followUps,
     finishedAt: status === "running" ? null : iso(answer.at),
