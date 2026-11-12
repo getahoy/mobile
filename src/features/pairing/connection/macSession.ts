@@ -1,12 +1,13 @@
 import type { SecureChannel } from "@getahoy/crypto";
 import {
   type CommandFrame,
+  decodeJson,
+  encodeJson,
   type Frame,
   frameSchema,
   type GoodbyeReason,
 } from "@getahoy/protocol";
 import type { FrameStream } from "./frameStream";
-import { decodeJson, encodeJson } from "./jsonBytes";
 
 const PING_INTERVAL_MS = 10_000;
 const PONG_TIMEOUT_MS = 5000;

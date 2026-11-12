@@ -1,8 +1,7 @@
+import { useElapsedOver, useSpinnerVisible } from "@getahoy/lib";
 import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@/lib/motion";
-import { useElapsedOver } from "@/lib/useElapsedOver";
-import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
 import { PennantSpinner } from "./pennantSpinner";
 import { Text } from "./text";
 

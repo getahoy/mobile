@@ -1,4 +1,5 @@
 import {
+  apiPaths,
   type PairingClaimRequest,
   type PairingUnlinkRequest,
   pairingClaimSchema,
@@ -8,17 +9,17 @@ import {
 import { sessionRequest } from "@/features/auth/client/sessionRequest";
 
 export function claimPairing(body: PairingClaimRequest) {
-  const path = "/api/pairing/claim";
+  const path = apiPaths.pairingClaim;
   return sessionRequest({ path, body, schema: pairingClaimSchema });
 }
 
 export function unlinkPairing(body: PairingUnlinkRequest) {
-  const path = "/api/pairing/unlink";
+  const path = apiPaths.pairingUnlink;
   return sessionRequest({ path, body, schema: pairingUnlinkSchema });
 }
 
 export function listPairingLinks(device: string) {
-  const path = "/api/pairing/links";
+  const path = apiPaths.pairingLinks;
   const query = { device };
   return sessionRequest({ path, query, schema: pairingLinksSchema });
 }

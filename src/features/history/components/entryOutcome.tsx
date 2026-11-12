@@ -1,9 +1,9 @@
+import { seconds, totalMs } from "@getahoy/lib";
 import type { HistoryEntry, HistoryStatus } from "@getahoy/protocol";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/cn";
 import { historyCopy } from "../copy/historyCopy";
-import { seconds, totalMs } from "../historyView";
 import { StatusMark } from "./statusMark";
 
 const statusTones: Record<HistoryStatus, string> = {

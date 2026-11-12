@@ -1,8 +1,8 @@
+import { dayLabel, timeLabel } from "@getahoy/lib";
 import type { HistoryEntry } from "@getahoy/protocol";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/cn";
-import { dayLabel, timeLabel } from "../historyView";
 
 const LONG_HEARD_CHARS = 60;
 

@@ -1,3 +1,4 @@
+import type { Appearance } from "@getahoy/lib";
 import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
@@ -7,7 +8,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { Text } from "@/components/ui/text";
 import { duration, easing, useReducedMotion } from "@/lib/motion";
-import type { Appearance } from "../appearanceChoice";
 import { appearanceCopy } from "../copy/appearanceCopy";
 import { AppearancePreview } from "./appearancePreview";
 import { AppearanceRadio } from "./appearanceRadio";

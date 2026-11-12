@@ -1,7 +1,5 @@
+import { spinnerTiming, useElapsedOver, useSpinnerVisible } from "@getahoy/lib";
 import { useRef } from "react";
-import { spinnerTiming } from "@/lib/motion";
-import { useElapsedOver } from "@/lib/useElapsedOver";
-import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
 import { authClient } from "../client/authClient";
 import {
   type GateInput,

@@ -1,10 +1,10 @@
+import { seconds } from "@getahoy/lib";
 import type { HistoryFollowUp } from "@getahoy/protocol";
 import { View } from "react-native";
 import { ChoiceTag } from "@/components/ui/choiceTag";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/cn";
 import { historyCopy } from "../copy/historyCopy";
-import { seconds } from "../historyView";
 
 export function EntryFollowUp({ followUp }: { followUp: HistoryFollowUp }) {
   const { waitedMs, said } = followUp;

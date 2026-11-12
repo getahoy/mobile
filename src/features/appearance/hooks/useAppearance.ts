@@ -1,6 +1,6 @@
+import type { Appearance } from "@getahoy/lib";
 import { useState } from "react";
 import { Uniwind, useUniwind } from "uniwind";
-import type { Appearance } from "../appearanceChoice";
 import { readAppearance, writeAppearance } from "../storage/appearanceStorage";
 
 // Uniwind.setTheme also sets Appearance.setColorScheme, so native views,

@@ -1,6 +1,7 @@
+import { sectionsByDay, timeLabel } from "@getahoy/lib";
 import type { HistoryEntry } from "@getahoy/protocol";
 import { router } from "expo-router";
-import { entryMeta, sectionsByDay, timeLabel } from "../historyView";
+import { entryMeta } from "../historyView";
 import type { HistoryScreenState } from "../hooks/useHistoryScreen";
 import { HistoryList } from "./historyList";
 import { HistoryListBlank } from "./historyListBlank";

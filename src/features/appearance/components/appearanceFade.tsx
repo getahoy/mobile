@@ -1,7 +1,7 @@
+import type { ResolvedTheme } from "@getahoy/lib";
 import { useCallback, useState } from "react";
 import { useUniwind } from "uniwind";
 import { useReducedMotion } from "@/lib/motion";
-import type { ResolvedTheme } from "../appearanceChoice";
 import { ThemeVeil } from "./themeVeil";
 
 type Fade = { from: ResolvedTheme; id: number };

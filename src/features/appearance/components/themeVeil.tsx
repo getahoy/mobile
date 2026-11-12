@@ -1,3 +1,4 @@
+import type { ResolvedTheme } from "@getahoy/lib";
 import { useEffect } from "react";
 import Animated, {
   useAnimatedStyle,
@@ -6,7 +7,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { cn } from "@/lib/cn";
 import { duration, easing } from "@/lib/motion";
-import type { ResolvedTheme } from "../appearanceChoice";
 
 const canvas: Record<ResolvedTheme, string> = {
   light: "bg-day",

@@ -1,8 +1,8 @@
+import type { HistorySection } from "@getahoy/lib";
 import type { HistoryEntry } from "@getahoy/protocol";
 import type { ReactElement, ReactNode } from "react";
 import { RefreshControl, SectionList } from "react-native";
 import { Text } from "@/components/ui/text";
-import type { HistorySection } from "../historyView";
 
 type HistoryListProps = {
   sections: readonly HistorySection[];

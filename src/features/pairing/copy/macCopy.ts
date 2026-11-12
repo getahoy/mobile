@@ -59,14 +59,7 @@ export const macCopy = {
       short: (mac: string) => `${mac} is now paired with a different phone.`,
     },
   },
-  endedWhen: {
-    justNow: "Just now",
-    minutes: (count: number) =>
-      count === 1 ? "1 minute ago" : `${count} minutes ago`,
-    hours: (count: number) =>
-      count === 1 ? "1 hour ago" : `${count} hours ago`,
-    whileClosed: (when: string) => `${when} · while Ahoy was closed`,
-  },
+  whileClosedNote: "while Ahoy was closed",
   stillPairedBefore: "You’re still paired with ",
   stillPairedAfter: ".",
   endedScanBefore: "On ",

@@ -1,8 +1,9 @@
+import { summaryLine } from "@getahoy/lib";
 import { useState } from "react";
 import { usePairedMacs } from "@/features/pairing/hooks/usePairedMacs";
 import { historyCopy } from "../copy/historyCopy";
 import { blankFor } from "../historyBlankState";
-import { listNotice, summaryLine } from "../historyView";
+import { listNotice } from "../historyView";
 import { useHistory } from "./historyContext";
 import { useFirstLoad } from "./useFirstLoad";
 

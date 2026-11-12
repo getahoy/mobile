@@ -1,3 +1,4 @@
+import { reportLines } from "@getahoy/lib";
 import { type HistoryEntry, MAX_REPORT_NOTE_CHARS } from "@getahoy/protocol";
 import { useState } from "react";
 import { TextInput, View } from "react-native";
@@ -5,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
 import { Text } from "@/components/ui/text";
 import { historyCopy } from "../copy/historyCopy";
-import { reportLines } from "../historyView";
 
 type ReportSheetProps = {
   entry: HistoryEntry;

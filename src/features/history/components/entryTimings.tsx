@@ -1,9 +1,9 @@
+import { seconds, timingSegments } from "@getahoy/lib";
 import type { HistoryTimings } from "@getahoy/protocol";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/cn";
 import { historyCopy } from "../copy/historyCopy";
-import { seconds, timingSegments } from "../historyView";
 import { EntryTimingLegend, timingSwatches } from "./entryTimingLegend";
 
 // Class names must be written out whole for the style compiler to find them.

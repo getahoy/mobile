@@ -6,7 +6,9 @@ import {
   startInitiator,
 } from "@getahoy/crypto";
 import {
+  decodeJson,
   type EndReason,
+  encodeJson,
   type Frame,
   handshakeReplySchema,
   PROTOCOL_VERSION,
@@ -16,7 +18,6 @@ import { phoneHello } from "../device/phoneDescription";
 import type { PairedMac } from "../storage/pairedMacs";
 import type { MarkStage } from "./connectTiming";
 import type { FrameStream } from "./frameStream";
-import { decodeJson, encodeJson } from "./jsonBytes";
 
 const REPLY_TIMEOUT_MS = 5000;
 

@@ -1,6 +1,6 @@
+import { APPEARANCES } from "@getahoy/lib";
 import { View } from "react-native";
 import { ListGroup } from "@/components/ui/listGroup";
-import { APPEARANCES } from "../appearanceChoice";
 import { appearanceCopy } from "../copy/appearanceCopy";
 import { useAppearanceSwitch } from "../hooks/useAppearanceSwitch";
 import { AppearanceTile } from "./appearanceTile";

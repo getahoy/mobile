@@ -1,6 +1,7 @@
+import { whyOf } from "@getahoy/lib";
 import type { HistoryEntry, HistoryFollowUp } from "@getahoy/protocol";
 import { ScrollView, View } from "react-native";
-import { whyOf } from "../historyView";
+import { historyCopy } from "../copy/historyCopy";
 import { useEntryActions } from "../hooks/useEntryActions";
 import { EntryActions } from "./entryActions";
 import { EntryBackBar } from "./entryBackBar";
@@ -18,7 +19,7 @@ const followUpKey = (followUp: HistoryFollowUp) =>
 
 export function EntryDetail({ entry }: { entry: HistoryEntry }) {
   const actions = useEntryActions(entry);
-  const why = whyOf(entry);
+  const why = whyOf(entry, historyCopy.why);
   const close = () => actions.setSheet(null);
   return (
     <View className="flex-1 bg-sailcloth pt-safe">

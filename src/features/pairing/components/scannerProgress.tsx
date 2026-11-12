@@ -1,6 +1,6 @@
+import { useSpinnerVisible } from "@getahoy/lib";
 import { ActivityIndicator, View } from "react-native";
 import { Text } from "@/components/ui/text";
-import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
 
 type ScannerProgressProps = { text: string };
 

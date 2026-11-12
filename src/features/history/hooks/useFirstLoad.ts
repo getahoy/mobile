@@ -1,4 +1,4 @@
-import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
+import { useSpinnerVisible } from "@getahoy/lib";
 
 // The waiting state keeps its place until its own spinner may leave, so it never flickers.
 export function useFirstLoad(waiting: boolean) {

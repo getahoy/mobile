@@ -1,7 +1,7 @@
+import type { Appearance } from "@getahoy/lib";
 import { useRef, useState } from "react";
 import { haptic } from "@/lib/haptics";
 import { useReducedMotion } from "@/lib/motion";
-import type { Appearance } from "../appearanceChoice";
 import { useAppearance } from "./useAppearance";
 
 const CROSSFADE_DELAY_MS = 60;

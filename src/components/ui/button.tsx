@@ -1,8 +1,8 @@
+import { useSpinnerVisible } from "@getahoy/lib";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 import { ActivityIndicator, Pressable } from "react-native";
 import { cn } from "@/lib/cn";
-import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
 import { TextClassContext } from "./text";
 
 const buttonVariants = cva(

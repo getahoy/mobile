@@ -1,8 +1,11 @@
-import { type AuthRequestState, authCopy } from "@getahoy/lib";
+import {
+  type AuthRequestState,
+  authCopy,
+  useElapsedOver,
+  useSpinnerVisible,
+} from "@getahoy/lib";
 import { useEffect, useState } from "react";
 import { haptic } from "@/lib/haptics";
-import { useElapsedOver } from "@/lib/useElapsedOver";
-import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
 
 const SLOW_AFTER_MS = 6000;
 

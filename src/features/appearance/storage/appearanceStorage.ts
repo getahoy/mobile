@@ -1,15 +1,15 @@
+import { type Appearance, appearanceSchema } from "@getahoy/lib";
 import { createMMKV } from "react-native-mmkv";
-import { z } from "zod";
-import { APPEARANCES, type Appearance } from "../appearanceChoice";
 
 const APPEARANCE_KEY = "appearance.choice";
 
 const appearanceStorage = createMMKV({ id: "ahoy.appearance" });
 
-const appearanceSchema = z.enum(APPEARANCES).catch("system");
+const storedAppearanceSchema = appearanceSchema.catch("system");
 
 export function readAppearance(): Appearance {
-  return appearanceSchema.parse(appearanceStorage.getString(APPEARANCE_KEY));
+  const stored = appearanceStorage.getString(APPEARANCE_KEY);
+  return storedAppearanceSchema.parse(stored);
 }
 
 export function writeAppearance(appearance: Appearance): void {

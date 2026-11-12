@@ -1,7 +1,7 @@
+import { seconds, type TimingSegment } from "@getahoy/lib";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/cn";
-import { seconds, type TimingSegment } from "../historyView";
 
 export const timingSwatches: Record<TimingSegment["tone"], string> = {
   ink: "bg-ink",

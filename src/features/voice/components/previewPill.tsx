@@ -1,7 +1,7 @@
+import { useSpinnerVisible } from "@getahoy/lib";
 import { ActivityIndicator, Pressable } from "react-native";
 import { Icon } from "@/components/ui/icon";
 import { Text } from "@/components/ui/text";
-import { useSpinnerVisible } from "@/lib/useSpinnerVisible";
 import { voiceCopy } from "../copy/voiceCopy";
 import type { SamplePhase } from "../previewState";
 

@@ -1,4 +1,5 @@
 import {
+  apiPaths,
   type HistoryQuery,
   type HistorySettings,
   type HistoryWrite,
@@ -9,11 +10,9 @@ import {
 } from "@getahoy/protocol";
 import { sessionRequest } from "@/features/auth/client/sessionRequest";
 
-const HISTORY = "/api/history";
-const entryPath = (id: string) => `${HISTORY}/${encodeURIComponent(id)}`;
-
 export function sendHistoryWrites(body: HistoryWrite) {
-  return sessionRequest({ path: HISTORY, body, schema: historyWrittenSchema });
+  const path = apiPaths.history;
+  return sessionRequest({ path, body, schema: historyWrittenSchema });
 }
 
 function urlQuery({ cursor, status, macKey }: HistoryQuery) {
@@ -28,41 +27,43 @@ function urlQuery({ cursor, status, macKey }: HistoryQuery) {
 export function fetchHistoryPage(query: HistoryQuery) {
   const schema = historyPageSchema;
   if (query.q) {
-    const path = `${HISTORY}/search`;
+    const path = apiPaths.historySearch;
     return sessionRequest({ path, body: query, schema });
   }
-  return sessionRequest({ path: HISTORY, query: urlQuery(query), schema });
+  const path = apiPaths.history;
+  return sessionRequest({ path, query: urlQuery(query), schema });
 }
 
 export function deleteHistoryEntry(id: string) {
-  const path = entryPath(id);
+  const path = apiPaths.historyEntry(id);
   const schema = historyChangedSchema;
   return sessionRequest({ path, method: "DELETE", schema });
 }
 
 export function restoreHistoryEntry(id: string) {
-  const path = `${entryPath(id)}/restore`;
+  const path = apiPaths.historyRestore(id);
   return sessionRequest({ path, method: "POST", schema: historyChangedSchema });
 }
 
 export function reportHistoryProblem(id: string, note: string) {
-  const path = `${entryPath(id)}/report`;
+  const path = apiPaths.historyReport(id);
   const body = note.trim() ? { note: note.trim() } : {};
   return sessionRequest({ path, body, schema: historyChangedSchema });
 }
 
 export function clearAllHistory() {
+  const path = apiPaths.history;
   const schema = historyChangedSchema;
-  return sessionRequest({ path: HISTORY, method: "DELETE", schema });
+  return sessionRequest({ path, method: "DELETE", schema });
 }
 
 export function readHistorySettings() {
-  const path = `${HISTORY}/settings`;
+  const path = apiPaths.historySettings;
   return sessionRequest({ path, schema: historySettingsSchema });
 }
 
 export function changeHistorySettings(body: HistorySettings) {
-  const path = `${HISTORY}/settings`;
+  const path = apiPaths.historySettings;
   const schema = historySettingsSchema;
   return sessionRequest({ path, method: "PATCH", body, schema });
 }

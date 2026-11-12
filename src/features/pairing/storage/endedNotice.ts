@@ -1,7 +1,8 @@
+import { noticeShown } from "@getahoy/lib";
 import { endReasonSchema } from "@getahoy/protocol";
 import { createMMKV, useMMKVString } from "react-native-mmkv";
 import { z } from "zod";
-import { type EndedNotice, noticeShown } from "../endedPairing";
+import type { EndedNotice } from "../endedPairing";
 
 const ENDED_NOTICE_KEY = "pairing.endedNotice";
 

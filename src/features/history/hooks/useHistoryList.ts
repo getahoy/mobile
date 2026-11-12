@@ -1,10 +1,9 @@
+import { HISTORY_SEARCH_DELAY_MS } from "@getahoy/lib";
 import { useMemo } from "react";
 import { useDebounce } from "react-haiku";
 import type { ListPhase } from "../historyQuery";
 import type { HistoryView } from "../localEntries";
 import { useHistoryQuery } from "./useHistoryQuery";
-
-const SEARCH_DELAY_MS = 300;
 
 function phaseOf(shown: boolean, failed: boolean): ListPhase {
   if (shown) return "ready";
@@ -13,7 +12,7 @@ function phaseOf(shown: boolean, failed: boolean): ListPhase {
 
 // Each view has its own cached pages, so a view never shows another view's entries.
 export function useHistoryList(view: HistoryView) {
-  const search = useDebounce(view.search, SEARCH_DELAY_MS);
+  const search = useDebounce(view.search, HISTORY_SEARCH_DELAY_MS);
   const { filter, macKey } = view;
   const settled = useMemo(
     () => ({ filter, macKey, search }),

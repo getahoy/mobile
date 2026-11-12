@@ -1,5 +1,5 @@
 import { request } from "@getahoy/lib";
-import { speakVoicesSchema } from "@getahoy/protocol";
+import { apiPaths, speakVoicesSchema } from "@getahoy/protocol";
 import { publicEnv } from "@/env/publicEnv";
 import { authClient } from "@/features/auth/client/authClient";
 import { writeVoiceIds } from "../storage/voiceIds";
@@ -9,7 +9,7 @@ const fetchWithOwnCookie: typeof fetch = (input, init) =>
   fetch(input, { ...init, credentials: "omit" });
 
 export async function refreshVoiceIds(): Promise<void> {
-  const url = new URL("/api/speak", publicEnv.EXPO_PUBLIC_API_URL);
+  const url = new URL(apiPaths.speak, publicEnv.EXPO_PUBLIC_API_URL);
   const response = await request({
     url: url.toString(),
     headers: { cookie: await authClient.getCookie() },

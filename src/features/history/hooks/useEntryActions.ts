@@ -1,10 +1,10 @@
+import { needsRunConfirm } from "@getahoy/lib";
 import type { HistoryEntry } from "@getahoy/protocol";
 import { setStringAsync } from "expo-clipboard";
 import { router } from "expo-router";
 import { useState } from "react";
 import { toast } from "@/components/ui/toast";
 import { historyCopy } from "../copy/historyCopy";
-import { needsRunConfirm } from "../historyView";
 import { useHistory } from "./historyContext";
 import { useReportProblem } from "./useReportProblem";
 import { useRunAgain } from "./useRunAgain";

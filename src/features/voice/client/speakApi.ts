@@ -1,4 +1,4 @@
-import type { SpeakVoice } from "@getahoy/protocol";
+import { apiPaths, type SpeakVoice } from "@getahoy/protocol";
 import { publicEnv } from "@/env/publicEnv";
 import { authClient } from "@/features/auth/client/authClient";
 
@@ -15,7 +15,7 @@ export async function fetchSpeech(
   voice: SpeakVoice,
   signal: AbortSignal,
 ): Promise<SpeakAudio> {
-  const url = new URL("/api/speak", publicEnv.EXPO_PUBLIC_API_URL);
+  const url = new URL(apiPaths.speak, publicEnv.EXPO_PUBLIC_API_URL);
   try {
     const response = await fetch(url.toString(), {
       method: "POST",

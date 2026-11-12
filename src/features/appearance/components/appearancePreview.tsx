@@ -1,6 +1,6 @@
+import type { Appearance } from "@getahoy/lib";
 import { View } from "react-native";
 import { ScopedTheme } from "uniwind";
-import type { Appearance } from "../appearanceChoice";
 import { AppearanceTileFace } from "./appearanceTileFace";
 
 type AppearancePreviewProps = { appearance: Appearance };

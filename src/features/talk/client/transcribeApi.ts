@@ -1,6 +1,7 @@
 import { type RequestResult, request } from "@getahoy/lib";
 import {
   AUDIO_UPLOAD_FIELD,
+  apiPaths,
   type TranscribeResponse,
   transcribeResponseSchema,
 } from "@getahoy/protocol";
@@ -23,7 +24,7 @@ const fetchWithOwnCookie: typeof fetch = (input, init) =>
 async function upload(uri: string) {
   const form = new FormData();
   form.append(AUDIO_UPLOAD_FIELD, new File(uri));
-  const url = new URL("/api/transcribe", publicEnv.EXPO_PUBLIC_API_URL);
+  const url = new URL(apiPaths.transcribe, publicEnv.EXPO_PUBLIC_API_URL);
   return request({
     url: url.toString(),
     method: "POST",
