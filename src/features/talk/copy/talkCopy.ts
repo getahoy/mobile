@@ -43,7 +43,7 @@ export const talkCopy = {
   buttonHint: "Hold, say a command, then let go to send it.",
   cancel: "Cancel",
   choiceTitle: "Which one?",
-  expiredTitle: "That screen changed. Ask again.",
+  expiredTitle: "That choice timed out. Say it again.",
   noneOfThese: "None of these",
   holdToAnswer: "Hold to answer",
   trySaying: "Try saying",
