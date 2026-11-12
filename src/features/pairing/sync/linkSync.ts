@@ -1,5 +1,5 @@
 import { encodeBytes } from "@getahoy/crypto";
-import { failureKind, type RequestResult } from "@getahoy/lib";
+import { doneOrGone } from "@getahoy/lib";
 import type { GoodbyeReason } from "@getahoy/protocol";
 import { pairingApi } from "../client/pairingApi";
 import type { LiveMacLinks } from "../connection/liveMacLinks";
@@ -18,13 +18,9 @@ const REACHABILITY_TIMEOUT_MS = 3000;
 
 type UnlinkReason = Extract<GoodbyeReason, "removed" | "signed_out">;
 
-function settled(result: RequestResult<unknown>): boolean {
-  return result.code === "success" || failureKind(result.error) === "notFound";
-}
-
 export async function flushPendingUnlinks(): Promise<void> {
   for (const unlink of await readPendingUnlinks()) {
-    if (settled(await pairingApi.unlink(unlink))) {
+    if (doneOrGone(await pairingApi.unlink(unlink))) {
       await settlePendingUnlink(unlink.peerPublicKey);
     }
   }

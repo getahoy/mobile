@@ -1,4 +1,4 @@
-import { failureKind } from "@getahoy/lib";
+import { doneOrGone } from "@getahoy/lib";
 import { useCallback } from "react";
 import { historyApi } from "../client/historyApi";
 import type { OutboxItem } from "../historyOutbox";
@@ -12,9 +12,8 @@ export function useDeleteEntry() {
   return useCallback(async (id: string): Promise<Deleted | null> => {
     const unsent = readOutbox()[id] ?? null;
     const deleted = await historyApi.remove(id);
-    const missing =
-      deleted.code === "error" && failureKind(deleted.error) === "notFound";
-    if (deleted.code !== "success" && !(missing && unsent)) return null;
+    const gone = unsent !== null && doneOrGone(deleted);
+    if (deleted.code !== "success" && !gone) return null;
     removeFromOutbox(id);
     return { id, unsent };
   }, []);
