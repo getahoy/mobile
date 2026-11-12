@@ -1,13 +1,12 @@
 import {
   type AuthRequestState,
   authCopy,
+  SLOW_AFTER_MS,
   useElapsedOver,
   useSpinnerVisible,
 } from "@getahoy/lib";
 import { useEffect, useState } from "react";
 import { haptic } from "@/lib/haptics";
-
-const SLOW_AFTER_MS = 6000;
 
 type AuthSource = "credentials" | "google";
 

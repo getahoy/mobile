@@ -1,7 +1,6 @@
+import { TOAST_MS } from "@getahoy/lib";
 import { useSyncExternalStore } from "react";
 import { AccessibilityInfo } from "react-native";
-
-const TOAST_MS = 3000;
 
 type ToastAction = { label: string; onAction: () => void };
 

@@ -1,21 +1,18 @@
+import { motionDurationMs, motionEasing } from "@getahoy/lib";
 import {
   Easing,
   useReducedMotion as useReanimatedReducedMotion,
 } from "react-native-reanimated";
 
-export const duration = {
-  fast: 150,
-  base: 240,
-  slow: 480,
-} as const;
+export const duration = motionDurationMs;
 
 export const easing = {
-  out: Easing.bezier(0.22, 1, 0.36, 1),
-  spring: Easing.bezier(0.34, 1.56, 0.64, 1),
-  inOut: Easing.bezier(0.65, 0, 0.35, 1),
+  out: Easing.bezier(...motionEasing.out),
+  spring: Easing.bezier(...motionEasing.spring),
+  inOut: Easing.bezier(...motionEasing.inOut),
 } as const;
 
-const easeOutCurve = Easing.bezierFn(0.22, 1, 0.36, 1);
+const easeOutCurve = Easing.bezierFn(...motionEasing.out);
 
 export function timelinePhase(
   timeMs: number,

@@ -1,11 +1,9 @@
-import { useElapsedOver, useSpinnerVisible } from "@getahoy/lib";
+import { SLOW_AFTER_MS, useElapsedOver, useSpinnerVisible } from "@getahoy/lib";
 import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { duration } from "@/lib/motion";
 import { PennantSpinner } from "./pennantSpinner";
 import { Text } from "./text";
-
-const SLOW_AFTER_MS = 6000;
 
 type WaitingStateProps = {
   busy: boolean;
