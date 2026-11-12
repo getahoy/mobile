@@ -1,16 +1,8 @@
-import { entryMatches } from "@getahoy/lib";
-import type {
-  HistoryEntry,
-  HistoryFilter,
-  HistoryWriteEntry,
-} from "@getahoy/protocol";
+import { type EntryView, entryMatches } from "@getahoy/lib";
+import type { HistoryEntry, HistoryWriteEntry } from "@getahoy/protocol";
 import type { Outbox, OutboxItem } from "./historyOutbox.ts";
 
-export type HistoryView = {
-  filter: HistoryFilter;
-  search: string;
-  macKey: string | null;
-};
+export type HistoryView = Required<EntryView>;
 
 function toEntry({ rev: _, ...entry }: HistoryWriteEntry): HistoryEntry {
   return entry;

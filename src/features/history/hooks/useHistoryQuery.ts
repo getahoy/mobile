@@ -2,12 +2,14 @@ import { HISTORY_STALE_MS, historyKey, queryOf } from "@getahoy/lib";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { historyApi } from "../client/historyApi";
 import { type ListedPage, savedPages } from "../historyPages";
-import { isDefaultView } from "../historyQuery";
 import type { HistoryView } from "../localEntries";
 import { readHistoryCache, writeHistoryCache } from "../storage/historyStore";
 
 const FIRST_PAGE: string | null = null;
 const SAVED_COPY_AGE = 0;
+
+const isDefaultView = (view: HistoryView) =>
+  view.filter === "all" && !view.search.trim() && view.macKey === null;
 
 // The query library learns of a failure only from a throw.
 export class HistoryRequestError extends Error {}

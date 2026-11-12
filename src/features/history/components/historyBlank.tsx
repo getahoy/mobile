@@ -8,7 +8,7 @@ type BlankAction = { label: string; onPress: () => void };
 type HistoryBlankProps = {
   eyebrow?: string;
   title: string;
-  body: string;
+  body?: string;
   action?: BlankAction;
   accessory?: ReactNode;
 };
