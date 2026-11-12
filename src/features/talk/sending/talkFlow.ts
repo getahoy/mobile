@@ -1,5 +1,4 @@
 import { haptic } from "@/lib/haptics";
-import { transcribeRecording } from "../client/transcribeApi";
 import { deleteRecording, type MicRefusal } from "../recorder/useFileRecorder";
 import {
   MAX_RECORDING_MS,
@@ -16,6 +15,7 @@ import type {
   Retry,
   TalkFlowOptions,
 } from "./talkFlowTypes";
+import { transcribeOnReturn } from "./transcribeOnReturn";
 import { uploadFailure } from "./uploadFailure";
 
 const READY: TalkState = { kind: "ready" };
@@ -121,7 +121,7 @@ export class TalkFlow {
   async #upload(uri: string): Promise<void> {
     this.#retry = { kind: "upload", uri };
     this.#options.onState({ kind: "understanding" });
-    const result = await transcribeRecording(uri);
+    const result = await transcribeOnReturn(uri, this.#options.activity);
     if (result.code === "success") {
       deleteRecording(uri);
       const { text } = result.data;
@@ -134,8 +134,7 @@ export class TalkFlow {
 
   async #ask(request: MacRequest, heard: string): Promise<void> {
     this.#retry = { kind: "request", request, heard };
-    const { link, onState } = this.#options;
-    const state = await askMac(link, request, heard, onState);
+    const state = await askMac(this.#options, request, heard);
     const answered = state.kind === "answered";
     if (answered) this.#retry = null;
     const choosing = answered && state.choices.length > 0;

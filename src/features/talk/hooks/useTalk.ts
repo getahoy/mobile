@@ -9,10 +9,24 @@ import type { PairedMac } from "@/features/pairing/storage/pairedMacs";
 import { useVoiceReplies } from "@/features/voice/hooks/useVoiceReplies";
 import { readVoiceSettings } from "@/features/voice/storage/voiceSettings";
 import { type MicRefusal, useFileRecorder } from "../recorder/useFileRecorder";
+import type { AppActivity } from "../sending/appActivity";
 import { signalPress } from "../sending/askMac";
 import { TalkFlow } from "../sending/talkFlow";
 import type { TalkState } from "../talkState";
 import { useReplyHaptic } from "./useReplyHaptic";
+
+const appActivity: AppActivity = {
+  isActive: () => AppState.currentState === "active",
+  onChange: (listener) => {
+    const subscription = AppState.addEventListener("change", listener);
+    return () => subscription.remove();
+  },
+};
+
+function speakOn(): SpeakTarget {
+  const { playsOn, policy } = readVoiceSettings();
+  return policy === "off" ? "off" : playsOn;
+}
 
 function openMicrophoneGate(refusal: MicRefusal): void {
   const params = refusal === "failed" ? { failed: "1" } : {};
@@ -38,15 +52,12 @@ export function useTalk(mac: PairedMac | null) {
       const { macKey: key } = latest.current;
       return key ? live.session(key) : null;
     };
-    const speakOn = (): SpeakTarget => {
-      const { playsOn, policy } = readVoiceSettings();
-      return policy === "off" ? "off" : playsOn;
-    };
     return new TalkFlow({
       recorder: () => latest.current.recorder,
       onMicRefused: openMicrophoneGate,
       canTalk: () => latest.current.macKey !== null,
       link: { current: session, onChange: live.onChange },
+      activity: appActivity,
       speakOn,
       onPress: (choosingFor) => {
         clearEndedNotice();

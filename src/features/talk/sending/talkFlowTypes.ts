@@ -2,6 +2,7 @@ import type { SpeakTarget } from "@getahoy/protocol";
 import type { MacSession } from "@/features/pairing/connection/macSession";
 import type { FileRecorder, MicRefusal } from "../recorder/useFileRecorder";
 import type { TalkState } from "../talkState";
+import type { AppActivity } from "./appActivity";
 import type { MacRequest } from "./sendCommand";
 import type { SessionLink } from "./waitForSession";
 
@@ -12,6 +13,7 @@ export type TalkFlowOptions = {
   onMicRefused: (refusal: MicRefusal) => void;
   canTalk: () => boolean;
   link: SessionLink<MacSession>;
+  activity: AppActivity;
   speakOn: () => SpeakTarget;
   onPress: (choosingFor: string | null) => void;
   onState: (state: TalkState) => void;
