@@ -1,20 +1,21 @@
+import { HISTORY_KEY, withoutEntries } from "@getahoy/lib";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { clearAllHistory } from "../client/historyApi";
-import { type HistoryPages, keepEntries } from "../historyPages";
+import { historyApi } from "../client/historyApi";
+import type { HistoryPages } from "../historyPages";
 import { clearHistoryEntries } from "../storage/historyStore";
-import { HISTORY_KEY, HistoryRequestError } from "./useHistoryQuery";
+import { HistoryRequestError } from "./useHistoryQuery";
 
 export function useClearHistory() {
   const client = useQueryClient();
   const clearing = useMutation({
     mutationFn: async () => {
-      const cleared = await clearAllHistory();
+      const cleared = await historyApi.clear();
       if (cleared.code !== "success") throw new HistoryRequestError("clear");
     },
     onSuccess: () => {
       clearHistoryEntries();
       client.setQueriesData<HistoryPages>({ queryKey: HISTORY_KEY }, (pages) =>
-        pages ? keepEntries(pages, () => false) : pages,
+        pages ? withoutEntries(pages, () => false) : pages,
       );
       void client.invalidateQueries({ queryKey: HISTORY_KEY });
     },

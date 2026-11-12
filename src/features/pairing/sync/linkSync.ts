@@ -1,7 +1,7 @@
 import { encodeBytes } from "@getahoy/crypto";
-import type { RequestResult } from "@getahoy/lib";
+import { failureKind, type RequestResult } from "@getahoy/lib";
 import type { GoodbyeReason } from "@getahoy/protocol";
-import { listPairingLinks, unlinkPairing } from "../client/pairingApi";
+import { pairingApi } from "../client/pairingApi";
 import type { LiveMacLinks } from "../connection/liveMacLinks";
 import { clearDeviceKeys, loadDeviceKeys } from "../storage/deviceKeys";
 import { clearEndedNotice } from "../storage/endedNotice";
@@ -19,14 +19,12 @@ const REACHABILITY_TIMEOUT_MS = 3000;
 type UnlinkReason = Extract<GoodbyeReason, "removed" | "signed_out">;
 
 function settled(result: RequestResult<unknown>): boolean {
-  if (result.code === "success") return true;
-  const { error } = result;
-  return error.kind === "api" && error.detail.code === "not_found";
+  return result.code === "success" || failureKind(result.error) === "notFound";
 }
 
 export async function flushPendingUnlinks(): Promise<void> {
   for (const unlink of await readPendingUnlinks()) {
-    if (settled(await unlinkPairing(unlink))) {
+    if (settled(await pairingApi.unlink(unlink))) {
       await settlePendingUnlink(unlink.peerPublicKey);
     }
   }
@@ -47,7 +45,7 @@ export async function endRevokedMacs(): Promise<void> {
   const live = await readPairedMacs();
   if (live.length === 0) return;
   const keys = await loadDeviceKeys();
-  const listed = await listPairingLinks(encodeBytes(keys.publicKey));
+  const listed = await pairingApi.links(encodeBytes(keys.publicKey));
   if (listed.code === "error") return;
   for (const mac of live) {
     const link = listed.data.links.find(
@@ -60,9 +58,9 @@ export async function endRevokedMacs(): Promise<void> {
 
 export async function serverReachable(): Promise<boolean> {
   const keys = await loadDeviceKeys();
-  const listed = listPairingLinks(encodeBytes(keys.publicKey)).then(
-    (result) => result.code === "success",
-  );
+  const listed = pairingApi
+    .links(encodeBytes(keys.publicKey))
+    .then((result) => result.code === "success");
   const timedOut = new Promise<boolean>((resolve) =>
     setTimeout(() => resolve(false), REACHABILITY_TIMEOUT_MS),
   );

@@ -3,7 +3,7 @@ import type { ErrorCode, RequestError } from "@getahoy/lib";
 import type { HistoryWriteEntry } from "@getahoy/protocol";
 import { logger } from "@/features/logging/logger";
 import { loadDeviceKeys } from "@/features/pairing/storage/deviceKeys";
-import { sendHistoryWrites } from "../client/historyApi";
+import { historyApi } from "../client/historyApi";
 import { markRejected, markSent, pendingBatch } from "../historyOutbox";
 import { readOutbox, updateOutbox } from "../storage/historyStore";
 
@@ -34,7 +34,7 @@ async function send(
   phoneKey: string,
   entries: HistoryWriteEntry[],
 ): Promise<Sent> {
-  const sent = await sendHistoryWrites({ phoneKey, entries });
+  const sent = await historyApi.write({ phoneKey, entries });
   if (sent.code === "success") {
     updateOutbox((outbox) => markSent(outbox, entries, Date.now()));
     return "sent";

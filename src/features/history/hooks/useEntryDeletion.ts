@@ -1,3 +1,4 @@
+import { HISTORY_KEY, withoutEntries } from "@getahoy/lib";
 import {
   useMutation,
   useMutationState,
@@ -6,9 +7,9 @@ import {
 import { useMemo } from "react";
 import { toast } from "@/components/ui/toast";
 import { historyCopy } from "../copy/historyCopy";
-import { type HistoryPages, keepEntries } from "../historyPages";
+import type { HistoryPages } from "../historyPages";
 import { useDeleteEntry } from "./useDeleteEntry";
-import { HISTORY_KEY, HistoryRequestError } from "./useHistoryQuery";
+import { HistoryRequestError } from "./useHistoryQuery";
 import { useRestoreEntry } from "./useRestoreEntry";
 
 const DELETE_KEY = ["deleteHistoryEntry"] as const;
@@ -28,7 +29,9 @@ export function useEntryDeletion() {
     },
     onSuccess: (deleted) => {
       client.setQueriesData<HistoryPages>({ queryKey: HISTORY_KEY }, (pages) =>
-        pages ? keepEntries(pages, (entry) => entry.id !== deleted.id) : pages,
+        pages
+          ? withoutEntries(pages, (entry) => entry.id !== deleted.id)
+          : pages,
       );
       const undo = async () => {
         const restored = await restore(deleted);

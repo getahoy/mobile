@@ -1,7 +1,7 @@
+import { HISTORY_KEY } from "@getahoy/lib";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { lastSentAt, type Outbox } from "../historyOutbox";
-import { HISTORY_KEY } from "./useHistoryQuery";
 
 // A send the shown list predates refetches History; the sent entry stays on screen meanwhile.
 // With no list yet, the first load already covers every send.

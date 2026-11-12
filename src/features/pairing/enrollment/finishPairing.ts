@@ -1,5 +1,5 @@
 import { encodeBytes } from "@getahoy/crypto";
-import { listPairingLinks } from "../client/pairingApi";
+import { pairingApi } from "../client/pairingApi";
 import { loadDeviceKeys } from "../storage/deviceKeys";
 import { clearEndedNotice } from "../storage/endedNotice";
 import { type PairedMac, savePairedMac } from "../storage/pairedMacs";
@@ -12,7 +12,7 @@ function wait(ms: number): Promise<void> {
 }
 
 async function linkIsActive(device: string, macKey: string): Promise<boolean> {
-  const listed = await listPairingLinks(device);
+  const listed = await pairingApi.links(device);
   if (listed.code === "error") return false;
   return listed.data.links.some(
     (link) => link.peerPublicKey === macKey && link.active,

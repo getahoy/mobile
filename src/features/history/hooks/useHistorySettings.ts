@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import {
-  changeHistorySettings,
-  readHistorySettings,
-} from "../client/historyApi";
+import { historyApi } from "../client/historyApi";
 import {
   clearHistoryEntries,
   keepsHistory,
@@ -19,7 +16,7 @@ export function useHistorySettings() {
   const [changing, setChanging] = useState(false);
 
   useEffect(() => {
-    void readHistorySettings().then((settings) => {
+    void historyApi.settings().then((settings) => {
       if (settings.code !== "success") return;
       keep(settings.data.keepHistory);
       setKeepHistory(settings.data.keepHistory);
@@ -28,7 +25,7 @@ export function useHistorySettings() {
 
   const change = useCallback(async (on: boolean) => {
     setChanging(true);
-    const changed = await changeHistorySettings({ keepHistory: on });
+    const changed = await historyApi.changeSettings(on);
     setChanging(false);
     if (changed.code !== "success") return false;
     keep(changed.data.keepHistory);

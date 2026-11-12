@@ -1,11 +1,10 @@
+import { HISTORY_KEY, historyKey, type ListPhase } from "@getahoy/lib";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { toast } from "@/components/ui/toast";
 import { historyCopy } from "../copy/historyCopy";
-import type { ListPhase } from "../historyQuery";
 import type { HistoryView } from "../localEntries";
 import { flushHistory } from "../sync/flushHistory";
-import { HISTORY_KEY, historyKey } from "./useHistoryQuery";
 
 const NO_FAILURE = -1;
 

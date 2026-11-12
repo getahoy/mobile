@@ -1,11 +1,11 @@
 import { useCallback, useState } from "react";
-import { reportHistoryProblem } from "../client/historyApi";
+import { historyApi } from "../client/historyApi";
 
 export function useReportProblem() {
   const [sending, setSending] = useState(false);
   const report = useCallback(async (id: string, note: string) => {
     setSending(true);
-    const sent = await reportHistoryProblem(id, note);
+    const sent = await historyApi.report(id, note);
     setSending(false);
     return sent.code === "success";
   }, []);

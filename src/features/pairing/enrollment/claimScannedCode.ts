@@ -1,7 +1,7 @@
 import { decodeBytes, encodeBytes, pairingProof } from "@getahoy/crypto";
 import type { PairingQr } from "@getahoy/protocol";
 import { logger } from "@/features/logging/logger";
-import { claimPairing } from "../client/pairingApi";
+import { pairingApi } from "../client/pairingApi";
 import { phoneDescription } from "../device/phoneDescription";
 import { loadDeviceKeys } from "../storage/deviceKeys";
 import type { PairedMac } from "../storage/pairedMacs";
@@ -22,7 +22,7 @@ export async function claimScannedCode(qr: PairingQr): Promise<ClaimOutcome> {
     phonePublicKey: keys.publicKey,
     desktopPublicKey: decodeBytes(qr.pk),
   });
-  const claimed = await claimPairing({
+  const claimed = await pairingApi.claim({
     userCode: qr.code,
     desktopPublicKey: qr.pk,
     proof: encodeBytes(proof),

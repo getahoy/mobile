@@ -1,6 +1,5 @@
 import { apiPaths, type SpeakVoice } from "@getahoy/protocol";
-import { publicEnv } from "@/env/publicEnv";
-import { authClient } from "@/features/auth/client/authClient";
+import { sessionClient } from "@/features/auth/client/sessionClient";
 
 export type SpeakAudio =
   | { kind: "audio"; bytes: ArrayBuffer }
@@ -15,15 +14,13 @@ export async function fetchSpeech(
   voice: SpeakVoice,
   signal: AbortSignal,
 ): Promise<SpeakAudio> {
-  const url = new URL(apiPaths.speak, publicEnv.EXPO_PUBLIC_API_URL);
+  const url = sessionClient.url(apiPaths.speak);
   try {
-    const response = await fetch(url.toString(), {
+    const headers = await sessionClient.headers();
+    const response = await fetch(url, {
       method: "POST",
       credentials: OWN_COOKIE_ONLY,
-      headers: {
-        "content-type": "application/json",
-        cookie: await authClient.getCookie(),
-      },
+      headers: { ...headers, "content-type": "application/json" },
       body: JSON.stringify({ text, voice }),
       signal,
     });
