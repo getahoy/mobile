@@ -1,55 +1,50 @@
 import { logger } from "@/features/logging/logger";
 import type { PairedMac } from "../storage/pairedMacs";
-import type { FrameStream, Transport } from "./frameStream";
+import type { Dialed, Transport } from "./frameStream";
 import { WebSocketFrameStream } from "./webSocketFrameStream";
 
 const DIAL_TIMEOUT_MS = 2500;
 
-type DialMiss = "error" | "timeout";
+type DialEnd = "open" | "error" | "timeout";
 
-// Measures whether a denied iOS Local Network fails faster than an absent Mac.
-function logDialMiss(miss: DialMiss, startedAt: number): void {
+// Measures whether a denied iOS Local Network fails faster than an absent Mac,
+// and whether a .local name that resolves to IPv6 first slows the connect.
+function logDial(ip: string | null, end: DialEnd, startedAt: number): void {
   if (!__DEV__) return;
-  logger.info("lanDial", `${miss} after ${Date.now() - startedAt} ms`);
+  const target = ip === null ? "bonjour" : "ip";
+  logger.info("lanDial", `${target} ${end} after ${Date.now() - startedAt} ms`);
 }
 
-function dialFirst(urls: string[]): Promise<WebSocket | null> {
-  return new Promise((resolve) => {
+function dialOne(host: string, port: number, ip: string | null) {
+  return new Promise<Dialed | null>((resolve) => {
     const startedAt = Date.now();
-    const sockets = urls.map((url) => new WebSocket(url));
-    let pending = sockets.length;
+    const socket = new WebSocket(`ws://${host}:${port}`);
     let settled = false;
-    const finish = (winner: WebSocket | null) => {
+    const finish = (end: DialEnd) => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
-      for (const socket of sockets) if (socket !== winner) socket.close();
-      resolve(winner);
+      logDial(ip, end, startedAt);
+      if (end === "open") {
+        resolve({ stream: new WebSocketFrameStream(socket), ip });
+        return;
+      }
+      socket.close();
+      resolve(null);
     };
-    const miss = (reason: DialMiss) => {
-      if (!settled) logDialMiss(reason, startedAt);
-      finish(null);
-    };
-    const timer = setTimeout(() => miss("timeout"), DIAL_TIMEOUT_MS);
-    for (const socket of sockets) {
-      socket.addEventListener("open", () => finish(socket));
-      socket.addEventListener("error", () => {
-        pending -= 1;
-        if (pending === 0) miss("error");
-      });
-    }
+    const timer = setTimeout(() => finish("timeout"), DIAL_TIMEOUT_MS);
+    socket.addEventListener("open", () => finish("open"));
+    socket.addEventListener("error", () => finish("error"));
   });
 }
 
 export const lanTransport: Transport = {
   kind: "lan",
-  async open(mac: PairedMac): Promise<FrameStream | null> {
-    if (mac.lanPort === null || mac.lastKnownAddresses.length === 0) {
-      return null;
-    }
+  dial(mac: PairedMac): Promise<Dialed | null>[] {
     const port = mac.lanPort;
-    const urls = mac.lastKnownAddresses.map((host) => `ws://${host}:${port}`);
-    const socket = await dialFirst(urls);
-    return socket ? new WebSocketFrameStream(socket) : null;
+    if (port === null) return [];
+    const byIp = mac.lastKnownAddresses.map((ip) => dialOne(ip, port, ip));
+    if (mac.localHost === null) return byIp;
+    return [...byIp, dialOne(mac.localHost, port, null)];
   },
 };

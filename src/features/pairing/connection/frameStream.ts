@@ -7,7 +7,9 @@ export interface FrameStream {
   onClose(listener: () => void): void;
 }
 
+export type Dialed = { stream: FrameStream; ip: string | null };
+
 export interface Transport {
   readonly kind: "lan";
-  open(mac: PairedMac): Promise<FrameStream | null>;
+  dial(mac: PairedMac): Promise<Dialed | null>[];
 }

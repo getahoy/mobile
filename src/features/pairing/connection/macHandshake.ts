@@ -9,8 +9,8 @@ import {
   decodeJson,
   type EndReason,
   encodeJson,
-  type Frame,
   handshakeReplySchema,
+  type LanEndpoint,
   PROTOCOL_VERSION,
   unknownMacKeySchema,
 } from "@getahoy/protocol";
@@ -22,7 +22,7 @@ import type { FrameStream } from "./frameStream";
 const REPLY_TIMEOUT_MS = 5000;
 
 export type HandshakeOutcome =
-  | { outcome: "connected"; channel: SecureChannel }
+  | { outcome: "connected"; channel: SecureChannel; lan: LanEndpoint | null }
   | { outcome: "macTooOld" }
   | { outcome: "macTooNew" }
   | { outcome: "ended"; reason: EndReason }
@@ -31,7 +31,6 @@ export type HandshakeOutcome =
 
 const UNREACHABLE: HandshakeOutcome = { outcome: "unreachable" };
 const UNRECOGNISED: HandshakeOutcome = { outcome: "unrecognised" };
-const READY: Frame = { type: "ready" };
 
 function readUnauthenticated(message: Uint8Array): HandshakeOutcome {
   const notice = unknownMacKeySchema.safeParse(decodeJson(message));
@@ -40,7 +39,6 @@ function readUnauthenticated(message: Uint8Array): HandshakeOutcome {
 
 function readReply(
   handshake: InitiatorHandshake,
-  stream: FrameStream,
   message: Uint8Array,
 ): HandshakeOutcome {
   const opened = handshake.readReply(message);
@@ -48,9 +46,10 @@ function readReply(
   const reply = handshakeReplySchema.safeParse(decodeJson(opened.payload));
   if (!reply.success) return UNREACHABLE;
   switch (reply.data.type) {
-    case "welcome":
-      stream.send(opened.channel.seal(encodeJson(READY)));
-      return { outcome: "connected", channel: opened.channel };
+    case "welcome": {
+      const lan = reply.data.lan ?? null;
+      return { outcome: "connected", channel: opened.channel, lan };
+    }
     case "version_mismatch":
       return reply.data.protocolVersion < PROTOCOL_VERSION
         ? { outcome: "macTooOld" }
@@ -95,7 +94,7 @@ export function shakeHands({
     stream.onFrame((message) => {
       if (answered) return;
       mark("replyReceived");
-      const outcome = readReply(handshake, stream, message);
+      const outcome = readReply(handshake, message);
       mark("replyRead");
       answer(outcome);
     });

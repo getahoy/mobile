@@ -4,17 +4,17 @@ import {
   type GoodbyeReason,
 } from "@getahoy/protocol";
 import { logger } from "@/features/logging/logger";
-import { markReachedOnLan } from "@/features/permissions/storage/localNetworkMemory";
 import { type PairedMac, updatePairedMac } from "../storage/pairedMacs";
 import { type EndSource, endPairedMac } from "../sync/endedMacs";
 import { createStageClock, type StageClock } from "./connectTiming";
-import type { MacLink } from "./connectToMac";
+import type { ConnectedLink, MacLink } from "./connectToMac";
 import { dialMac } from "./dialMac";
 import { BACKGROUND_GRACE_MS, resumeLink, retryDelay } from "./linkTiming";
 import type { LiveMacLinks } from "./liveMacLinks";
 import { MacLinkMemory } from "./macLinkMemory";
 import { isLinking, keepsRetrying, type MacLinkState } from "./macLinkState";
 import type { MacEvent, MacSession } from "./macSession";
+import { rememberLink } from "./rememberLink";
 
 type MacConnectionOptions = {
   mac: PairedMac;
@@ -23,7 +23,7 @@ type MacConnectionOptions = {
 };
 
 export class MacConnection {
-  readonly #options: MacConnectionOptions;
+  #options: MacConnectionOptions;
   #state: MacLinkState;
   #session: MacSession | null = null;
   #attempt = 0;
@@ -105,7 +105,7 @@ export class MacConnection {
   async #apply(link: MacLink, attempt: number): Promise<void> {
     switch (link.outcome) {
       case "connected":
-        return this.#adopt(link.session, attempt);
+        return this.#adopt(link, attempt);
       case "ended":
         return this.#end(link.reason, "handshake");
       case "unreachable":
@@ -121,11 +121,12 @@ export class MacConnection {
     }
   }
 
-  #adopt(session: MacSession, attempt: number): void {
-    this.#session = session;
+  #adopt(link: ConnectedLink, attempt: number): void {
+    this.#session = link.session;
     this.#misses = 0;
-    markReachedOnLan(this.#options.mac.publicKey);
-    session.onEvent((event) => void this.#handle(event, attempt));
+    const mac = rememberLink(this.#options.mac, link);
+    this.#options = { ...this.#options, mac };
+    link.session.onEvent((event) => void this.#handle(event, attempt));
   }
 
   async #handle(event: MacEvent, attempt: number): Promise<void> {
