@@ -1,5 +1,5 @@
+import type { PromptLine } from "@getahoy/protocol";
 import { logger } from "@/features/logging/logger";
-import type { PromptClip } from "../promptClips";
 import { playSource } from "./audioPlayback";
 import { deviceVoice } from "./deviceVoice";
 import { type PreparedSpeech, prepareSpeech } from "./elevenLabsVoice";
@@ -50,7 +50,7 @@ async function speakWithFallback(
 }
 
 export type ReplyVoice = VoiceEngine & {
-  speakPrompt: (clip: PromptClip, options: SpeakOptions) => Promise<void>;
+  speakPrompt: (clip: PromptLine, options: SpeakOptions) => Promise<void>;
   warmPrompts: (voice: SpeakOptions["voice"]) => void;
 };
 

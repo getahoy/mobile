@@ -1,4 +1,5 @@
-import type { SpeakVoice } from "@getahoy/protocol";
+import { parseStored } from "@getahoy/lib";
+import { type SpeakVoice, speechPaceKey } from "@getahoy/protocol";
 import { CryptoDigestAlgorithm, digestStringAsync } from "expo-crypto";
 import { Directory, File, Paths } from "expo-file-system";
 import { z } from "zod";
@@ -9,7 +10,6 @@ import { touchCache } from "./cacheOrder";
 const ORDER_KEY = "voice.cacheOrder";
 const AUDIO_EXTENSION = ".mp3";
 const UNKNOWN_VOICE_ID = "unknown";
-const SPEECH_PACE = "speed0.9-pause0.3";
 
 const orderSchema = z.array(z.string());
 
@@ -20,14 +20,7 @@ function speechDirectory(): Directory {
 }
 
 function readOrder(): string[] {
-  try {
-    const parsed = orderSchema.safeParse(
-      JSON.parse(voiceStorage.getString(ORDER_KEY) ?? "[]"),
-    );
-    return parsed.success ? parsed.data : [];
-  } catch {
-    return [];
-  }
+  return parseStored(orderSchema, voiceStorage.getString(ORDER_KEY)) ?? [];
 }
 
 function fileFor(key: string): File {
@@ -44,10 +37,10 @@ function remember(key: string): void {
 }
 
 // The server voice id and pace are part of the key, so changing either on the server never
-// replays old audio. The server does not report its pace: change SPEECH_PACE with speechVoices.ts.
+// replays old audio.
 export function speechKey(text: string, voice: SpeakVoice): Promise<string> {
   const voiceId = readVoiceId(voice) ?? UNKNOWN_VOICE_ID;
-  const material = `${voice}\n${voiceId}\n${SPEECH_PACE}\n${text}`;
+  const material = `${voice}\n${voiceId}\n${speechPaceKey()}\n${text}`;
   return digestStringAsync(CryptoDigestAlgorithm.SHA256, material);
 }
 

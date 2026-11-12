@@ -1,16 +1,13 @@
-export const PROMPT_CLIPS = ["whichOne", "confirm"] as const;
+import type { PromptLine } from "@getahoy/protocol";
 
-export type PromptClip = (typeof PROMPT_CLIPS)[number];
-
-// The same lines are recorded per voice by web/scripts/buildVoiceSamples.ts --prompts.
-export const promptText: Record<PromptClip, string> = {
-  whichOne: "Which one? Say the number.",
-  confirm: "Tap the button on your phone to go ahead.",
-};
+export const PROMPT_CLIPS = [
+  "whichOne",
+  "confirm",
+] as const satisfies readonly PromptLine[];
 
 type Asking = { choices: number; confirm: boolean };
 
-export function promptFor({ choices, confirm }: Asking): PromptClip | null {
+export function promptFor({ choices, confirm }: Asking): PromptLine | null {
   if (choices === 0) return null;
   return confirm ? "confirm" : "whichOne";
 }

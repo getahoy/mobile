@@ -1,3 +1,4 @@
+import { VOICE_PREVIEW_LINE } from "@getahoy/protocol";
 import { Platform } from "react-native";
 
 export const voiceCopy = {
@@ -35,8 +36,7 @@ export const voiceCopy = {
     default: "A natural English voice",
     india: "English with an Indian accent",
   },
-  previewLine:
-    "Hey there! Your Mac’s all set. So, what are we working on today?",
+  previewLine: VOICE_PREVIEW_LINE,
   playSample: "Play sample",
   pauseSample: "Pause",
   playSampleLabel: (voice: string) => `Play a sample of the ${voice} voice`,
