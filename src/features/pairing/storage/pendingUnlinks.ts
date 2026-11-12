@@ -1,3 +1,4 @@
+import { parseStored } from "@getahoy/lib";
 import { pairingUnlinkRequestSchema } from "@getahoy/protocol";
 import { z } from "zod";
 import { pairingEntry, pairingKeychain } from "./pairingKeychain";
@@ -10,13 +11,7 @@ export async function readPendingUnlinks(): Promise<PendingUnlink[]> {
   const text = await pairingKeychain
     .read(pairingEntry.pendingUnlinks)
     .catch(() => null);
-  if (text === null) return [];
-  try {
-    const parsed = pendingListSchema.safeParse(JSON.parse(text));
-    return parsed.success ? parsed.data : [];
-  } catch {
-    return [];
-  }
+  return parseStored(pendingListSchema, text) ?? [];
 }
 
 async function writePendingUnlinks(list: PendingUnlink[]): Promise<void> {

@@ -1,3 +1,4 @@
+import { parseStored } from "@getahoy/lib";
 import {
   SPEAK_TARGETS,
   SPEAK_VOICES,
@@ -38,20 +39,13 @@ function defaults(): VoiceSettings {
   };
 }
 
-function storedJson(): unknown {
-  const text = voiceStorage.getString(SETTINGS_KEY);
-  if (text === undefined) return null;
-  try {
-    return JSON.parse(text);
-  } catch {
-    return null;
-  }
-}
+const storedFieldsSchema = z.record(z.string(), z.unknown());
 
 // A bad stored value falls back to the defaults instead of crashing a screen.
 export function readVoiceSettings(): VoiceSettings {
-  const stored = z.record(z.string(), z.unknown()).safeParse(storedJson());
-  const merged = { ...defaults(), ...(stored.success ? stored.data : {}) };
+  const text = voiceStorage.getString(SETTINGS_KEY);
+  const stored = parseStored(storedFieldsSchema, text) ?? {};
+  const merged = { ...defaults(), ...stored };
   const parsed = voiceSettingsSchema.safeParse(merged);
   return parsed.success ? parsed.data : defaults();
 }

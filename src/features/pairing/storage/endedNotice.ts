@@ -1,4 +1,4 @@
-import { noticeShown } from "@getahoy/lib";
+import { noticeShown, parseStored } from "@getahoy/lib";
 import { endReasonSchema } from "@getahoy/protocol";
 import { createMMKV, useMMKVString } from "react-native-mmkv";
 import { z } from "zod";
@@ -15,16 +15,6 @@ const endedNoticeSchema: z.ZodType<EndedNotice> = z.object({
   whileClosed: z.boolean(),
 });
 
-function parseNotice(text: string | undefined): EndedNotice | null {
-  if (text === undefined) return null;
-  try {
-    const parsed = endedNoticeSchema.safeParse(JSON.parse(text));
-    return parsed.success ? parsed.data : null;
-  } catch {
-    return null;
-  }
-}
-
 export function saveEndedNotice(notice: EndedNotice): void {
   endedNoticeStorage.set(ENDED_NOTICE_KEY, JSON.stringify(notice));
 }
@@ -35,7 +25,7 @@ export function clearEndedNotice(): void {
 
 export function useEndedNotice() {
   const [text] = useMMKVString(ENDED_NOTICE_KEY, endedNoticeStorage);
-  const notice = parseNotice(text);
+  const notice = parseStored(endedNoticeSchema, text);
   const shown = notice && noticeShown(notice, Date.now()) ? notice : null;
   return { notice: shown, dismiss: clearEndedNotice };
 }

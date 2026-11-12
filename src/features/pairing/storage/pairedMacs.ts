@@ -1,3 +1,4 @@
+import { parseStored } from "@getahoy/lib";
 import { bytes32Schema, endReasonSchema } from "@getahoy/protocol";
 import { z } from "zod";
 import { pairingEntry, pairingKeychain } from "./pairingKeychain";
@@ -29,13 +30,7 @@ export async function readStoredMacs(): Promise<StoredMac[]> {
   const text = await pairingKeychain
     .read(pairingEntry.pairedMacs)
     .catch(() => null);
-  if (text === null) return [];
-  try {
-    const parsed = storedMacListSchema.safeParse(JSON.parse(text));
-    return parsed.success ? parsed.data : [];
-  } catch {
-    return [];
-  }
+  return parseStored(storedMacListSchema, text) ?? [];
 }
 
 export async function readPairedMacs(): Promise<PairedMac[]> {

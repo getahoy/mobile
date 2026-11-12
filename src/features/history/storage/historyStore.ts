@@ -1,3 +1,4 @@
+import { parseStored } from "@getahoy/lib";
 import { historyPageSchema, historyWriteSchema } from "@getahoy/protocol";
 import { createMMKV } from "react-native-mmkv";
 import { z } from "zod";
@@ -28,21 +29,8 @@ type HistoryCache = z.infer<typeof cacheSchema>;
 
 const emptyCache: HistoryCache = { entries: [], summary: null, fetchedAt: 0 };
 
-function parseJson<T>(text: string | undefined, schema: z.ZodType<T>) {
-  if (text === undefined) return null;
-  try {
-    const parsed = schema.safeParse(JSON.parse(text));
-    return parsed.success ? parsed.data : null;
-  } catch {
-    return null;
-  }
-}
-
-const readJson = <T>(key: string, schema: z.ZodType<T>) =>
-  parseJson(historyStorage.getString(key), schema);
-
 export function parseOutbox(text: string | undefined): Outbox {
-  return parseJson(text, outboxSchema) ?? {};
+  return parseStored(outboxSchema, text) ?? {};
 }
 
 export function readOutbox(): Outbox {
@@ -58,7 +46,8 @@ export function updateOutbox(change: (outbox: Outbox) => Outbox): void {
 }
 
 export function readHistoryCache(): HistoryCache {
-  return readJson(CACHE_KEY, cacheSchema) ?? emptyCache;
+  const text = historyStorage.getString(CACHE_KEY);
+  return parseStored(cacheSchema, text) ?? emptyCache;
 }
 
 export function writeHistoryCache(cache: HistoryCache): void {

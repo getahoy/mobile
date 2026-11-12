@@ -1,3 +1,4 @@
+import { parseStored } from "@getahoy/lib";
 import {
   type SpeakVoice,
   type SpeakVoices,
@@ -12,13 +13,9 @@ type VoiceIds = SpeakVoices["voices"];
 const UNKNOWN: VoiceIds = { default: null, india: null };
 
 export function readVoiceId(voice: SpeakVoice): string | null {
-  try {
-    const stored = voiceStorage.getString(VOICE_IDS_KEY) ?? "null";
-    const parsed = speakVoicesSchema.shape.voices.safeParse(JSON.parse(stored));
-    return (parsed.success ? parsed.data : UNKNOWN)[voice];
-  } catch {
-    return UNKNOWN[voice];
-  }
+  const stored = voiceStorage.getString(VOICE_IDS_KEY);
+  const ids = parseStored(speakVoicesSchema.shape.voices, stored) ?? UNKNOWN;
+  return ids[voice];
 }
 
 export function writeVoiceIds(ids: VoiceIds): void {

@@ -4,6 +4,7 @@ import {
   generateKeyPair,
   type KeyPair,
 } from "@getahoy/crypto";
+import { parseStored } from "@getahoy/lib";
 import { bytes32Schema } from "@getahoy/protocol";
 import { z } from "zod";
 import { pairingEntry, pairingKeychain } from "./pairingKeychain";
@@ -12,16 +13,6 @@ const storedKeysSchema = z.object({
   publicKey: bytes32Schema,
   secretKey: bytes32Schema,
 });
-
-function parseStored(text: string | null) {
-  if (text === null) return null;
-  try {
-    const parsed = storedKeysSchema.safeParse(JSON.parse(text));
-    return parsed.success ? parsed.data : null;
-  } catch {
-    return null;
-  }
-}
 
 // Every reconnect needs the keys; reading SecureStore each time slows the dial.
 let loaded: Promise<KeyPair> | null = null;
@@ -40,9 +31,8 @@ export function loadDeviceKeys(): Promise<KeyPair> {
 }
 
 async function readOrCreateKeys(): Promise<KeyPair> {
-  const stored = parseStored(
-    await pairingKeychain.read(pairingEntry.deviceKeys),
-  );
+  const text = await pairingKeychain.read(pairingEntry.deviceKeys);
+  const stored = parseStored(storedKeysSchema, text);
   if (stored) {
     return {
       publicKey: decodeBytes(stored.publicKey),

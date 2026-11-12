@@ -1,3 +1,4 @@
+import { parseStored } from "@getahoy/lib";
 import { createMMKV, useMMKVBoolean } from "react-native-mmkv";
 import { z } from "zod";
 
@@ -10,13 +11,7 @@ const reachedMacsSchema = z.array(z.string());
 
 function reachedMacs(): string[] {
   const text = localNetworkStorage.getString(REACHED_MACS_KEY);
-  if (text === undefined) return [];
-  try {
-    const parsed = reachedMacsSchema.safeParse(JSON.parse(text));
-    return parsed.success ? parsed.data : [];
-  } catch {
-    return [];
-  }
+  return parseStored(reachedMacsSchema, text) ?? [];
 }
 
 export function hasReachedOnLan(publicKey: string): boolean {
