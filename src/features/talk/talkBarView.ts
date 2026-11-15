@@ -28,7 +28,7 @@ function labelOf(state: TalkState, mac: string, durationMs: number): string {
     case "understanding":
       return talkCopy.understanding;
     case "sending":
-      return state.slow ? talkCopy.checkMac : talkCopy.sending(mac);
+      return state.slow ? talkCopy.stillWorking : talkCopy.sending(mac);
     case "ready":
     case "tooShort":
     case "answered":
