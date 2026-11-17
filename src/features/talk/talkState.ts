@@ -22,12 +22,14 @@ export type TalkFailure =
   | "rateLimited"
   | "signedOut";
 
+export type SendWait = "short" | "slow" | "verySlow";
+
 export type TalkState =
   | { kind: "ready" }
   | { kind: "tooShort" }
   | { kind: "listening" }
   | { kind: "understanding" }
-  | { kind: "sending"; heard: string; slow: boolean; commandId?: string }
+  | { kind: "sending"; heard: string; wait: SendWait; commandId?: string }
   | {
       kind: "answered";
       commandId: string;

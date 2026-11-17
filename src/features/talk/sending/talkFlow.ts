@@ -30,21 +30,26 @@ export class TalkFlow {
   #attempt = 0;
   #retry: Retry | null = null;
   #choosingFor: string | null = null;
+  #waitingFor: string | null = null;
   #maxTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(options: TalkFlowOptions) {
     this.#options = options;
   }
 
+  // A press while the Mac is still working cancels that command; its late answer is dropped.
   readonly press = async (): Promise<void> => {
-    if (this.#phase !== "idle" || !this.#options.canTalk()) return;
+    const cancelling = this.#waitingFor;
+    const free = this.#phase === "idle" || cancelling !== null;
+    if (!free || !this.#options.canTalk()) return;
+    this.#waitingFor = null;
     this.#phase = "starting";
     this.#releasedEarly = false;
     this.#sawRecording = false;
     this.#pressedAt = Date.now();
     this.#forgetRetry();
     this.#attempt += 1;
-    this.#options.onPress(this.#choosingFor);
+    this.#options.onPress(this.#choosingFor, cancelling);
     const attempt = this.#attempt;
     const started = await this.#options.recorder().start();
     if (attempt !== this.#attempt) return this.#stopOrphan();
@@ -134,7 +139,15 @@ export class TalkFlow {
 
   async #ask(request: MacRequest, heard: string): Promise<void> {
     this.#retry = { kind: "request", request, heard };
-    const state = await askMac(this.#options, request, heard);
+    const { commandId } = request;
+    this.#waitingFor = commandId;
+    const stillWaiting = () => this.#waitingFor === commandId;
+    const onState = (state: TalkState) => {
+      if (stillWaiting()) this.#options.onState(state);
+    };
+    const state = await askMac({ ...this.#options, onState }, request, heard);
+    if (!stillWaiting()) return;
+    this.#waitingFor = null;
     const answered = state.kind === "answered";
     if (answered) this.#retry = null;
     const choosing = answered && state.choices.length > 0;

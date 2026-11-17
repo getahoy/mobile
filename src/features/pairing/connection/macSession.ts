@@ -128,6 +128,7 @@ export class MacSession {
       case "command.lookup":
       case "speech.stop":
       case "choice.extend":
+      case "command.cancel":
         return;
       default: {
         const unhandled: never = frame.data;

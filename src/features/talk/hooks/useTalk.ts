@@ -59,10 +59,10 @@ export function useTalk(mac: PairedMac | null) {
       link: { current: session, onChange: live.onChange },
       activity: appActivity,
       speakOn,
-      onPress: (choosingFor) => {
+      onPress: (choosingFor, cancelling) => {
         clearEndedNotice();
         latest.current.stopVoice();
-        signalPress(session(), choosingFor);
+        signalPress(session(), choosingFor, cancelling);
       },
       onState: setState,
     });

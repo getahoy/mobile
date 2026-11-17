@@ -15,7 +15,7 @@ export type TalkFlowOptions = {
   link: SessionLink<MacSession>;
   activity: AppActivity;
   speakOn: () => SpeakTarget;
-  onPress: (choosingFor: string | null) => void;
+  onPress: (choosingFor: string | null, cancelling: string | null) => void;
   onState: (state: TalkState) => void;
 };
 

@@ -33,6 +33,7 @@ export const talkCopy = {
   macUnreachable: (mac: string) => `Can’t reach ${mac}.`,
   noAnswer: (mac: string) => `No answer from ${mac}. Check your Mac.`,
   stillWorking: "Still working…",
+  slowConnection: "Slow connection, still trying…",
   rateLimited: "Too many tries, wait a moment.",
   signedOut: "Sign in again.",
   tryAgain: "Try again",

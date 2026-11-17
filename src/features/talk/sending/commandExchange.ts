@@ -10,6 +10,7 @@ import {
   RECEIVED_TIMEOUT_MS,
   RESULT_TIMEOUT_MS,
   SLOW_COMMAND_MS,
+  VERY_SLOW_COMMAND_MS,
 } from "./sendCommand";
 
 type Result = Extract<Frame, { type: "command.result" }>;
@@ -119,9 +120,11 @@ class CommandExchange {
       return;
     }
     const noAnswer = () => this.#settle({ kind: "noAnswer" });
+    const { onWait } = this.#send;
     this.#timers = [
       setTimeout(noAnswer, RESULT_TIMEOUT_MS),
-      setTimeout(this.#send.onSlow, SLOW_COMMAND_MS),
+      setTimeout(() => onWait("slow"), SLOW_COMMAND_MS),
+      setTimeout(() => onWait("verySlow"), VERY_SLOW_COMMAND_MS),
     ];
   }
 

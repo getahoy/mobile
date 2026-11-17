@@ -1,7 +1,7 @@
 import type { SpeakTarget } from "@getahoy/protocol";
 import { randomUUID } from "expo-crypto";
 import type { MacSession } from "@/features/pairing/connection/macSession";
-import type { TalkState } from "../talkState";
+import type { SendWait, TalkState } from "../talkState";
 import { sendCommand } from "./commandExchange";
 import {
   type MacLine,
@@ -21,14 +21,19 @@ export function choiceRequest(parentId: string, number: number): MacRequest {
   return { type: "command.choose", commandId, parentId, number };
 }
 
-// Pressing talk silences the Mac and keeps an open choice alive while the answer is spoken.
-// Stop goes out whatever the setting says now: the Mac may still be speaking under the old one.
+// Pressing talk silences the Mac, cancels a command still running and keeps an open choice alive
+// while the answer is spoken. Stop goes out whatever the setting says now: the Mac may still be
+// speaking under the old one.
 export function signalPress(
   session: MacSession | null,
   choosingFor: string | null,
+  cancelling: string | null,
 ): void {
   if (!session) return;
   session.send({ type: "speech.stop" });
+  if (cancelling) {
+    session.send({ type: "command.cancel", commandId: cancelling });
+  }
   if (choosingFor) {
     session.send({ type: "choice.extend", choiceId: choosingFor });
   }
@@ -42,14 +47,14 @@ export async function askMac(
 ): Promise<TalkState> {
   const { commandId } = request;
   const { onState } = line;
-  onState({ kind: "sending", heard, slow: false, commandId });
-  const onSlow = () =>
-    onState({ kind: "sending", heard, slow: true, commandId });
-  const slowLink = setTimeout(onSlow, SLOW_COMMAND_MS);
+  const onWait = (wait: SendWait) =>
+    onState({ kind: "sending", heard, wait, commandId });
+  onWait("short");
+  const slowLink = setTimeout(() => onWait("slow"), SLOW_COMMAND_MS);
   const session = await openSession(line);
   clearTimeout(slowLink);
   const sentAt = Date.now();
-  const send = { line, request, onSlow };
+  const send = { line, request, onWait };
   const answer = session
     ? await sendCommand(session, send).catch(() => null)
     : null;

@@ -1,5 +1,5 @@
 import { talkCopy } from "./copy/talkCopy.ts";
-import type { TalkBlock, TalkState } from "./talkState";
+import type { SendWait, TalkBlock, TalkState } from "./talkState";
 
 type TalkBarView = {
   label: string;
@@ -21,6 +21,21 @@ function blockReason(block: TalkBlock, mac: string): string {
   return talkCopy.noMac;
 }
 
+function sendingLabel(wait: SendWait, mac: string): string {
+  switch (wait) {
+    case "short":
+      return talkCopy.sending(mac);
+    case "slow":
+      return talkCopy.stillWorking;
+    case "verySlow":
+      return talkCopy.slowConnection;
+    default: {
+      const unhandled: never = wait;
+      return unhandled;
+    }
+  }
+}
+
 function labelOf(state: TalkState, mac: string, durationMs: number): string {
   switch (state.kind) {
     case "listening":
@@ -28,7 +43,7 @@ function labelOf(state: TalkState, mac: string, durationMs: number): string {
     case "understanding":
       return talkCopy.understanding;
     case "sending":
-      return state.slow ? talkCopy.stillWorking : talkCopy.sending(mac);
+      return sendingLabel(state.wait, mac);
     case "ready":
     case "tooShort":
     case "answered":

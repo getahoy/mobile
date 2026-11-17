@@ -1,13 +1,14 @@
 import type { CommandChoice, CommandStatus, Frame } from "@getahoy/protocol";
 import type { MacSession } from "@/features/pairing/connection/macSession";
-import type { ResultDetails } from "../talkState";
+import type { ResultDetails, SendWait } from "../talkState";
 import { type AppActivity, untilActive } from "./appActivity";
 import { type SessionLink, waitForSession } from "./waitForSession";
 
 export const RECEIVED_TIMEOUT_MS = 5000;
-// Covers the Mac asking the interpreter (7 s) and then running an action (5 s).
-export const RESULT_TIMEOUT_MS = 15_000;
+// Covers the Mac's snapshot (up to about 1 s), its wait for the interpreter (12 s) and the action.
+export const RESULT_TIMEOUT_MS = 17_000;
 export const SLOW_COMMAND_MS = 3000;
+export const VERY_SLOW_COMMAND_MS = 8000;
 
 export type CommandAnswer =
   | {
@@ -30,7 +31,7 @@ export type MacLine = { link: SessionLink<MacSession>; activity: AppActivity };
 export type CommandSend = {
   line: MacLine;
   request: MacRequest;
-  onSlow: () => void;
+  onWait: (wait: SendWait) => void;
 };
 
 export async function openSession(line: MacLine): Promise<MacSession | null> {
